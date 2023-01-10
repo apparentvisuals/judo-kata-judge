@@ -107,23 +107,3 @@ function updateTime() {
   }
 }
 </script>
-
-<style>
-html,
-body,
-#__nuxt {
-  width: 100%;
-  height: 100%;
-}
-
-.bg {
-  background-image: radial-gradient(hsla(var(--bc)/.2) 0.5px, hsla(var(--b2)/1) 0.5px);
-  background-size: 5px 5px;
-}
-
-@media print {
-  .table {
-    border: 1px solid lightgray;
-  }
-}
-</style>
