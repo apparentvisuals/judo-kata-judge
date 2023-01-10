@@ -1,158 +1,27 @@
-import { customAlphabet } from 'nanoid';
-import { omit, pick } from 'lodash-es';
-import { moveList, calculateHasMajor, calculateMoveScore } from '~/src/utils';
-import Match from './models/match';
-import Invite from './models/invite';
-
-export const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-
-const KEYSET = {
-  [process.env.AUTH_KEY]: {},
-  [process.env.JC_KEY]: { org: 'jc' },
-  [process.env.AB_KEY]: { org: 'ab' },
-  [process.env.BC_KEY]: { org: 'bc' },
-  [process.env.SK_KEY]: { org: 'sk' },
-  [process.env.MB_KEY]: { org: 'mb' },
-  [process.env.ON_KEY]: { org: 'on' },
-  [process.env.QC_KEY]: { org: 'qc' },
-  [process.env.NB_KEY]: { org: 'nb' },
-  [process.env.NS_KEY]: { org: 'ns' },
-  [process.env.PE_KEY]: { org: 'pe' },
-  [process.env.NL_KEY]: { org: 'nl' },
-  [process.env.YT_KEY]: { org: 'yt' },
-  [process.env.NT_KEY]: { org: 'nt' },
-  [process.env.NU_KEY]: { org: 'nu' },
-};
-
-export function isDev() {
-  return process.env.NODE_ENV !== 'production';
+export function createUpdateMessage(judge) {
+  return `data: ${judge.number};${judge.name};${JSON.stringify(judge.scores)}\n\n`;
 }
 
-export function getToken(event) {
-  const authorization = getHeader(event, 'authorization');
-  if (!authorization) {
-    return;
-  }
-  const [_header, token] = authorization.split(' ');
-  if (_header !== 'Bearer' || !token) {
-    return;
-  }
-  return token;
+export function createReportMessage(report) {
+  return `data: ${JSON.stringify(report)}\n\n`;
 }
 
-export function getAuth(key) {
-  if (key) {
-    const context = KEYSET[key];
-    if (context) {
-      return context;
+export function createSummaryMessage(matInfo) {
+  const matches = matInfo.matches;
+  const summary = matches.map((match) => {
+    const matchSummary = {
+      number: match.number,
+      kata: match.kata,
+      tori: match.tori,
+      uke: match.uke,
     }
-  }
-}
-
-export function objectToEventString(object) {
-  if (object) {
-    return `data: ${JSON.stringify(object)}\n\n`;
-  }
-  return 'data: \n\n';
-}
-
-export function createNoMatchMessage() {
-  return `data: ${JSON.stringify({ error: 'no more matches' })}\n\n`
-}
-
-export async function createInitialUpdateEvent(id, matNumber) {
-  const initialUpdateEvent = {};
-  const tournament = await Invite.getTournament(id);
-  initialUpdateEvent.tournament = pick(tournament.data, ['name', 'org']);
-
-  const updateEvent = await createUpdateEvent(tournament, matNumber);
-  Object.assign(initialUpdateEvent, updateEvent);
-  return initialUpdateEvent;
-}
-
-export async function createUpdateEvent(tournament, matNumber) {
-  const update = {
-    matNumber,
-  };
-  const { match, group, matchIndex, groupIndex } = tournament.getNextMatch(matNumber);
-  if (match) {
-    const matchData = await Match.get(match.id);
-    const scores = matchDataToScores(matchData, group);
-    const judgeState = scores.map((judgeScore) => !!judgeScore.name);
-    update.match = match;
-    update.group = pick(group, ['kata', 'name', 'numberOfJudges', 'disableDivideByHalf', 'disableMajor', 'disableForgotten']);
-    update.matchIndex = matchIndex;
-    update.groupIndex = groupIndex;
-    update.state = judgeState;
-  } else {
-    update.matchIndex = -1;
-    update.groupIndex = -1;
-  }
-  return update;
-}
-
-export async function createInitialSummaryEvent(id) {
-  const initialSummaryEvent = {};
-  const tournament = await Invite.getTournament(id);
-  initialSummaryEvent.tournament = pick(tournament.data, ['name', 'org', 'showJudgeTotals']);
-
-  const summaryEvent = createSummaryEvent(tournament.data);
-  Object.assign(initialSummaryEvent, summaryEvent);
-  return initialSummaryEvent;
-}
-
-export function createSummaryEvent(tournament) {
-  const summary = { results: [] };
-  for (const mat of tournament.mats) {
-    const groups = mat.groups;
-    const groupsSummary = groups.map((group) => {
-      const matches = group.matches;
-      const summary = matches.map((match) => {
-        const matchSummary = {
-          number: match.number,
-          kata: group.kata,
-          tori: match.tori,
-          uke: match.uke,
-          scores: [],
-        }
-        if (match.completed) {
-          matchSummary.scores = match.summary.scores;
-          matchSummary.total = match.summary.total;
-        }
-        return matchSummary;
-      });
-      return { name: group.name, kata: group.kata, matches: summary };
-    });
-    summary.results.push(...groupsSummary);
-  }
-  return summary;
-}
-
-export function createSummaryMessage(tournament) {
-  const summary = { name: tournament.name, org: tournament.org, showJudgeTotals: tournament.showJudgeTotals, results: [] };
-  for (const mat of tournament.mats) {
-    const groups = mat.groups;
-    const groupsSummary = groups.map((group) => {
-      const matches = group.matches;
-      const summary = matches.map((match) => {
-        const matchSummary = {
-          number: match.number,
-          kata: group.kata,
-          tori: match.tori,
-          uke: match.uke,
-          scores: [],
-        }
-        if (match.completed) {
-          matchSummary.scores = match.summary.scores;
-          matchSummary.total = match.summary.total;
-        }
-        return matchSummary;
-      });
-      return { name: group.name, kata: group.kata, matches: summary };
-    });
-    summary.results.push(...groupsSummary);
-  }
-  return summary;
+    if (match.completed) {
+      matchSummary.scores = match.results.summary.values;
+      matchSummary.total = match.results.summary.total;
+    }
+    return matchSummary;
+  })
+  return `data: ${JSON.stringify(summary)}\n\n`;
 }
 
 export function notifyAllClients(clients, message) {
@@ -165,31 +34,39 @@ export function numberOfTechniques(kata) {
   return moveList(kata).length;
 }
 
-export function createReport(group, match) {
-  const kata = group.kata;
-  const numberOfJudges = match.completed ? match.scores.length : group.numberOfJudges;
-  const scores = match.scores;
-  const techniquesCount = numberOfTechniques(kata);
-  const report = _defaultTechniqueScore(numberOfJudges, techniquesCount);
+export function createReport(match) {
+  const judges = match.judges;
+  const techniquesCount = numberOfTechniques(match.kata);
+  const numberOfJudges = match.numberOfJudges;
+  const judgesCount = judges.length;
+  const report = _defaultTechniqueScore(match);
   const summary = {
     total: 0,
-    values: new Array(numberOfJudges),
+    values: new Array(judgesCount).fill(0),
   }
-  let divideByHalf = true;
-  for (let ii = 0; ii < numberOfJudges; ii++) {
-    const judgeScores = scores[ii];
-    if (judgeScores.scores) {
-      let total = 0;
-      const hasMajor = calculateHasMajor(judgeScores.scores);
-      divideByHalf = divideByHalf && hasMajor;
-      for (let jj = 0; jj < techniquesCount; jj++) {
-        const deductions = (judgeScores.scores[jj] && judgeScores.scores[jj].deductions ? judgeScores.scores[jj].deductions : ':::::').split(':');
-        let value = calculateMoveScore(deductions);
-        report[jj].values[ii] = value;
-        total += value;
+  for (const judge of judges) {
+    const judgeIndex = judge.number;
+    let hasMajor = false;
+    let judgeTotal = 0;
+    for (let ii = 0; ii < techniquesCount; ii++) {
+      let moveTotal = judge.scores[ii].value;
+      const [_small1, _small2, _medium, _big, forgotten, correction] = judge.scores[ii].deductions.split(':');
+      if (hasMajor) {
+        moveTotal /= 2;
       }
-      summary.values[ii] = hasMajor && !group.disableDivideByHalf ? total / 2 : total;
+      if (correction === '+') {
+        moveTotal += 0.5;
+      } else if (correction === '-') {
+        moveTotal -= 0.5;
+      }
+      report[ii].values[judgeIndex] = Math.min(Math.max(0, moveTotal), 10);;
+      judgeTotal += moveTotal;
+
+      if (forgotten === '1') {
+        hasMajor = true;
+      }
     }
+    summary.values[judgeIndex] = judgeTotal;
   }
 
   let total = 0;
@@ -197,58 +74,57 @@ export function createReport(group, match) {
     let min = 11;
     let max = -1;
     let subTotal = 0;
-    for (let ii = 0; ii < numberOfJudges; ii++) {
+    for (let ii = 0; ii < judgesCount; ii++) {
       const value = technique.values[ii];
       subTotal += value;
       min = Math.min(min, value);
       max = Math.max(max, value);
     }
-    if (numberOfJudges > 3) {
+    if (match.numberOfJudges > 3) {
       subTotal -= min;
     }
-    if (numberOfJudges > 4) {
+    if (match.numberOfJudges > 4) {
       subTotal -= max;
     }
     technique.total = subTotal;
     total += subTotal;
   });
-  summary.total = divideByHalf && !group.disableDivideByHalf ? total / 2 : total;
+  summary.total = total;
 
-  return { report, summary };
+  return { numberOfJudges, report, summary };
 }
 
-export function isMatchComplete(match) {
+function _defaultTechniqueScore(match) {
+  const kata = match.kata;
   const numberOfJudges = match.numberOfJudges;
-  const scores = match.scores;
-  let completed = true;
-  for (let ii = 0; ii < numberOfJudges; ii++) {
-    if (scores[ii].name == null) {
-      completed = false;
-      break;
-    }
-  }
-  return completed;
-}
-
-export function matchDataToScores(match, group) {
-  // 0 if this match has no submissions
-  // if match is completed then use array size instead of numberOfJudges
-  match = match || {};
-  const numberOfJudges = match.numberOfJudges || group.numberOfJudges || 0;
-  const scores = Array(numberOfJudges);
-  for (let ii = 0; ii < numberOfJudges; ii++) {
-    if (match[ii + 1]) {
-      scores[ii] = match[ii + 1];
-    } else {
-      scores[ii] = {};
-    }
-  }
-  return scores;
-}
-
-function _defaultTechniqueScore(numberOfJudges, techniquesCount) {
-  const report = new Array(techniquesCount).fill().map((_el) => {
-    return { values: new Array(numberOfJudges).fill().map(() => 10) };
+  const techniquesCount = numberOfTechniques(kata);
+  const list = moveList(kata);
+  const report = new Array(techniquesCount).fill().map((el, index) => {
+    return { technique: list[index], values: new Array(numberOfJudges).fill().map(() => 10) };
   });
   return report;
 }
+
+export function moveList(kata) {
+  switch (kata) {
+    case 'nnk3':
+      return NNK3_MOVE_LIST;
+    case 'nnk':
+      return NNK_MOVE_LIST;
+    case 'knk':
+      return KNK_MOVE_LIST;
+    case 'jnk':
+      return JNK_MOVE_LIST;
+    case 'kgj':
+      return KGJ_MOVE_LIST;
+    case 'kink':
+      return KINK_MOVE_LIST;
+  }
+}
+
+const NNK3_MOVE_LIST = ['Opening Ceremony', 'Uki-otoshi', 'Seoi-nage', 'Kata-guruma', 'Uki-goshi', 'Harai-goshi', 'Tsurikomi-goshi', 'Okuri-ashi-harai', 'Sasae-tsurikomi-ashi', 'Uchi-mata', 'Closing Ceremony'];
+const NNK_MOVE_LIST = ['Opening Ceremony', 'Uki-otoshi', 'Seoi-nage', 'Kata-guruma', 'Uki-goshi', 'Harai-goshi', 'Tsurikomi-goshi', 'Okuri-ashi-harai', 'Sasae-tsurikomi-ashi', 'Uchi-mata', 'Tomoe-nage', 'Ura-nage', 'Sumi-gaeshi', 'Yoko-gake', 'Yoko-guruma', 'Uki-waza', 'Closing Ceremony'];
+const KNK_MOVE_LIST = ['Opening Ceremony', 'Kesa-gatame', 'Kata-gatame', 'Kami-shiho-gatame', 'Yoko-shiho-gatame', 'Kuzure-kami-shiho-gatame', 'Kata-juji-jime', 'Hadaka-jime', 'Okuri-eri-jime', 'Kataha-jime', 'Gyaku-juji-jime', 'Ude-garami', 'Ude-hishigi-juji-gatame', 'Ude-hishigi-ude-gatame', 'Ude-hishigi-hiza-hatame', 'Ashi-garami', 'Closing Ceremony'];
+const JNK_MOVE_LIST = ['Opening Ceremony', 'Tsuki-dashi', 'Kata-oshi', 'Ryote-dori', 'Kata-mawashi', 'Ago-oshi', 'Kiri-oroshi', 'Ryokata-oshi', 'Nanami-uchi', 'Katate-dori', 'Katate-age', 'Obi-tori', 'Mune-oshi', 'Tsuki-age', 'Uchi-oroshi', 'Ryogan-tsuki', 'Closing Ceremony'];
+const KGJ_MOVE_LIST = ['Opening Ceremony', 'Ryote-dori', 'Hidari-eri-dori', 'Migi-eri-dori', 'Kataude-dori', 'Ushiro-eri-dori', 'Ushiro-jime', 'Kakae-dori', 'Naname-uchi', 'Ago-tsuki', 'Ganmen-tsuki', 'Mae-geri', 'Yoko-geri', 'Tsukkake', 'Choku-tsuki', 'Naname-tsuki', 'Furi-age', 'Furi-oroshi', 'Morote-tsuki', 'Shomen-zuke', 'Koshi-gamae', 'Haimen-zuke', 'Closing Ceremony'];
+const KINK_MOVE_LIST = ['Opening Ceremony', 'Ryote-dori', 'Tsukkake', 'Suri-age', ' Yoko-uchi', 'Ushiro-dori', 'Tsukkomi', 'Kiri-komi', 'Yoko-tsuki', 'Ryote-dori', 'Sode-tori', 'Tsukkake', 'Tsuki-age', 'Suri-age', ' Yoko-uchi', 'Ke-age', 'Ushiro-dori', 'Tsukkomi', 'Kiri-komi', 'Nuki-gake', 'Kiri-oroshi', 'Closing Ceremony'];
