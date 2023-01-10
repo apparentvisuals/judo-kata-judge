@@ -1,16 +1,21 @@
 import { pick } from 'lodash-es';
 
 import db from '../../db';
-import { moveList } from '../../utils';
+import { getTournamentToken, moveList } from '../../utils';
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
+  const token = getTournamentToken(event);
+  if (!token) {
+    return;
+  }
+
   const mat = parseInt(event.context.params.mat - 1);
 
-  const matchInfo = db.getMatch(mat);
+  const tournament = await db.tournament(token);
+  const matchInfo = tournament.getMatch(mat);
   if (!matchInfo) {
-    return {};
+    throw createError({ statusCode: 400, statusMessage: 'no more matches' })
   }
   const response = pick(matchInfo, ['number', 'kata', 'tori', 'uke']);
-  response.moveList = moveList(matchInfo.kata);
   return response;
 });

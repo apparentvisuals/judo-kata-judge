@@ -1,29 +1,25 @@
 <template>
   <div class="bg bg-base-200 h-full overflow-y-auto">
-    <div class="my-0 mx-auto w-full p-6">
-      <div class="py-6">
-        <label>Mat: {{ mat }}</label>
-        <label class="pl-4">Start Time:</label>
-        <input type="time" v-model="startTime" />
-      </div>
-      <table class="table table-compact w-full" v-for="kata in Object.keys(schedule)">
-        <caption class="p-4">{{ getKataName(kata) }}</caption>
-        <thead>
-          <tr>
-            <th class="w-8"></th>
-            <th>Pair</th>
-            <th class="px-0 w-24 text-center">Start</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="hover" v-for="(match, index) in schedule[kata]">
-            <td>{{ match.number + 1 }}</td>
-            <td>{{ `${match.tori} / ${match.uke}` }}</td>
-            <td>{{ `${match.time.toLocaleTimeString()}` }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="py-2 px-4 bg-base-200 text-center">
+      <h1 class="text-3xl font-bold uppercase">mat {{ mat }} - Start Time <input type="time" v-model="startTime" /></h1>
     </div>
+    <table class="table table-compact w-full" v-for="kata in Object.keys(schedule)">
+      <caption class="p-4">{{ getKataName(kata) }}</caption>
+      <thead>
+        <tr>
+          <th class="w-8"></th>
+          <th>Pair</th>
+          <th class="px-0 w-24 text-center">Start</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="hover" v-for="(match, index) in schedule[kata]">
+          <td>{{ match.number + 1 }}</td>
+          <td>{{ `${match.tori} / ${match.uke}` }}</td>
+          <td>{{ `${match.time.toLocaleTimeString()}` }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -32,8 +28,10 @@ import { addMinutes, format, setHours, setMinutes, setSeconds } from 'date-fns';
 import { getKataName } from '@/src/utils';
 
 const mat = 1;
+const auth = useAuth();
 const start = useState('start', () => setSeconds(new Date(), 0));
 const matches = useState('matches', () => []);
+
 const startTime = computed({
   get() {
     return format(start.value, 'HH:mm');
@@ -46,6 +44,7 @@ const startTime = computed({
     start.value = setSeconds(start.value, 0);
   }
 });
+
 const schedule = computed(() => {
   const schedule = {};
   matches.value.forEach((match, index) => {
@@ -61,7 +60,7 @@ watch(start, (newValue) => {
   updateTime();
 });
 
-matches.value = await $fetch(`/api/${mat}`);
+matches.value = await $fetch(`/api/${mat}`, { headers: { authorization: `Bearer ${auth.value}` } });
 updateTime();
 
 function breakDuration() {

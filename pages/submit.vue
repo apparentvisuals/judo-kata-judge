@@ -1,73 +1,93 @@
 <template>
   <div class="bg bg-base-200 h-full overflow-y-auto">
-    <div class="my-0 mx-auto w-full p-6">
-      <div class="py-6">
-        <label>mat: 1, judge:</label>
-        <input type=" number" class="input" v-model.number="judge" />
+    <div class="py-2 px-4 bg-base-200 text-center">
+      <div v-if="numberOfMats > 0">
+        <div class="text-3xl font-bold uppercase inline-block align-middle h-12 leading-[3rem]">mat&nbsp;</div>
+        <div class="btn-group">
+          <button class="btn" :class="mat === matNumber ? 'btn-active' : ''" v-for="matNumber in numberOfMats"
+            @click.stop="mat = matNumber">
+            {{ matNumber }}
+          </button>
+        </div>
+        <h1 class="text-3xl font-bold uppercase">judge {{ judge }}</h1>
       </div>
-      <table class="table w-full">
-        <thead>
-          <tr>
-            <th>Technique</th>
-            <th class="px-0 w-24 text-center">Small (1)</th>
-            <th class="px-0 w-24 text-center">Small (1)</th>
-            <th class="px-0 w-24 text-center">Medium (3)</th>
-            <th class="px-0 w-24 text-center">Big (5)</th>
-            <th class="px-0 w-24 text-center">Forgotten (0)</th>
-            <th class="px-0 w-24 text-center">Correction</th>
-            <th class="px-0 w-24 text-center">Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="hover" v-for="score in scores">
-            <td>{{ score.technique }}</td>
-            <td v-for="(deduction, index) in score.deductions" class="p-0">
-              <button class="btn btn-lg btn-block block rounded-none bg-transparent border-none"
-                @click.prevent="toggleScore(score, index)">
-                <CheckIcon v-if="deduction === '1'" />
-                <PlusIcon v-if="index === 5 && deduction === '+'" />
-                <MinusIcon v-if="index === 5 && deduction === '-'" />
-              </button>
-            </td>
-            <td class="text-center">{{ score.total }}</td>
-          </tr>
-          <tr>
-            <td>Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="text-center">{{ grandTotal }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <h1 v-if="error" class="text-3xl font-bold uppercase">{{ error }}</h1>
+
     </div>
+    <table v-show="!error" class="table w-full p-4">
+      <thead>
+        <tr>
+          <th>Technique</th>
+          <th class="px-0 w-24 text-center">Small (1)</th>
+          <th class="px-0 w-24 text-center">Small (1)</th>
+          <th class="px-0 w-24 text-center">Medium (3)</th>
+          <th class="px-0 w-24 text-center">Big (5)</th>
+          <th class="px-0 w-24 text-center">Major (0)</th>
+          <th class="px-0 w-24 text-center">Correction</th>
+          <th class="px-0 w-24 text-center">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="hover" v-for="(score, index) in scores">
+          <td>{{ moves[index] }}</td>
+          <td v-for="(deduction, index) in score.deductions" class="p-0">
+            <button class="block h-16 w-full pl-8" @click.prevent="toggleScore(score, index)">
+              <CheckIcon class="w-8" v-if="deduction === '1'" />
+              <PlusIcon class="w-8" v-if="index === 5 && deduction === '+'" />
+              <MinusIcon class="w-8" v-if="index === 5 && deduction === '-'" />
+            </button>
+          </td>
+          <td class="text-center">{{ score.total }}</td>
+        </tr>
+        <tr>
+          <td>Total</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td class="text-center">{{ grandTotal }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script setup>
 import { CheckIcon, PlusIcon, MinusIcon } from '@heroicons/vue/24/outline';
+import { moveList } from '~~/server/utils';
+import { handleServerError } from '~~/src/utils';
 
+const auth = useAuth();
+const error = useState('error', () => '');
+const tournament = useState('tournament', () => { return {}; });
+const match = useState('match', () => { return {}; });
 const judge = useState('judge', () => 1);
 const scores = useState('scores', () => []);
 const majorIndex = useState('majorIndex', () => []);
+const mat = useState('mat', () => 1);
+
 const hasMajor = computed(() => majorIndex.value.find((item) => item));
 const grandTotal = computed(() => scores.value.reduce((acc, value) => acc += value.total, 0));
-let moveList = [];
-let numberOfTechniques = 0;
+const numberOfMats = computed(() => tournament.value.numberOfMats || 0);
+const moves = computed(() => moveList(match.value.kata));
+const numberOfTechniques = computed(() => moves.value.length);
 
-const mat = 1;
-const match = await $fetch(`/api/${mat}/match`);
-if (match) {
-  moveList = match.moveList;
-  numberOfTechniques = moveList.length;
-
-  scores.value = calculateScore();
-  majorIndex.value = new Array(numberOfTechniques).fill(0);
+try {
+  tournament.value = await $fetch('/api/tournament', { headers: { authorization: `Bearer ${auth.value}` } });
+  await _getMatch();
+} catch (err) {
+  error.value = handleServerError(err);
 }
 
+watch(hasMajor, (newValue, oldValue) => {
+  computeScore();
+});
+
+watch(mat, async (newValue) => {
+  await _getMatch();
+});
 
 async function toggleScore(score, index) {
   const deductions = score.deductions;
@@ -96,7 +116,11 @@ async function toggleScore(score, index) {
   }
 
   computeScore();
-  await $fetch(`/api/${mat}/${judge.value}/submit-score`, { method: 'POST', body: { move: score.number, deductions: score.deductions.join(':'), total: score.origTotal } });
+  await $fetch(`/api/${mat.value}/${judge.value}`, {
+    method: 'POST',
+    body: { move: score.number, deductions: score.deductions.join(':'), total: score.origTotal },
+    headers: { authorization: `Bearer ${auth.value}` }
+  });
 }
 
 function computeScore() {
@@ -133,31 +157,34 @@ function computeScore() {
   }
 }
 
-watch(hasMajor, (newValue, oldValue) => {
-  computeScore();
-});
+function calculateScore(judgeInfo) {
+  console.log();
+  const count = numberOfTechniques.value;
+  const newMajorIndex = new Array(count);
+  const newScores = new Array(count);
+  for (let ii = 0; ii < count; ii++) {
+    const score = judgeInfo.scores[ii];
+    const deductions = score.deductions.split(':');
+    const total = score.value;
+    newScores[ii] = { number: ii, deductions, total };
+    newMajorIndex[ii] = deductions[4] === '1';
+  }
+  // return new Array(numberOfTechniques.value).fill().map((score, index) => {
+  //   return { number: index, deductions: judgeInfo.scores[index].deductions.split(':'), total: judgeInfo.scores[index].value };
+  // });
+  return { newScores, newMajorIndex };
+}
 
-watch(judge, () => {
-  scores.value = calculateScore();
-});
-
-function calculateScore() {
-  return new Array(numberOfTechniques).fill().map((score, index) => {
-    return { number: index, technique: moveList[index], deductions: Array(6).fill(''), total: 10 };
-  });
+async function _getMatch() {
+  try {
+    error.value = '';
+    match.value = await $fetch(`/api/${mat.value}/match`, { headers: { authorization: `Bearer ${auth.value}` } });
+    const judgeInfo = await $fetch(`/api/${mat.value}/${judge.value}`, { headers: { authorization: `Bearer ${auth.value}` } });
+    const { newScores, newMajorIndex } = calculateScore(judgeInfo);
+    scores.value = newScores;
+    majorIndex.value = newMajorIndex;
+  } catch (err) {
+    error.value = handleServerError(err);
+  }
 }
 </script>
-
-<style>
-html,
-body,
-#__nuxt {
-  width: 100%;
-  height: 100%;
-}
-
-.bg {
-  background-image: radial-gradient(hsla(var(--bc)/.2) 0.5px, hsla(var(--b2)/1) 0.5px);
-  background-size: 5px 5px;
-}
-</style>

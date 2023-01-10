@@ -12,5 +12,16 @@ export function getKataName(kata) {
       return 'Kodokan-goshin-jutsu';
     case 'kink':
       return 'Kime-no-kata';
+    default:
+      return '';
   }
 };
+
+export function handleServerError(err) {
+  if (err.response) {
+    console.log(err.response._data.message);
+    return err.response._data.message;
+  } else {
+    return err.message;
+  }
+}

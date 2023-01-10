@@ -16,7 +16,7 @@ export default class Clients {
   get count() {
     return this.#numberOfClients;
   }
-  get clients() {
+  get list() {
     return this.#clients.values();
   }
 }
