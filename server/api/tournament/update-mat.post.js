@@ -14,8 +14,10 @@ export default defineEventHandler(async (event) => {
   }
   const { mat, numberOfJudges } = await readBody(event);
   try {
-    const response = await db.updateMat(token, mat, numberOfJudges);
-    return pick(response, 'number', 'numberOfJudges', 'matches');
+    const tournament = await db.tournament(token);
+    tournament.updateMat(mat, numberOfJudges);
+    await tournament.save();
+    return tournament.data;
   } catch (err) {
     switch (err.message) {
       case 'no such tournament found':

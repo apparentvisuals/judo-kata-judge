@@ -17,10 +17,7 @@ body,
   z-index: 2;
 }
 
-table,
-tr,
 td {
   border: 1px solid;
-  border-collapse: collapse;
   @apply border-base-200;
 }

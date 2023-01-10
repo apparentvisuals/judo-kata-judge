@@ -3,7 +3,7 @@
     <div class="py-2 px-4 bg-base-200 text-center">
       <h1 class="text-3xl font-bold uppercase">mat {{ mat }} - Start Time <input type="time" v-model="startTime" /></h1>
     </div>
-    <table class="table table-compact w-full" v-for="kata in Object.keys(schedule)">
+    <table class="table w-full" v-for="kata in Object.keys(schedule)">
       <caption class="p-4">{{ getKataName(kata) }}</caption>
       <thead>
         <tr>
@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="hover" v-for="(match, index) in schedule[kata]">
+        <tr class="hover" v-for="match in schedule[kata]">
           <td>{{ match.number + 1 }}</td>
           <td>{{ `${match.tori} / ${match.uke}` }}</td>
           <td>{{ `${match.time.toLocaleTimeString()}` }}</td>
@@ -27,10 +27,10 @@
 import { addMinutes, format, setHours, setMinutes, setSeconds } from 'date-fns';
 import { getKataName } from '@/src/utils';
 
-const mat = 1;
 const auth = useAuth();
 const start = useState('start', () => setSeconds(new Date(), 0));
 const matches = useState('matches', () => []);
+const mat = useState('mat', () => 1);
 
 const startTime = computed({
   get() {
@@ -57,11 +57,11 @@ const schedule = computed(() => {
 });
 
 watch(start, (newValue) => {
-  updateTime();
+  updateTime(newValue);
 });
 
-matches.value = await $fetch(`/api/${mat}`, { headers: { authorization: `Bearer ${auth.value}` } });
-updateTime();
+matches.value = await $fetch(`/api/${mat.value}`, { headers: { authorization: `Bearer ${auth.value}` } });
+updateTime(start.value);
 
 function breakDuration() {
   return 10;
@@ -91,11 +91,11 @@ function matchTime(prevTime, kata, breakDuration) {
   return addMinutes(prevTime, dur);
 }
 
-function updateTime() {
+function updateTime(start) {
   if (matches.value) {
     let prevKata = null;
-    let prevTime = start.value;
-    matches.value.forEach((match, index) => {
+    let prevTime = start;
+    matches.value.forEach(match => {
       if (prevKata != null && prevKata !== match.kata) {
         match.time = matchTime(prevTime, prevKata, breakDuration());
       } else {
