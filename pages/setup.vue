@@ -44,6 +44,5 @@ async function submit() {
   const result = await $fetch(`/api/tournament`, { method: 'POST', body: { name: name.value, numberOfMats: numberOfMats.value }, headers: { authorization: `Bearer ${code.value}` } });
   auth.value = result.id;
   created.value = true;
-  // navigateTo('/tournament');
 }
 </script>

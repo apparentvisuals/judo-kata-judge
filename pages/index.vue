@@ -1,15 +1,16 @@
 <template>
-  <div class="bg bg-base-200 h-full overflow-y-auto">
-    <div class="py-2 px-4 bg-base-200 text-center">
-      <div v-if="numberOfMats > 0">
-        <div class="text-3xl font-bold uppercase inline-block align-middle h-12 leading-[3rem]">mat&nbsp;</div>
-        <div class="btn-group">
-          <button class="btn" :class="mat === matNumber ? 'btn-active' : ''" v-for="matNumber in numberOfMats"
-            @click.stop="mat = matNumber">
-            {{ matNumber }}
-          </button>
-        </div>
+  <div v-if="!mat" class="bg bg-base-200 h-full flex flex-col">
+    <div class="py-2 px-4 bg-base-200 text-center w-full">
+      <h1 v-if="error" class="text-3xl font-bold uppercase">{{ error }}</h1>
+    </div>
+    <div class="m-auto max-w-xs max-h-96">
+      <div class="btn-group">
+        <button class="btn" v-for="aMat in numberOfMats" @click.prevent="mat = aMat">{{ `Mat ${aMat}` }}</button>
       </div>
+    </div>
+  </div>
+  <div v-else class="bg bg-base-200 h-full overflow-y-auto">
+    <div class="py-2 px-4 bg-base-200 text-center">
       <h1 v-if="error" class="text-3xl font-bold uppercase">{{ error }}</h1>
     </div>
     <table class="table w-full" v-for="kata in Object.keys(scores)">
@@ -52,7 +53,7 @@ const error = useState('error', () => '');
 const tournament = useState('tournament', () => { return {}; });
 const scores = useState('scores', () => { return {}; });
 const numberOfMats = computed(() => tournament.value.numberOfMats);
-const mat = useState('mat', () => 1);
+const mat = useState('mat', () => 0);
 
 try {
   tournament.value = await $fetch('/api/tournament', { headers: { authorization: `Bearer ${auth.value}` } });
@@ -60,15 +61,12 @@ try {
   error.value = handleServerError(err);
 }
 
-let events;
-if (process.client) {
-  _subscribe(mat.value);
-}
-
 watch(mat, (newValue) => {
   _subscribe(newValue);
-})
+});
 
+
+let events;
 function _subscribe(matNumber) {
   if (events) {
     events.close();
@@ -100,17 +98,3 @@ function _subscribe(matNumber) {
   };
 }
 </script>
-
-<style>
-html,
-body,
-#__nuxt {
-  width: 100%;
-  height: 100%;
-}
-
-.bg {
-  background-image: radial-gradient(hsla(var(--bc)/.2) 0.5px, hsla(var(--b2)/1) 0.5px);
-  background-size: 5px 5px;
-}
-</style>

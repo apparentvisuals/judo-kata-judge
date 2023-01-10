@@ -169,9 +169,6 @@ function calculateScore(judgeInfo) {
     newScores[ii] = { number: ii, deductions, total };
     newMajorIndex[ii] = deductions[4] === '1';
   }
-  // return new Array(numberOfTechniques.value).fill().map((score, index) => {
-  //   return { number: index, deductions: judgeInfo.scores[index].deductions.split(':'), total: judgeInfo.scores[index].value };
-  // });
   return { newScores, newMajorIndex };
 }
 
