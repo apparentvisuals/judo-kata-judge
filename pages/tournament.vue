@@ -11,21 +11,23 @@
       <h1 class="text-3xl font-bold uppercase">{{ error }}</h1>
     </div>
     <div class="flex flex-row gap-2">
-      <div v-for="mat in tournament.mats" class="w-1/3 p-2 bg-base-100">
-        <div class="bg-base-100">
-          <h2 class="text-lg font-semibold">Mat {{ mat.number + 1 }}</h2>
-          <table class="table table-compact">
-            <thead>
-              <tr>
-                <th class="w-10" v-for="index in 5">{{ index }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td v-for="code in mat.judgeCodes">{{ code }}</td>
-              </tr>
-            </tbody>
-          </table>
+      <div v-for="mat in tournament.mats" class="w-1/3 p-6 bg-base-100 rounded-box">
+        <div>
+          <div class="flex justify-between mb-2">
+            <h2 class="text-lg font-semibold">Mat {{ mat.number + 1 }}</h2>
+            <table class="table table-compact">
+              <thead>
+                <tr>
+                  <th class="w-10 text-center" v-for="index in 5">{{ index }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td v-for="code in mat.judgeCodes">{{ code }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <button class="btn w-full mb-2" @click.prevent="showUpdate(mat.number)">Update</button>
           <button class="btn w-full mb-2" @click.prevent="showAdd(mat.number)">Add Match</button>
         </div>
