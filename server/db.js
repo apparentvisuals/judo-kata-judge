@@ -30,22 +30,35 @@ class Tournament {
     return mat.matches.find((match) => !match.completed);
   }
 
+  getJudgeNumber(matNumber, judge) {
+    const mat = this.getMat(matNumber);
+    const judgeIndex = mat.judges.indexOf(judge);
+    return judgeIndex + 1;
+  }
+
   async updateMat(matNumber, numberOfJudges) {
     const mat = this.getMat(matNumber);
     if (!mat) {
       return;
     }
     mat.numberOfJudges = numberOfJudges;
-    // const matInfo = {
-    //   number: mats.length,
-    //   numberOfJudges,
-    //   matches: [],
-    //   clients: new Clients(),
-    //   reportClients: new Clients(),
-    //   summaryClients: new Clients(),
-    // }
-    // tournament.mats.push(matInfo);
-    await this.save();
+    mat.judgeCodes = Array(5).fill().map(() => nanoid(4));
+    switch (numberOfJudges) {
+      case 5:
+        break;
+      case 4:
+        mat.judgeCodes[0] = '-';
+        break;
+      case 3:
+        mat.judgeCodes[0] = mat.judgeCodes[4] = '-';
+        break;
+      case 2:
+        mat.judgeCodes[0] = mat.judgeCodes[1] = mat.judgeCodes[4] = '-';
+        break;
+      case 1:
+        mat.judgeCodes[0] = mat.judgeCodes[1] = mat.judgeCodes[3] = mat.judgeCodes[4] = '-';
+        break;
+    }
     return mat;
   }
 

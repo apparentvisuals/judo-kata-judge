@@ -158,7 +158,6 @@ function computeScore() {
 }
 
 function calculateScore(judgeInfo) {
-  console.log();
   const count = numberOfTechniques.value;
   const newMajorIndex = new Array(count);
   const newScores = new Array(count);
