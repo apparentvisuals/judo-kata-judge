@@ -1,0 +1,130 @@
+<template>
+  <div class="bg bg-base-200 h-full overflow-y-auto">
+    <div class="my-0 mx-auto w-full p-6">
+      <div class="py-6">
+        <label>Mat: {{ mat }}</label>
+        <label class="pl-4">Start Time:</label>
+        <input type="time" v-model="startTime" />
+      </div>
+      <table class="table table-compact w-full" v-for="kata in Object.keys(schedule)">
+        <caption class="p-4">{{ getKataName(kata) }}</caption>
+        <thead>
+          <tr>
+            <th class="w-8"></th>
+            <th>Pair</th>
+            <th class="px-0 w-24 text-center">Start</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hover" v-for="(match, index) in schedule[kata]">
+            <td>{{ match.number + 1 }}</td>
+            <td>{{ `${match.tori} / ${match.uke}` }}</td>
+            <td>{{ `${match.time.toLocaleTimeString()}` }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { addMinutes, format, setHours, setMinutes, setSeconds } from 'date-fns';
+import { getKataName } from '@/src/utils';
+
+const mat = 1;
+const start = useState('start', () => setSeconds(new Date(), 0));
+const matches = useState('matches', () => []);
+const startTime = computed({
+  get() {
+    return format(start.value, 'HH:mm');
+  },
+  set(value) {
+    const [hr, min] = value.split(':');
+    console.log(hr, min);
+    start.value = setHours(start.value, parseInt(hr));
+    start.value = setMinutes(start.value, parseInt(min));
+    start.value = setSeconds(start.value, 0);
+  }
+});
+const schedule = computed(() => {
+  const schedule = {};
+  matches.value.forEach((match, index) => {
+    if (!schedule[match.kata]) {
+      schedule[match.kata] = [];
+    }
+    schedule[match.kata].push(match);
+  });
+  return schedule;
+});
+
+watch(start, (newValue) => {
+  updateTime();
+});
+
+matches.value = await $fetch(`/api/${mat}`);
+updateTime();
+
+function breakDuration() {
+  return 10;
+}
+
+function duration(kata) {
+  switch (kata) {
+    case 'nnk3':
+      return 4;
+    case 'nnk':
+      return 7;
+    case 'knk':
+      return 10;
+    case 'jnk':
+      return 9;
+    case 'kgj':
+      return 8;
+    case 'kink':
+      return 11;
+    default:
+      return 0;
+  }
+}
+
+function matchTime(prevTime, kata, breakDuration) {
+  const dur = breakDuration ? duration(kata) + breakDuration : duration(kata);
+  return addMinutes(prevTime, dur);
+}
+
+function updateTime() {
+  if (matches.value) {
+    let prevKata = null;
+    let prevTime = start.value;
+    matches.value.forEach((match, index) => {
+      if (prevKata != null && prevKata !== match.kata) {
+        match.time = matchTime(prevTime, prevKata, breakDuration());
+      } else {
+        match.time = matchTime(prevTime, prevKata);
+      }
+      prevKata = match.kata;
+      prevTime = match.time;
+    });
+  }
+}
+</script>
+
+<style>
+html,
+body,
+#__nuxt {
+  width: 100%;
+  height: 100%;
+}
+
+.bg {
+  background-image: radial-gradient(hsla(var(--bc)/.2) 0.5px, hsla(var(--b2)/1) 0.5px);
+  background-size: 5px 5px;
+}
+
+@media print {
+  .table {
+    border: 1px solid lightgray;
+  }
+}
+</style>
