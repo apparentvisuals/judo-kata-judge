@@ -2,12 +2,21 @@ import db from '../../../db';
 import { notifyAllClients, createUpdateMessage, createReportMessage, createReport } from '../../../utils';
 
 export default defineEventHandler(async (event) => {
+  const authorization = getHeader(event, 'authorization');
+  if (!authorization) {
+    return;
+  }
+  const [_header, token] = authorization.split(' ');
+  if (_header !== 'Bearer' || !token) {
+    return;
+  }
+
   const mat = parseInt(event.context.params.mat - 1);
   const judge = parseInt(event.context.params.judge - 1);
   const { move, deductions, total } = await readBody(event);
 
-  const matInfo = db.getMat(mat);
-  const matchInfo = db.getMatch(mat);
+  const tournament = await db.tournament(token);
+  const matchInfo = tournament.getMatch(mat);
   if (!matchInfo) {
     return {};
   }
@@ -19,9 +28,11 @@ export default defineEventHandler(async (event) => {
     judgeInfo.majorIndex[move] = move + 1;
   }
   matchInfo.results = createReport(matchInfo);
+  await tournament.save();
 
-  notifyAllClients(matInfo.clients.clients, createUpdateMessage(judgeInfo));
-  notifyAllClients(matInfo.reportClients.clients, createReportMessage(matchInfo.results));
+  const clients = db.clients(`${token}-${mat}`);
+  notifyAllClients(clients.match.list, createUpdateMessage(judgeInfo));
+  notifyAllClients(clients.report.list, createReportMessage(matchInfo.results));
 
   return {};
 });

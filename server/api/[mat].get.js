@@ -2,24 +2,33 @@ import { pick } from 'lodash-es';
 
 import db from '../db';
 
-db.createTournament('Test Tournament', 1);
-db.addMat(5);
 
-db.addMatch(0, 'kgj', 'John Morris', 'Stephen Duran');
-db.addMatch(0, 'kgj', 'Matt Roots', 'Drew Roots');
-db.addMatch(0, 'jnk', 'Massey Tanaka', 'Francis Au-Yeung');
-db.addMatch(0, 'knk', 'Jeremy Le Bris', 'Layton Keely');
-db.addMatch(0, 'nnk', 'Reza Nickmanesh', 'Anthony Jewitt');
-db.addMatch(0, 'nnk3', 'Sanghoon Lee', 'Jeremy Grant');
-db.addMatch(0, 'nnk3', 'Benny Lo', 'Reza Nickmanesh');
-db.addMatch(0, 'nnk3', 'Justin Lang', 'Brad Thiel');
-db.addMatch(0, 'nnk3', 'Anthony Jewitt', 'Reza Nickmanesh');
+export default defineEventHandler(async (event) => {
+  // await db.createTournament('Test Tournament', 1);
+  // await db.addMat(5);
 
+  // await db.addMatch(0, 'kgj', 'John Morris', 'Stephen Duran');
+  // await db.addMatch(0, 'kgj', 'Matt Roots', 'Drew Roots');
+  // await db.addMatch(0, 'jnk', 'Massey Tanaka', 'Francis Au-Yeung');
+  // await db.addMatch(0, 'knk', 'Jeremy Le Bris', 'Layton Keely');
+  // await db.addMatch(0, 'nnk', 'Reza Nickmanesh', 'Anthony Jewitt');
+  // await db.addMatch(0, 'nnk3', 'Sanghoon Lee', 'Jeremy Grant');
+  // await db.addMatch(0, 'nnk3', 'Benny Lo', 'Reza Nickmanesh');
+  // await db.addMatch(0, 'nnk3', 'Justin Lang', 'Brad Thiel');
+  // await db.addMatch(0, 'nnk3', 'Anthony Jewitt', 'Reza Nickmanesh');
 
-export default defineEventHandler((event) => {
+  const authorization = getHeader(event, 'authorization');
+  if (!authorization) {
+    return;
+  }
+  const [_header, token] = authorization.split(' ');
+  if (_header !== 'Bearer' || !token) {
+    return;
+  }
+
   const mat = parseInt(event.context.params.mat - 1);
 
-  const matInfo = db.getMat(mat);
+  const matInfo = await db.getMat(token, mat);
   if (!matInfo) {
     return {};
   }

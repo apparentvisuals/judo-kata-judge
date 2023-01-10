@@ -1,3 +1,19 @@
+export function isDev() {
+  process.env.NODE_ENV !== 'production';
+}
+
+export function getTournamentToken(event) {
+  const authorization = getHeader(event, 'authorization');
+  if (!authorization) {
+    return;
+  }
+  const [_header, token] = authorization.split(' ');
+  if (_header !== 'Bearer' || !token) {
+    return;
+  }
+  return token;
+}
+
 export function createUpdateMessage(judge) {
   return `data: ${judge.number};${judge.name};${JSON.stringify(judge.scores)}\n\n`;
 }
@@ -14,6 +30,7 @@ export function createSummaryMessage(matInfo) {
       kata: match.kata,
       tori: match.tori,
       uke: match.uke,
+      scores: [],
     }
     if (match.completed) {
       matchSummary.scores = match.results.summary.values;
@@ -36,8 +53,10 @@ export function numberOfTechniques(kata) {
 
 export function createReport(match) {
   const judges = match.judges;
-  const techniquesCount = numberOfTechniques(match.kata);
+  const kata = match.kata;
+  const number = match.number;
   const numberOfJudges = match.numberOfJudges;
+  const techniquesCount = numberOfTechniques(kata);
   const judgesCount = judges.length;
   const report = _defaultTechniqueScore(match);
   const summary = {
@@ -91,7 +110,7 @@ export function createReport(match) {
   });
   summary.total = total;
 
-  return { numberOfJudges, report, summary };
+  return { numberOfJudges, kata, number, report, summary };
 }
 
 function _defaultTechniqueScore(match) {
@@ -119,6 +138,7 @@ export function moveList(kata) {
       return KGJ_MOVE_LIST;
     case 'kink':
       return KINK_MOVE_LIST;
+    default: return [];
   }
 }
 

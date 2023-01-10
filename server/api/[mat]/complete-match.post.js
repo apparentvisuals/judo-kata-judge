@@ -1,24 +1,30 @@
 import db from '../../db';
 
-import { notifyAllClients, createSummaryMessage, createReportMessage } from '../../utils';
+import { notifyAllClients, createSummaryMessage, createReportMessage, getTournamentToken } from '../../utils';
 
 export default defineEventHandler(async (event) => {
-  const mat = parseInt(event.context.params.mat - 1);
+  const token = getTournamentToken(event);
+  if (!token) {
+    return;
+  }
 
-  const matInfo = db.getMat(mat);
-  const matchInfo = db.getMatch(mat);
+  const mat = parseInt(event.context.params.mat - 1);
+  const tournament = await db.tournament(token);
+  const matInfo = tournament.getMat(mat);
+  const matchInfo = tournament.getMatch(mat);
 
   if (matchInfo) {
     matchInfo.completed = true;
-
-    const nextMatch = db.getMatch(mat);
+    await tournament.save();
+    const nextMatch = tournament.getMatch(mat);
+    const clients = db.clients(`${token}-${mat}`);
     if (nextMatch) {
-      notifyAllClients(matInfo.reportClients.clients, createReportMessage(nextMatch.results));
+      notifyAllClients(clients.report.list, createReportMessage(nextMatch.results));
     } else {
-      notifyAllClients(matInfo.reportClients.clients, `data: ${JSON.stringify({ error: 'no more matches' })}\n\n`);
+      notifyAllClients(clients.report.list, `data: ${JSON.stringify({ error: 'no more matches' })}\n\n`);
     }
 
-    notifyAllClients(matInfo.summaryClients.clients, createSummaryMessage(matInfo));
+    notifyAllClients(clients.summary.list, createSummaryMessage(matInfo));
   }
 
   return {};
