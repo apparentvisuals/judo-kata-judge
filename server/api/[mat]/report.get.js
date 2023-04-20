@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import db from '../../db';
-import { createReportMessage, getTournamentToken } from '../../utils';
+import { createReportMessage, getToken } from '../../utils';
 
 export default defineEventHandler(async (event) => {
   const { token } = getQuery(event);

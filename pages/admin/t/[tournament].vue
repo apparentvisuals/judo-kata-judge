@@ -37,10 +37,11 @@
               <th class="w-4">#</th>
               <th>Name</th>
               <th class="text-right">Kata</th>
+              <th class="w-6"></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="match in mat.matches">
+            <tr v-for="(match, index) in mat.matches">
               <td>{{ match.number + 1 }}</td>
               <td>
                 <div>{{ match.tori }}</div>
@@ -48,6 +49,11 @@
               </td>
               <td>
                 <div class="text-right">{{ getKataName(match.kata) }}</div>
+              </td>
+              <td>
+                <button class="btn btn-square btn-sm" alt="delete match">
+                  <XMarkIcon class="w-4 h-4" @click.prevent="delMatch(mat.number, index)" />
+                </button>
               </td>
             </tr>
           </tbody>
@@ -106,13 +112,13 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script setup>
+import { XMarkIcon } from '@heroicons/vue/24/outline';
 import { getKataName, handleServerError } from '~~/src/utils';
 
-const auth = useAuth();
+const admin = useAdmin();
 const tournament = useState('tournament', () => { return {} });
 const showAddMatch = useState('showAddMatch', () => false);
 const mat = useState('mat', () => 0);
@@ -122,9 +128,10 @@ const uke = useState('uke', () => '');
 const error = useState('error', () => '');
 const showUpdateMat = useState('showUpdateMat', () => false);
 const numberOfJudges = useState('numberOfJudges', () => 5);
+const route = useRoute();
 
 try {
-  tournament.value = await $fetch(`/api/tournament`, { headers: { authorization: `Bearer ${auth.value}` } });
+  tournament.value = await $fetch(`/api/tournament/${route.params.tournament}`, { headers: { authorization: `Bearer ${admin.value}` } });
 } catch (err) {
   error.value = handleServerError(err);
 }
@@ -141,7 +148,7 @@ async function showUpdate(selectedMat) {
 }
 
 async function addMatch() {
-  const response = await $fetch(`/api/tournament/add-match`, { method: 'POST', body: { mat: mat.value, kata: kata.value, tori: tori.value, uke: uke.value }, headers: { authorization: `Bearer ${auth.value}` } });
+  const response = await $fetch(`/api/tournament/${route.params.tournament}/m/${mat.value}/match`, { method: 'POST', body: { kata: kata.value, tori: tori.value, uke: uke.value }, headers: { authorization: `Bearer ${admin.value}` } });
   tournament.value = response;
   showAddMatch.value = false;
   tori.value = '';
@@ -149,8 +156,12 @@ async function addMatch() {
 }
 
 async function updateMat() {
-  tournament.value = await $fetch(`/api/tournament/update-mat`, { method: 'POST', body: { mat: mat.value, numberOfJudges: numberOfJudges.value }, headers: { authorization: `Bearer ${auth.value}` } });
+  tournament.value = await $fetch(`/api/tournament/${route.params.tournament}/update-mat`, { method: 'POST', body: { mat: mat.value, numberOfJudges: numberOfJudges.value }, headers: { authorization: `Bearer ${admin.value}` } });
   showUpdateMat.value = false;
 }
 
+async function delMatch(matNumber, matchId) {
+  const response = await $fetch(`/api/tournament/${route.params.tournament}/m/${matNumber}/match/${matchId}`, { method: 'DELETE', headers: { authorization: `Bearer ${admin.value}` } });
+  tournament.value = response;
+}
 </script>

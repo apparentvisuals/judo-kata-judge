@@ -1,20 +1,22 @@
 import { pick } from 'lodash-es';
 
-import db from '../../db';
-import { isDev } from '../../utils';
+import db from '../../../db';
+import { getToken } from '../../../utils';
+import { getAuth } from '../../../utils/auth-key';
 
 export default defineEventHandler(async (event) => {
-  const authorization = getHeader(event, 'authorization');
-  if (!authorization) {
-    return;
+  const token = getToken(event);
+  if (!token) {
+    throw createError({ statusCode: 401, statusMessage: 'unauthorized' });
   }
-  const [_header, token] = authorization.split(' ');
-  if (_header !== 'Bearer' || !token) {
-    return;
+  if (token !== getAuth()) {
+    throw createError({ statusCode: 403, statusMessage: 'forbidden' });
   }
+
+  const tournamentId = getRouterParam(event, 'tournament');
   const { mat, numberOfJudges } = await readBody(event);
   try {
-    const tournament = await db.tournament(token);
+    const tournament = await db.tournament(tournamentId);
     tournament.updateMat(mat, numberOfJudges);
     await tournament.save();
     return tournament.data;

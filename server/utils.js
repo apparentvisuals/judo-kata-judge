@@ -2,7 +2,7 @@ export function isDev() {
   process.env.NODE_ENV !== 'production';
 }
 
-export function getTournamentToken(event) {
+export function getToken(event) {
   const authorization = getHeader(event, 'authorization');
   if (!authorization) {
     return;

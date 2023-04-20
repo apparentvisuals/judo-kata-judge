@@ -1,7 +1,7 @@
 import db from '../../db';
 
 export default defineEventHandler(async (event) => {
-  const token = getTournamentToken(event);
+  const token = getToken(event);
   if (!token) {
     return;
   }

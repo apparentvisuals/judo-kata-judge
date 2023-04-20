@@ -93,6 +93,19 @@ class Tournament {
     return match;
   }
 
+  async deleteMatch(matNumber, matchNumber) {
+    const mat = this.getMat(matNumber);
+    if (!mat) {
+      return;
+    }
+    const matches = mat.matches;
+    matches.splice(matchNumber, 1);
+  }
+
+  get id() {
+    return this.#id;
+  }
+
   get data() {
     return this.#tournament;
   }
@@ -106,7 +119,6 @@ class DB {
   async createTournament(name = 'Tournament 1', numberOfMats = 1) {
     const id = nanoid(6);
     const tournamentData = {
-      id,
       name,
       numberOfMats,
       mats: Array(numberOfMats).fill(0).map((v, index) => _createMatInfo(index)),
@@ -138,6 +150,18 @@ class DB {
       });
     }
     return clients.get(key);
+  }
+
+  async getAllTournaments() {
+    const tournamentsIds = await useStorage('kata').getKeys();
+    const loadTournaments = tournamentsIds.map((id) => {
+      return (async () => {
+        const tournament = await this.tournament(id);
+        return { id: tournament.id, name: tournament.data.name };
+      })();
+    });
+    const tournaments = await Promise.all(loadTournaments);
+    return tournaments;
   }
 
   async updateMat(id, mat, numberOfJudges) {

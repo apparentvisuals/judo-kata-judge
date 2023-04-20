@@ -7,14 +7,18 @@ export default defineNuxtConfig({
     dataValue: 'theme', // activate data-theme in <html> tag
     classSuffix: '',
   },
-  build: {
-    transpile: ['@heroicons/vue']
-  },
+  // build: {
+  //   transpile: ['@heroicons/vue']
+  // },
   nitro: {
     storage: {
       'kata': {
         driver: 'fs',
         base: './data/db'
+      },
+      'archive': {
+        driver: 'fs',
+        base: './data/archive'
       }
     }
   },
