@@ -1,11 +1,14 @@
 {
+  "name": "kata-judge",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "start": "node .output/server/index.mjs"
   },
   "devDependencies": {
     "@heroicons/vue": "^2.0.13",
