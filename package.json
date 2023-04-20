@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "start": "node .output/server/index.mjs"
   },
-  "devDependencies": {
+  "devDependencies": {},
+  "dependencies": {
     "@heroicons/vue": "^2.0.17",
     "@nuxtjs/color-mode": "^3.2.0",
     "@nuxtjs/tailwindcss": "^6.6.6",
@@ -18,12 +19,11 @@
     "daisyui": "^2.51.5",
     "nuxt": "^3.4.1",
     "postcss": "^8.4.23",
-    "vue": "^3.2.47"
-  },
-  "dependencies": {
+    "vue": "^3.2.47",
     "date-fns": "^2.29.3",
     "lodash-es": "^4.17.21",
     "nanoid": "^4.0.2",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "vue-router": "^4.1.6"
   }
 }
