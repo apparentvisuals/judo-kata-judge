@@ -7,10 +7,8 @@
     "dev": "AUTH_KEY=f9005f7426814b42 nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
     "start": "node .output/server/index.mjs"
   },
-  "devDependencies": {},
   "dependencies": {
     "@heroicons/vue": "^2.0.17",
     "@nuxtjs/color-mode": "^3.2.0",
@@ -23,7 +21,6 @@
     "date-fns": "^2.29.3",
     "lodash-es": "^4.17.21",
     "nanoid": "^4.0.2",
-    "uuid": "^9.0.0",
-    "vue-router": "^4.1.6"
+    "uuid": "^9.0.0"
   }
 }
