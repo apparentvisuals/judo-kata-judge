@@ -1,13 +1,36 @@
-export default defineNuxtRouteMiddleware(async (to, from) => {
+export default defineNuxtRouteMiddleware((to, from) => {
   const auth = useAuth();
-  if (to.path !== '/code' && to.path !== '/setup') {
+  const admin = useAdmin();
+  console.log(to.path)
+  if (to.path.startsWith('/admin')) {
+    if (to.path === '/admin/code') {
+      return;
+    }
+    console.log(admin.value);
+    if (admin.value === '') {
+      console.log('navigateTo')
+      return navigateTo(
+        {
+          path: '/admin/code',
+          query: {
+            from: to.path,
+          }
+        },
+        { replace: true }
+      );
+    }
+  }
+  else if (to.path !== '/code' && to.path !== '/setup') {
     if (auth.value === '') {
-      await navigateTo({
-        path: '/code',
-        query: {
-          from: to.path,
-        }
-      });
+      return navigateTo(
+        {
+          path: '/code',
+          query: {
+            from: to.path,
+          }
+        },
+        { replace: true }
+      );
     }
   }
 })

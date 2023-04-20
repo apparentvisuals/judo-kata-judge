@@ -9,6 +9,9 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
+      "env": {
+        "AUTH_KEY": "f9005f7426814b42"
+      },
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",

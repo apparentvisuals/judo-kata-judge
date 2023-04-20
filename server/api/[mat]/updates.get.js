@@ -4,7 +4,7 @@ import db from '../../db';
 import { createUpdateMessage } from '../../utils';
 
 export default defineEventHandler(async (event) => {
-  const token = getTournamentToken(event);
+  const token = getToken(event);
   if (!token) {
     return;
   }

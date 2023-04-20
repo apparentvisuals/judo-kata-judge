@@ -1,9 +1,9 @@
 import db from '../../db';
 
-import { notifyAllClients, createSummaryMessage, createReportMessage, getTournamentToken } from '../../utils';
+import { notifyAllClients, createSummaryMessage, createReportMessage, getToken } from '../../utils';
 
 export default defineEventHandler(async (event) => {
-  const token = getTournamentToken(event);
+  const token = getToken(event);
   if (!token) {
     return;
   }
