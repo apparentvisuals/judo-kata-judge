@@ -48,15 +48,22 @@ import { getKataName } from '@/src/utils';
 const auth = useAuth();
 const tournament = useState('tournament', () => { return {}; });
 const mat = useState('mat', () => { return { startTime: format(new Date(), 'HH:mm'), matches: [] } });
-const matNumber = useState('matNumber', () => 1);
+const matNumber = useState('matNumber', () => 0);
 const error = useState('error', () => '');
 
 const numberOfMats = computed(() => tournament.value.numberOfMats);
 const start = computed(() => parse(mat.value.startTime, 'HH:mm', new Date()));
 const matches = computed(() => mat.value.matches);
 
+watch(matNumber, (newValue) => {
+  if (newValue !== 0) {
+    _schedule(newValue);
+  }
+});
+
 try {
   tournament.value = await $fetch(`/api/tournament/${auth.value}`);
+  matNumber.value = 1;
 } catch (err) {
   error.value = handleServerError(err);
 }
@@ -70,11 +77,6 @@ const schedule = computed(() => {
     schedule[match.kata].push(match);
   });
   return schedule;
-});
-
-_schedule(matNumber.value);
-watch(matNumber, (newValue) => {
-  _schedule(newValue);
 });
 
 function breakDuration() {

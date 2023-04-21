@@ -1,17 +1,24 @@
 <template>
-  <div v-if="!mat" class="bg bg-base-200 h-full flex flex-col">
-    <div class="py-2 px-4 bg-base-200 text-center w-full">
-      <h1 v-if="error" class="text-3xl font-bold uppercase">{{ error }}</h1>
-    </div>
-    <div class="m-auto max-w-xs max-h-96">
-      <div class="btn-group">
-        <button class="btn" v-for="aMat in numberOfMats" @click.prevent="mat = aMat">{{ `Mat ${aMat}` }}</button>
+  <div class="bg bg-base-200 h-full overflow-y-auto">
+    <div class="navbar bg-base-100 shadow-xl rounded-box m-2">
+      <div class="navbar-start">
+        <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/code?from=/')">
+          <ArrowLeftIcon class="w-6 h-6" />
+        </button>
       </div>
-    </div>
-  </div>
-  <div v-else class="bg bg-base-200 h-full overflow-y-auto">
-    <div class="py-2 px-4 bg-base-200 text-center">
-      <h1 v-if="error" class="text-3xl font-bold uppercase">{{ error }}</h1>
+      <div class="navbar-center">
+        <div v-if="numberOfMats > 0">
+          <div class="btn-group">
+            <button class="btn" :class="matNumber === number ? 'btn-active' : ''" v-for="number in numberOfMats"
+              @click.stop="matNumber = number">
+              {{ `mat ${number}` }}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="navbar-end">
+        <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
+      </div>
     </div>
     <table class="table w-full" v-for="kata in Object.keys(scores)">
       <caption class="bg-base-200 rounded-t pt-4">
@@ -46,6 +53,7 @@
 </template>
 
 <script setup>
+import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import { getKataName, handleServerError } from '@/src/utils';
 
 const auth = useAuth();
@@ -53,25 +61,27 @@ const error = useState('error', () => '');
 const tournament = useState('tournament', () => { return {}; });
 const scores = useState('scores', () => { return {}; });
 const numberOfMats = computed(() => tournament.value.numberOfMats);
-const mat = useState('mat', () => 0);
+const matNumber = useState('matNumber', () => 0);
+
+watch(matNumber, (newValue) => {
+  if (newValue !== 0) {
+    _subscribe(newValue);
+  }
+});
 
 try {
   tournament.value = await $fetch(`/api/tournament/${auth.value}`);
+  matNumber.value = 1;
 } catch (err) {
   error.value = handleServerError(err);
 }
-
-watch(mat, (newValue) => {
-  _subscribe(newValue);
-});
-
 
 let events;
 function _subscribe(matNumber) {
   if (events) {
     events.close();
   }
-  events = new EventSource(`/api/${mat.value}/summary?token=${auth.value}`);
+  events = new EventSource(`/api/${matNumber}/summary?token=${auth.value}`);
   events.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (!data.error) {

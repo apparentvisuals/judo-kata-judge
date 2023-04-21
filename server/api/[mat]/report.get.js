@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const req = event.req;
   const res = event.res;
 
-  const mat = parseInt(event.context.params.mat - 1);
+  const mat = parseInt(getRouterParams(event, 'mat')) - 1;
   const tournament = await db.tournament(token);
   const matchInfo = tournament.getMatch(mat);
 
