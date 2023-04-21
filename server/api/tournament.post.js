@@ -1,5 +1,5 @@
 import db from '../db';
-import { isDev } from '../utils';
+import { getToken } from '../utils';
 import { getAuth } from '../utils/auth-key';
 
 export default defineEventHandler(async (event) => {

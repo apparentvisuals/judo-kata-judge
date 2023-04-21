@@ -38,7 +38,6 @@ const startTime = computed({
   },
   set(value) {
     const [hr, min] = value.split(':');
-    console.log(hr, min);
     start.value = setHours(start.value, parseInt(hr));
     start.value = setMinutes(start.value, parseInt(min));
     start.value = setSeconds(start.value, 0);

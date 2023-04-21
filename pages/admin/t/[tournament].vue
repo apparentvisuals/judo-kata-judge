@@ -104,10 +104,10 @@
           <input id="numberOfJudges" type="number" class="input input-bordered" v-model.number="numberOfJudges" />
         </div>
         <div class="modal-action">
-          <button for="add-match-modal" class="btn btn-error btn-outline" @click.prevent="showUpdateMat = false">
+          <button for="update-mat-modal" class="btn btn-error btn-outline" @click.prevent="showUpdateMat = false">
             Cancel
           </button>
-          <button for="add-match-modal" class="btn btn-success" @click.prevent="updateMat">Update</button>
+          <button for="update-mat-modal" class="btn btn-success" @click.prevent="updateMat">Update</button>
         </div>
       </div>
     </div>

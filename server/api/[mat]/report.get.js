@@ -23,7 +23,6 @@ export default defineEventHandler(async (event) => {
     'Cache-Control': 'no-cache'
   };
   setHeaders(event, headers);
-  // res.writeHead(200, headers);
 
   if (matchInfo) {
     res.write(createReportMessage(matchInfo.results));
