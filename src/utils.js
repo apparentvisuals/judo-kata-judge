@@ -12,6 +12,12 @@ export function getKataName(kata) {
       return 'Kodokan-goshin-jutsu';
     case 'kink':
       return 'Kime-no-kata';
+    case 'ko5':
+      return 'Kodomo-no-kata 5';
+    case 'ko6':
+      return 'Kodomo-no-kata 6';
+    case 'ko7':
+      return 'Kodomo-no-kata 7';
     default:
       return '';
   }
@@ -19,7 +25,6 @@ export function getKataName(kata) {
 
 export function handleServerError(err) {
   if (err.response) {
-    console.log(err.response._data.message);
     return err.response._data.message;
   } else {
     return err.message;

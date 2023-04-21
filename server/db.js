@@ -42,6 +42,7 @@ class Tournament {
       return;
     }
     mat.numberOfJudges = numberOfJudges;
+    mat.judges = Array(5).fill().map(() => '');
     mat.judgeCodes = Array(5).fill().map(() => nanoid(4));
     switch (numberOfJudges) {
       case 5:
@@ -107,7 +108,7 @@ class Tournament {
   }
 
   get data() {
-    return this.#tournament;
+    return { ...this.#tournament, id: this.#id };
   }
 
   async save() {
@@ -157,7 +158,7 @@ class DB {
     const loadTournaments = tournamentsIds.map((id) => {
       return (async () => {
         const tournament = await this.tournament(id);
-        return { id: tournament.id, name: tournament.data.name };
+        return { id: tournament.data.id, name: tournament.data.name };
       })();
     });
     const tournaments = await Promise.all(loadTournaments);

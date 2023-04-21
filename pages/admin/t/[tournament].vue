@@ -3,7 +3,10 @@
     <div class="py-4">
       <div class="navbar bg-base-100 shadow-xl rounded-box">
         <div class="navbar-center">
-          <a class="btn btn-ghost normal-case text-xl">{{ tournament.name }}</a>
+          <button class="btn btn-circle">
+            <ArrowLeftIcon class="w-6 h-6" @click.prevent="navigateTo('/admin')" />
+          </button>
+          <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
         </div>
       </div>
     </div>
@@ -51,8 +54,8 @@
                 <div class="text-right">{{ getKataName(match.kata) }}</div>
               </td>
               <td>
-                <button class="btn btn-square btn-sm" alt="delete match">
-                  <XMarkIcon class="w-4 h-4" @click.prevent="delMatch(mat.number, index)" />
+                <button class="btn btn-square btn-sm btn-error" alt="delete match">
+                  <XMarkIcon class="w-5 h-5" @click.prevent="delMatch(mat.number, index)" />
                 </button>
               </td>
             </tr>
@@ -73,6 +76,9 @@
             <option value="jnk">Ju-no-kata</option>
             <option value="kgj">Kodokan-goshin-jutsu</option>
             <option value="kink">Kime-no-kata</option>
+            <option value="ko5">Kodomo-no-kata 5</option>
+            <option value="ko6">Kodomo-no-kata 6</option>
+            <option value="ko7">Kodomo-no-kata 7</option>
           </select>
         </div>
         <div class="form-control w-full">
@@ -115,7 +121,7 @@
 </template>
 
 <script setup>
-import { XMarkIcon } from '@heroicons/vue/24/outline';
+import { XMarkIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import { getKataName, handleServerError } from '~~/src/utils';
 
 const admin = useAdmin();
@@ -156,7 +162,7 @@ async function addMatch() {
 }
 
 async function updateMat() {
-  tournament.value = await $fetch(`/api/tournament/${route.params.tournament}/update-mat`, { method: 'POST', body: { mat: mat.value, numberOfJudges: numberOfJudges.value }, headers: { authorization: `Bearer ${admin.value}` } });
+  tournament.value = await $fetch(`/api/tournament/${route.params.tournament}/m/${mat.value}`, { method: 'PATCH', body: { mat: mat.value, numberOfJudges: numberOfJudges.value }, headers: { authorization: `Bearer ${admin.value}` } });
   showUpdateMat.value = false;
 }
 
