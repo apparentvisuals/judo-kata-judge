@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "AUTH_KEY=f9005f7426814b42 nuxt dev",
+    "dev": "AUTH_KEY=f nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "start": "node .output/server/index.mjs"

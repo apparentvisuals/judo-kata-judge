@@ -1,5 +1,5 @@
 import db from '../db';
-import { getToken } from '../utils';
+import { getToken, isDev } from '../utils';
 import { getAuth } from '../utils/auth-key';
 
 export default defineEventHandler(async (event) => {
@@ -10,7 +10,10 @@ export default defineEventHandler(async (event) => {
   if (token !== getAuth()) {
     throw createError({ statusCode: 403, statusMessage: 'forbidden' });
   }
-  const { name, numberOfMats } = await readBody(event);
-  const response = await db.createTournament(name, numberOfMats);
-  return response;
+  try {
+    const tournaments = await db.getAllTournaments();
+    return tournaments;
+  } catch (err) {
+    throw createError({ statusCode: 400, statusMessage: err.message });
+  }
 });

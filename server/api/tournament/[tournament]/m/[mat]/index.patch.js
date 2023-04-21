@@ -15,10 +15,10 @@ export default defineEventHandler(async (event) => {
 
   const tournamentId = getRouterParam(event, 'tournament');
   const mat = parseInt(getRouterParam(event, 'mat'));
-  const { numberOfJudges } = await readBody(event);
+  const { numberOfJudges, startTime } = await readBody(event);
   try {
     const tournament = await db.tournament(tournamentId);
-    tournament.updateMat(mat, numberOfJudges);
+    tournament.updateMat(mat, numberOfJudges, startTime);
     await tournament.save();
     return tournament.data;
   } catch (err) {

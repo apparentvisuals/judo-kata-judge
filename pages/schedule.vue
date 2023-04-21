@@ -1,10 +1,27 @@
 <template>
   <div class="bg bg-base-200 h-full overflow-y-auto">
-    <div class="py-2 px-4 bg-base-200 text-center">
-      <h1 class="text-3xl font-bold uppercase">mat {{ mat }} - Start Time <input type="time" v-model="startTime" /></h1>
+    <div class="navbar bg-base-100 shadow-xl rounded-box m-2">
+      <div class="navbar-start">
+        <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/code?from=/schedule')">
+          <ArrowLeftIcon class="w-6 h-6" />
+        </button>
+      </div>
+      <div class="navbar-center">
+        <div v-if="numberOfMats > 0">
+          <div class="btn-group">
+            <button class="btn" :class="matNumber === number ? 'btn-active' : ''" v-for="number in numberOfMats"
+              @click.stop="matNumber = number">
+              {{ `mat ${number}` }}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="navbar-end">
+        <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
+      </div>
     </div>
     <table class="table w-full" v-for="kata in Object.keys(schedule)">
-      <caption class="p-4">{{ getKataName(kata) }}</caption>
+      <caption class="p-4 text-lg">{{ getKataName(kata) }}</caption>
       <thead>
         <tr>
           <th class="w-8"></th>
@@ -24,25 +41,25 @@
 </template>
 
 <script setup>
-import { addMinutes, format, setHours, setMinutes, setSeconds } from 'date-fns';
+import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
+import { addMinutes, format, parse } from 'date-fns';
 import { getKataName } from '@/src/utils';
 
 const auth = useAuth();
-const start = useState('start', () => setSeconds(new Date(), 0));
-const matches = useState('matches', () => []);
-const mat = useState('mat', () => 1);
+const tournament = useState('tournament', () => { return {}; });
+const mat = useState('mat', () => { return { startTime: format(new Date(), 'HH:mm'), matches: [] } });
+const matNumber = useState('matNumber', () => 1);
+const error = useState('error', () => '');
 
-const startTime = computed({
-  get() {
-    return format(start.value, 'HH:mm');
-  },
-  set(value) {
-    const [hr, min] = value.split(':');
-    start.value = setHours(start.value, parseInt(hr));
-    start.value = setMinutes(start.value, parseInt(min));
-    start.value = setSeconds(start.value, 0);
-  }
-});
+const numberOfMats = computed(() => tournament.value.numberOfMats);
+const start = computed(() => parse(mat.value.startTime, 'HH:mm', new Date()));
+const matches = computed(() => mat.value.matches);
+
+try {
+  tournament.value = await $fetch(`/api/tournament/${auth.value}`);
+} catch (err) {
+  error.value = handleServerError(err);
+}
 
 const schedule = computed(() => {
   const schedule = {};
@@ -55,12 +72,10 @@ const schedule = computed(() => {
   return schedule;
 });
 
-watch(start, (newValue) => {
-  updateTime(newValue);
+_schedule(matNumber.value);
+watch(matNumber, (newValue) => {
+  _schedule(newValue);
 });
-
-matches.value = await $fetch(`/api/${mat.value}`, { headers: { authorization: `Bearer ${auth.value}` } });
-updateTime(start.value);
 
 function breakDuration() {
   return 10;
@@ -80,6 +95,10 @@ function duration(kata) {
       return 8;
     case 'kink':
       return 11;
+    case 'ko5':
+    case 'ko6':
+    case 'ko7':
+      return 3;
     default:
       return 0;
   }
@@ -104,5 +123,10 @@ function updateTime(start) {
       prevTime = match.time;
     });
   }
+}
+
+async function _schedule() {
+  mat.value = await $fetch(`/api/${matNumber.value}`, { headers: { authorization: `Bearer ${auth.value}` } });
+  updateTime(start.value);
 }
 </script>
