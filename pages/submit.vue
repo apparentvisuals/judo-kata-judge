@@ -75,7 +75,7 @@ const moves = computed(() => moveList(match.value.kata));
 const numberOfTechniques = computed(() => moves.value.length);
 
 try {
-  tournament.value = await $fetch('/api/tournament', { headers: { authorization: `Bearer ${auth.value}` } });
+  tournament.value = await $fetch(`/api/tournament/${auth.value}`);
   await _getMatch();
 } catch (err) {
   error.value = handleServerError(err);

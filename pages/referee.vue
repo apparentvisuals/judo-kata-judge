@@ -52,7 +52,7 @@ const numberOfMats = computed(() => tournament.value.numberOfMats);
 const mat = useState('mat', () => 1);
 
 try {
-  tournament.value = await $fetch('/api/tournament', { headers: { authorization: `Bearer ${auth.value}` } });
+  tournament.value = await $fetch(`/api/tournament/${auth.value}`);
 } catch (err) {
   error.value = handleServerError(err);
 }
