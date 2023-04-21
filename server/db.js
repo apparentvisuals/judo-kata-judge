@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 
 import Clients from './clients';
 import { createReport, numberOfTechniques } from './utils';
+import { format } from 'date-fns';
 
 const clients = new Map();
 
@@ -19,7 +20,9 @@ class Tournament {
     if (matNumber >= numberOfMats) {
       return;
     }
-    return this.#tournament.mats[matNumber];
+    const mat = this.#tournament.mats[matNumber];
+    mat.startTime = mat.startTime || format(new Date(), 'HH:mm');
+    return mat;
   }
 
   getMatch(matNumber) {
@@ -36,12 +39,13 @@ class Tournament {
     return judgeIndex + 1;
   }
 
-  async updateMat(matNumber, numberOfJudges) {
+  async updateMat(matNumber, numberOfJudges, startTime) {
     const mat = this.getMat(matNumber);
     if (!mat) {
       return;
     }
     mat.numberOfJudges = numberOfJudges;
+    mat.startTime = startTime;
     mat.judges = Array(5).fill().map(() => '');
     mat.judgeCodes = Array(5).fill().map(() => nanoid(4));
     switch (numberOfJudges) {
@@ -206,6 +210,8 @@ function _createMatInfo(mat) {
     number: mat,
     numberOfJudges: 5,
     matches: [],
+    judges: Array(5).fill().map(() => ''),
+    judgeCodes: Array(5).fill().map(() => nanoid(4)),
     // clients: new Clients(),
     // reportClients: new Clients(),
     // summaryClients: new Clients(),

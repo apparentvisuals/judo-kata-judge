@@ -2,12 +2,15 @@
   <div class="bg bg-base-200 h-full overflow-y-auto px-4">
     <div class="py-4">
       <div class="navbar bg-base-100 shadow-xl rounded-box">
-        <div class="navbar-center">
-          <button class="btn btn-circle">
-            <ArrowLeftIcon class="w-6 h-6" @click.prevent="navigateTo('/admin')" />
+        <div class="navbar-start">
+          <button class="btn btn-square" @click.prevent="navigateTo('/admin')">
+            <ArrowLeftIcon class="w-6 h-6" />
           </button>
+        </div>
+        <div class="navbar-center">
           <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
         </div>
+        <div class="navbar-end"></div>
       </div>
     </div>
     <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
@@ -18,23 +21,31 @@
         <div>
           <div class="flex justify-between mb-2">
             <h2 class="text-lg font-semibold">Mat {{ mat.number + 1 }}</h2>
-            <table class="table table-compact">
-              <thead>
-                <tr>
-                  <th class="w-10 text-center" v-for="index in 5">{{ index }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td v-for="code in mat.judgeCodes">{{ code }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="flex">
+              <button class="btn btn-square mr-2 btn-accent" @click.prevent="showUpdate(mat.number)">
+                <PencilIcon class="w-6 h-6" />
+              </button>
+              <button class="btn btn-square btn-primary" @click.prevent="showAdd(mat.number)">
+                <PlusIcon class="w-6 h-6" />
+              </button>
+            </div>
           </div>
-          <button class="btn w-full mb-2" @click.prevent="showUpdate(mat.number)">Update</button>
-          <button class="btn w-full mb-2" @click.prevent="showAdd(mat.number)">Add Match</button>
+          <table class="table table-compact w-full mb-2">
+            <caption>Judge access codes</caption>
+            <thead>
+              <tr>
+                <th class="w-10 text-center" v-for="index in 5">{{ index }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td v-for="code in mat.judgeCodes">{{ code }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <table class="table w-full">
+          <caption>Competitor list</caption>
           <thead>
             <tr>
               <th class="w-4">#</th>
@@ -97,7 +108,7 @@
           <button for="add-match-modal" class="btn btn-error btn-outline" @click.prevent="showAddMatch = false">
             Cancel
           </button>
-          <button for="add-match-modal" class="btn btn-success" @click.prevent="addMatch">Add</button>
+          <button for="add-match-modal" class="btn btn-primary" @click.prevent="addMatch">Add</button>
         </div>
       </div>
     </div>
@@ -109,11 +120,18 @@
           </label>
           <input id="numberOfJudges" type="number" class="input input-bordered" v-model.number="numberOfJudges" />
         </div>
+        <div class="form-control w-full">
+          <label class="label" for="startTime">
+            <span class="label-text">Start Time</span>
+          </label>
+          <input id="startTime" type="time" class="input input-bordered" v-model="startTime" />
+        </div>
+
         <div class="modal-action">
           <button for="update-mat-modal" class="btn btn-error btn-outline" @click.prevent="showUpdateMat = false">
             Cancel
           </button>
-          <button for="update-mat-modal" class="btn btn-success" @click.prevent="updateMat">Update</button>
+          <button for="update-mat-modal" class="btn btn-primary" @click.prevent="updateMat">Update</button>
         </div>
       </div>
     </div>
@@ -121,7 +139,8 @@
 </template>
 
 <script setup>
-import { XMarkIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline';
+import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon } from '@heroicons/vue/24/outline';
+import { format } from 'date-fns';
 import { getKataName, handleServerError } from '~~/src/utils';
 
 const admin = useAdmin();
@@ -134,7 +153,9 @@ const uke = useState('uke', () => '');
 const error = useState('error', () => '');
 const showUpdateMat = useState('showUpdateMat', () => false);
 const numberOfJudges = useState('numberOfJudges', () => 5);
+const startTime = useState('startTime', () => format(new Date(), 'HH:mm'));
 const route = useRoute();
+const headers = { authorization: `Bearer ${admin.value}` };
 
 try {
   tournament.value = await $fetch(`/api/tournament/${route.params.tournament}`, { headers: { authorization: `Bearer ${admin.value}` } });
@@ -150,6 +171,7 @@ async function showAdd(selectedMat) {
 async function showUpdate(selectedMat) {
   mat.value = selectedMat;
   numberOfJudges.value = tournament.value.mats[selectedMat].numberOfJudges;
+  startTime.value = tournament.value.mats[selectedMat].startTime;
   showUpdateMat.value = true;
 }
 
@@ -162,12 +184,13 @@ async function addMatch() {
 }
 
 async function updateMat() {
-  tournament.value = await $fetch(`/api/tournament/${route.params.tournament}/m/${mat.value}`, { method: 'PATCH', body: { mat: mat.value, numberOfJudges: numberOfJudges.value }, headers: { authorization: `Bearer ${admin.value}` } });
+  const body = { mat: mat.value, numberOfJudges: numberOfJudges.value, startTime: startTime.value };
+  tournament.value = await $fetch(`/api/tournament/${route.params.tournament}/m/${mat.value}`, { method: 'PATCH', body, headers });
   showUpdateMat.value = false;
 }
 
 async function delMatch(matNumber, matchId) {
-  const response = await $fetch(`/api/tournament/${route.params.tournament}/m/${matNumber}/match/${matchId}`, { method: 'DELETE', headers: { authorization: `Bearer ${admin.value}` } });
+  const response = await $fetch(`/api/tournament/${route.params.tournament}/m/${matNumber}/match/${matchId}`, { method: 'DELETE', headers });
   tournament.value = response;
 }
 </script>

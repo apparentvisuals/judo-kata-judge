@@ -19,9 +19,12 @@ export default defineEventHandler(async (event) => {
   if (!matInfo) {
     return {};
   }
-  const response = matInfo.matches.map((match) => {
-    return pick(match, ['number', 'kata', 'tori', 'uke'])
-  });
+  const response = {
+    startTime: matInfo.startTime,
+    matches: matInfo.matches.map((match) => {
+      return pick(match, ['number', 'kata', 'tori', 'uke'])
+    }),
+  }
 
   return response;
 });
