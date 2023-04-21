@@ -1,6 +1,6 @@
-import db from '../db';
-import { getToken, isDev } from '../utils';
-import { getAuth } from '../utils/auth-key';
+import db from '../../db';
+import { getToken } from '../../utils';
+import { getAuth } from '../../utils/auth-key';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
