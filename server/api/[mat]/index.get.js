@@ -1,6 +1,6 @@
 import { pick } from 'lodash-es';
 
-import db from '../db';
+import db from '../../db';
 
 
 export default defineEventHandler(async (event) => {
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const mat = parseInt(event.context.params.mat - 1);
+  const mat = parseInt(getRouterParam(event, 'mat')) - 1;
 
   const matInfo = await db.getMat(token, mat);
   if (!matInfo) {
