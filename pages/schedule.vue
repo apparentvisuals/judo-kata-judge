@@ -1,6 +1,6 @@
 <template>
   <div class="bg bg-base-200 h-full overflow-y-auto">
-    <div class="navbar bg-base-100 shadow-xl rounded-box m-2">
+    <div class="navbar bg-base-100 shadow-xl rounded-box">
       <div class="navbar-start">
         <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/code?from=/schedule')">
           <ArrowLeftIcon class="w-6 h-6" />
