@@ -10,7 +10,8 @@
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "env": {
-        "AUTH_KEY": "f9005f7426814b42"
+        "AUTH_KEY": "f",
+        "REDIS_URL": "redis://localhost:6379"
       },
       "runtimeExecutable": "npm",
       "runtimeArgs": [

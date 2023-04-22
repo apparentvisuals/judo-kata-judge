@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "AUTH_KEY=f nuxt dev",
+    "dev": "AUTH_KEY=f REDIS_URL=redis://localhost:6379 nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "start": "node .output/server/index.mjs"

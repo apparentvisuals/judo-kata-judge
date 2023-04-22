@@ -1,18 +1,30 @@
 <template>
   <div class="bg bg-base-200 h-full overflow-y-auto">
-    <div class="py-2 px-4 bg-base-200 text-center">
-      <div v-if="numberOfMats > 0">
-        <div class="text-3xl font-bold uppercase inline-block align-middle h-12 leading-[3rem]">mat&nbsp;</div>
-        <div class="btn-group">
-          <button class="btn" :class="mat === matNumber ? 'btn-active' : ''" v-for="matNumber in numberOfMats"
-            @click.stop="mat = matNumber">
-            {{ matNumber }}
-          </button>
-        </div>
-        <h1 class="text-3xl font-bold uppercase">judge {{ judge }}</h1>
+    <div class="navbar bg-base-100 shadow-xl rounded-box m-2">
+      <div class="navbar-start">
+        <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/code?from=/schedule')">
+          <ArrowLeftIcon class="w-6 h-6" />
+        </button>
       </div>
-      <h1 v-if="error" class="text-3xl font-bold uppercase">{{ error }}</h1>
-
+      <div class="navbar-center">
+        <div v-if="numberOfMats > 0">
+          <div class="btn-group pr-2">
+            <button class="btn" :class="matNumber === number ? 'btn-active' : ''" v-for="number in numberOfMats"
+              @click.stop="matNumber = number">
+              {{ `mat ${number}` }}
+            </button>
+          </div>
+          <div class="btn-group">
+            <button class="btn" :class="judge === number ? 'btn-active' : ''" v-for="number in 5"
+              @click.stop="judge = number">
+              {{ `judge ${number}` }}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="navbar-end">
+        <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
+      </div>
     </div>
     <table v-show="!error" class="table w-full p-4">
       <thead>
@@ -55,7 +67,7 @@
 </template>
 
 <script setup>
-import { CheckIcon, PlusIcon, MinusIcon } from '@heroicons/vue/24/outline';
+import { CheckIcon, PlusIcon, MinusIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import { moveList } from '~~/server/utils';
 import { handleServerError } from '~~/src/utils';
 
@@ -66,7 +78,7 @@ const match = useState('match', () => { return {}; });
 const judge = useState('judge', () => 1);
 const scores = useState('scores', () => []);
 const majorIndex = useState('majorIndex', () => []);
-const mat = useState('mat', () => 1);
+const matNumber = useState('matNumber', () => 0);
 
 const hasMajor = computed(() => majorIndex.value.find((item) => item));
 const grandTotal = computed(() => scores.value.reduce((acc, value) => acc += value.total, 0));
@@ -74,20 +86,24 @@ const numberOfMats = computed(() => tournament.value.numberOfMats || 0);
 const moves = computed(() => moveList(match.value.kata));
 const numberOfTechniques = computed(() => moves.value.length);
 
-try {
-  tournament.value = await $fetch(`/api/tournament/${auth.value}`);
-  await _getMatch();
-} catch (err) {
-  error.value = handleServerError(err);
-}
-
-watch(hasMajor, (newValue, oldValue) => {
+watch(hasMajor, () => {
   computeScore();
 });
 
-watch(mat, async (newValue) => {
+watch(matNumber, async () => {
   await _getMatch();
 });
+
+watch(judge, async () => {
+  await _getMatch();
+});
+
+try {
+  tournament.value = await $fetch(`/api/tournament/${auth.value}`);
+  matNumber.value = 1;
+} catch (err) {
+  error.value = handleServerError(err);
+}
 
 async function toggleScore(score, index) {
   const deductions = score.deductions;
@@ -116,7 +132,7 @@ async function toggleScore(score, index) {
   }
 
   computeScore();
-  await $fetch(`/api/${mat.value}/${judge.value}`, {
+  await $fetch(`/api/${matNumber.value}/${judge.value}`, {
     method: 'POST',
     body: { move: score.number, deductions: score.deductions.join(':'), total: score.origTotal },
     headers: { authorization: `Bearer ${auth.value}` }
@@ -174,8 +190,8 @@ function calculateScore(judgeInfo) {
 async function _getMatch() {
   try {
     error.value = '';
-    match.value = await $fetch(`/api/${mat.value}/match`, { headers: { authorization: `Bearer ${auth.value}` } });
-    const judgeInfo = await $fetch(`/api/${mat.value}/${judge.value}`, { headers: { authorization: `Bearer ${auth.value}` } });
+    match.value = await $fetch(`/api/${matNumber.value}/match`, { headers: { authorization: `Bearer ${auth.value}` } });
+    const judgeInfo = await $fetch(`/api/${matNumber.value}/${judge.value}`, { headers: { authorization: `Bearer ${auth.value}` } });
     const { newScores, newMajorIndex } = calculateScore(judgeInfo);
     scores.value = newScores;
     majorIndex.value = newMajorIndex;

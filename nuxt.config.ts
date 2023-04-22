@@ -13,8 +13,9 @@ export default defineNuxtConfig({
   nitro: {
     storage: {
       'kata': {
-        driver: 'fs',
-        base: './data/db'
+        driver: 'redis',
+        base: 'kata',
+        url: process.env.REDIS_URL,
       },
       'archive': {
         driver: 'fs',
