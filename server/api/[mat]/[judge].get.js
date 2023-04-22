@@ -9,7 +9,6 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-
   const mat = parseInt(getRouterParam(event, 'mat')) - 1;
 
   const tournament = await db.tournament(token);
