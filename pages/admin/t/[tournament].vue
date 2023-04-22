@@ -3,7 +3,7 @@
     <div class="py-4">
       <div class="navbar bg-base-100 shadow-xl rounded-box">
         <div class="navbar-start">
-          <button class="btn btn-square" @click.prevent="navigateTo('/admin')">
+          <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/admin')">
             <ArrowLeftIcon class="w-6 h-6" />
           </button>
         </div>
