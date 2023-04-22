@@ -1,6 +1,6 @@
 <template>
   <div class="bg bg-base-200 h-full overflow-y-auto">
-    <div class="navbar bg-base-100 shadow-xl rounded-box m-2">
+    <div class="navbar bg-base-100 shadow-xl rounded-box">
       <div class="navbar-start">
         <!-- <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/code?from=/schedule')">
           <ArrowLeftIcon class="w-6 h-6" />
@@ -24,6 +24,7 @@
       </div>
       <div class="navbar-end">
         <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
+        <button v-else class="btn btn-primary" @click.prevent.stop="loadNext">Next</button>
       </div>
     </div>
     <table v-show="!error" class="table w-full p-4">
@@ -103,6 +104,10 @@ try {
   matNumber.value = 1;
 } catch (err) {
   error.value = handleServerError(err);
+}
+
+async function loadNext() {
+  await _getMatch();
 }
 
 async function toggleScore(score, index) {
