@@ -28,6 +28,7 @@
       </div>
     </div>
     <table v-show="!error" class="table w-full p-4">
+      <caption>{{ `${match.number} - ${match.tori}/${match.uke} (${getKataName(match.kata)})` }}</caption>
       <thead>
         <tr>
           <th>Technique</th>
@@ -70,7 +71,7 @@
 <script setup>
 import { CheckIcon, PlusIcon, MinusIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import { moveList } from '~~/server/utils';
-import { handleServerError } from '~~/src/utils';
+import { getKataName, handleServerError } from '~~/src/utils';
 
 const auth = useAuth();
 const error = useState('error', () => '');
