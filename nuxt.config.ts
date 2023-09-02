@@ -12,10 +12,14 @@ export default defineNuxtConfig({
   // },
   nitro: {
     storage: {
+      // 'kata': {
+      //   driver: 'redis',
+      //   base: 'kata',
+      //   url: process.env.REDIS_URL,
+      // },
       'kata': {
-        driver: 'redis',
-        base: 'kata',
-        url: process.env.REDIS_URL,
+        driver: 'fs',
+        base: './data/kata'
       },
       'archive': {
         driver: 'fs',
