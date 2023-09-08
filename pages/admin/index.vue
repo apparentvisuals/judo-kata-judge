@@ -40,7 +40,8 @@
 <script setup>
 import { handleServerError } from '~~/src/utils';
 
-const admin = useAdmin();
+// const admin = useAdmin();
+const cookie = useCookie('jkj', { default: () => ({}) });
 const error = useState('error', () => '');
 const tournaments = useState('tournaments', () => { return {} });
 const showAdd = useState('showAdd', () => false)
@@ -48,14 +49,14 @@ const name = useState('name', () => '');
 const numberOfMats = useState('numberOfMats', () => 0);
 
 try {
-  tournaments.value = await $fetch(`/api/tournament`, { headers: { authorization: `Bearer ${admin.value}` } });
+  tournaments.value = await $fetch(`/api/tournament`, { headers: { authorization: `Bearer ${cookie.value.adminCode}` } });
 } catch (err) {
   error.value = handleServerError(err);
 }
 
 async function addTournament() {
   const body = { name: name.value, numberOfMats: numberOfMats.value };
-  const headers = { authorization: `Bearer ${admin.value}` };
+  const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
   const result = await $fetch(`/api/tournament`, { method: 'POST', body, headers });
   tournaments.value.push({ id: result.id, name: result.name });
   showAdd.value = false;

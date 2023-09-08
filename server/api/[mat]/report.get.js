@@ -9,13 +9,12 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const req = event.req;
-  const res = event.res;
+  const req = event.node.req;
+  const res = event.node.res;
 
   const mat = parseInt(getRouterParam(event, 'mat')) - 1;
   const tournament = await db.tournament(token);
   const matchInfo = tournament.getMatch(mat);
-
 
   const headers = {
     'Content-Type': 'text/event-stream',
@@ -25,8 +24,6 @@ export default defineEventHandler(async (event) => {
   setHeaders(event, headers);
 
   if (matchInfo) {
-    res.write(createReportMessage(matchInfo.results));
-
     const id = uuidv4();
     const clients = db.clients(`${token}-${mat}`);
     clients.report.add(id, res);
@@ -35,6 +32,10 @@ export default defineEventHandler(async (event) => {
       console.log(`m${mat}:${id} report connection closed`);
       clients.report.remove(id);
     });
+    res.write(createReportMessage(matchInfo.results));
+
+    event._handled = true;
+
   } else {
     res.write(`data: ${JSON.stringify({ error: 'no more matches' })}\n\n`);
     res.end();

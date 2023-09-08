@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const tournament = await db.tournament(token);
   const matchInfo = tournament.getMatch(mat);
   if (!matchInfo) {
-    throw createError({ statusCode: 400, statusMessage: 'no more matches' })
+    throw createError({ statusCode: 400, message: 'no more matches' })
   }
 
   const judge = parseInt(getRouterParam(event, 'judge')) - 1;

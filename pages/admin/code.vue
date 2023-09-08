@@ -15,12 +15,15 @@
 </template>
 
 <script setup>
-const code = useState('code', () => '');
+const cookie = useCookie('jkj', { default: () => ({}) });
 const admin = useAdmin();
 const route = useRoute();
 
+const code = useState('code', () => '');
+
 function submit() {
   admin.value = code;
+  cookie.value.adminCode = code;
   if (route.query.from) {
     navigateTo(route.query.from);
   } else {

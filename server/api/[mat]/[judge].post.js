@@ -21,12 +21,12 @@ export default defineEventHandler(async (event) => {
     return {};
   }
   const judgeInfo = matchInfo.judges[judge];
-  const [_small1, _small2, _medium, _big, forgotten, _correction] = deductions.split(':');
-  judgeInfo.scores[move].value = total;
+  // const [_small1, _small2, _medium, _big, forgotten, _correction] = deductions.split(':');
+  // judgeInfo.scores[move].value = total;
   judgeInfo.scores[move].deductions = deductions;
-  if (forgotten === '1') {
-    judgeInfo.majorIndex[move] = move + 1;
-  }
+  // if (forgotten === '1') {
+  //   judgeInfo.majorIndex[move] = move + 1;
+  // }
   matchInfo.results = createReport(matchInfo);
   await tournament.save();
 

@@ -70,7 +70,7 @@
 
 <script setup>
 import { CheckIcon, PlusIcon, MinusIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline';
-import { moveList } from '~~/server/utils';
+import { moveList, calculateMoveScore } from '~~/server/utils';
 import { getKataName, handleServerError } from '~~/src/utils';
 
 const auth = useAuth();
@@ -83,7 +83,13 @@ const majorIndex = useState('majorIndex', () => []);
 const matNumber = useState('matNumber', () => 0);
 
 const hasMajor = computed(() => majorIndex.value.find((item) => item));
-const grandTotal = computed(() => scores.value.reduce((acc, value) => acc += value.total, 0));
+const grandTotal = computed(() => {
+  const total = scores.value.reduce((acc, value) => acc += value.total, 0);
+  if (hasMajor.value) {
+    return total / 2;
+  }
+  return total;
+});
 const numberOfMats = computed(() => tournament.value.numberOfMats || 0);
 const moves = computed(() => moveList(match.value.kata));
 const numberOfTechniques = computed(() => moves.value.length);
@@ -149,33 +155,7 @@ function computeScore() {
   const values = scores.value;
   for (let ii = 0; ii < values.length; ii++) {
     const score = values[ii];
-    const deductions = score.deductions;
-    let total = 10;
-    if (deductions[0] === '1') {
-      total -= 1;
-    }
-    if (deductions[1] === '1') {
-      total -= 1;
-    }
-    if (deductions[2] === '1') {
-      total -= 3;
-    }
-    if (deductions[3] === '1') {
-      total -= 5;
-    }
-    if (deductions[4] === '1') {
-      total -= 10;
-    }
-    score.origTotal = total;
-    if (score.number > hasMajor.value - 1) {
-      total /= 2;
-    }
-    if (deductions[5] === '+') {
-      total += 0.5;
-    } else if (deductions[5] === '-') {
-      total -= 0.5;
-    }
-    score.total = Math.min(Math.max(0, total), 10);
+    score.total = calculateMoveScore(score.deductions);
   }
 }
 
