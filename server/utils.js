@@ -51,6 +51,31 @@ export function numberOfTechniques(kata) {
   return moveList(kata).length;
 }
 
+export function calculateMoveScore(deductions) {
+  let total = 10;
+  if (deductions[0] === '1') {
+    total -= 1;
+  }
+  if (deductions[1] === '1') {
+    total -= 1;
+  }
+  if (deductions[2] === '1') {
+    total -= 3;
+  }
+  if (deductions[3] === '1') {
+    total -= 5;
+  }
+  if (deductions[4] === '1') {
+    total -= 10;
+  }
+  if (deductions[5] === '+') {
+    total += 0.5;
+  } else if (deductions[5] === '-') {
+    total -= 0.5;
+  }
+  return Math.min(Math.max(0, total), 10);
+}
+
 export function createReport(match) {
   const judges = match.judges;
   const kata = match.kata;
@@ -68,22 +93,16 @@ export function createReport(match) {
     let hasMajor = false;
     let judgeTotal = 0;
     for (let ii = 0; ii < techniquesCount; ii++) {
-      let moveTotal = judge.scores[ii].value;
-      const [_small1, _small2, _medium, _big, forgotten, correction] = judge.scores[ii].deductions.split(':');
-      if (hasMajor) {
-        moveTotal /= 2;
-      }
-      if (correction === '+') {
-        moveTotal += 0.5;
-      } else if (correction === '-') {
-        moveTotal -= 0.5;
-      }
-      report[ii].values[judgeIndex] = Math.min(Math.max(0, moveTotal), 10);;
+      const deductions = judge.scores[ii].deductions.split(':');
+      let moveTotal = calculateMoveScore(deductions);
+      report[ii].values[judgeIndex]
       judgeTotal += moveTotal;
-
-      if (forgotten === '1') {
+      if (deductions[4] === '1') {
         hasMajor = true;
       }
+    }
+    if (hasMajor) {
+      judgeTotal = judgeTotal / 2;
     }
     summary.values[judgeIndex] = judgeTotal;
   }

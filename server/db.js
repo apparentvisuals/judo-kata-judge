@@ -116,7 +116,7 @@ class Tournament {
   }
 
   async save() {
-    await useStorage().setItem(`kata:${this.#id}`, this.#tournament);
+    await useStorage().setItem(`tournament:${this.#id}`, this.#tournament);
   }
 }
 
@@ -134,7 +134,7 @@ class DB {
   }
 
   async tournament(id) {
-    const tournament = await useStorage().getItem(`kata:${id}`);
+    const tournament = await useStorage().getItem(`tournament:${id}`);
     if (!tournament) {
       const error = new Error('no such tournament');
       throw error;
@@ -158,7 +158,7 @@ class DB {
   }
 
   async getAllTournaments() {
-    const tournamentsIds = await useStorage('kata').getKeys();
+    const tournamentsIds = await useStorage('tournament').getKeys();
     const loadTournaments = tournamentsIds.map((id) => {
       return (async () => {
         const tournament = await this.tournament(id);

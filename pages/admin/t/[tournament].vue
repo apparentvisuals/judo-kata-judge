@@ -54,8 +54,29 @@
               <th class="w-6"></th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="(match, index) in mat.matches">
+          <!-- <tbody> -->
+          <ClientOnly fallback-tag="tr" fallback="Loading matches...">
+            <draggable v-model="mat.matches" handle=".handle" item-key="number" tag="tbody">
+              <template #item="{ element: match }">
+                <tr>
+                  <td>{{ match.number + 1 }}</td>
+                  <td>
+                    <div>{{ match.tori }}</div>
+                    <div>{{ match.uke }}</div>
+                  </td>
+                  <td>
+                    <div class="text-right">{{ getKataName(match.kata) }}</div>
+                  </td>
+                  <td>
+                    <button class="btn btn-square btn-sm btn-error" alt="delete match">
+                      <XMarkIcon class="w-5 h-5" @click.prevent="delMatch(mat.number, index)" />
+                    </button>
+                  </td>
+                </tr>
+              </template>
+            </draggable>
+          </ClientOnly>
+          <!-- <tr v-for="(match, index) in mat.matches">
               <td>{{ match.number + 1 }}</td>
               <td>
                 <div>{{ match.tori }}</div>
@@ -69,8 +90,8 @@
                   <XMarkIcon class="w-5 h-5" @click.prevent="delMatch(mat.number, index)" />
                 </button>
               </td>
-            </tr>
-          </tbody>
+            </tr> -->
+          <!-- </tbody> -->
         </table>
       </div>
     </div>
@@ -144,6 +165,7 @@ import { format } from 'date-fns';
 import { getKataName, handleServerError } from '~~/src/utils';
 
 const admin = useAdmin();
+const cookie = useCookie('jkj', { default: () => ({}) });
 const tournament = useState('tournament', () => { return {} });
 const showAddMatch = useState('showAddMatch', () => false);
 const mat = useState('mat', () => 0);
@@ -155,10 +177,10 @@ const showUpdateMat = useState('showUpdateMat', () => false);
 const numberOfJudges = useState('numberOfJudges', () => 5);
 const startTime = useState('startTime', () => format(new Date(), 'HH:mm'));
 const route = useRoute();
-const headers = { authorization: `Bearer ${admin.value}` };
+const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
 try {
-  tournament.value = await $fetch(`/api/tournament/${route.params.tournament}`, { headers: { authorization: `Bearer ${admin.value}` } });
+  tournament.value = await $fetch(`/api/tournament/${route.params.tournament}`, { headers });
 } catch (err) {
   error.value = handleServerError(err);
 }
@@ -176,7 +198,8 @@ async function showUpdate(selectedMat) {
 }
 
 async function addMatch() {
-  const response = await $fetch(`/api/tournament/${route.params.tournament}/m/${mat.value}/match`, { method: 'POST', body: { kata: kata.value, tori: tori.value, uke: uke.value }, headers: { authorization: `Bearer ${admin.value}` } });
+  const body = { tournament: kata.value, tori: tori.value, uke: uke.value };
+  const response = await $fetch(`/api/tournament/${route.params.tournament}/m/${mat.value}/match`, { method: 'POST', body, headers });
   tournament.value = response;
   showAddMatch.value = false;
   tori.value = '';

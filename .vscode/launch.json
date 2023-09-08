@@ -9,10 +9,7 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "env": {
-        "AUTH_KEY": "f",
-        "REDIS_URL": "redis://localhost:6379"
-      },
+      "envFile": "${workspaceFolder}/.env",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",

@@ -1,5 +1,9 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 
+function isDev() {
+  return process.env.NODE_ENV === 'development';
+}
+
 export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
   colorMode: {
@@ -7,19 +11,21 @@ export default defineNuxtConfig({
     dataValue: 'theme', // activate data-theme in <html> tag
     classSuffix: '',
   },
-  // build: {
-  //   transpile: ['@heroicons/vue']
-  // },
   nitro: {
     storage: {
-      // 'kata': {
-      //   driver: 'redis',
-      //   base: 'kata',
-      //   url: process.env.REDIS_URL,
-      // },
-      'kata': {
-        driver: 'fs',
-        base: './data/kata'
+      'tournament': {
+        driver: 'azureCosmos',
+        endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
+        accountKey: process.env.COSMOS_KEY,
+        containerName: isDev() ? 'tournaments-dev' : 'tournaments',
+        databaseName: 'judo-kata-judge'
+      },
+      'judge': {
+        driver: 'azureCosmos',
+        endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
+        accountKey: process.env.COSMOS_KEY,
+        containerName: isDev() ? 'judges-dev' : 'judges',
+        databaseName: 'judo-kata-judge'
       },
       'archive': {
         driver: 'fs',

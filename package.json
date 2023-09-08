@@ -4,23 +4,27 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "AUTH_KEY=f REDIS_URL=redis://localhost:6379 nuxt dev",
+    "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "start": "node .output/server/index.mjs"
   },
   "dependencies": {
-    "@heroicons/vue": "^2.0.17",
-    "@nuxtjs/color-mode": "^3.2.0",
-    "@nuxtjs/tailwindcss": "^6.6.6",
-    "autoprefixer": "^10.4.14",
-    "daisyui": "^2.51.5",
-    "nuxt": "^3.4.1",
-    "postcss": "^8.4.23",
-    "vue": "^3.2.47",
-    "date-fns": "^2.29.3",
+    "@azure/cosmos": "^3.17.3",
+    "@azure/identity": "^3.3.0",
+    "@heroicons/vue": "^2.0.18",
+    "@nuxtjs/color-mode": "^3.3.0",
+    "@nuxtjs/tailwindcss": "^6.8.0",
+    "autoprefixer": "^10.4.15",
+    "daisyui": "^3.7.3",
+    "date-fns": "^2.30.0",
     "lodash-es": "^4.17.21",
     "nanoid": "^4.0.2",
-    "uuid": "^9.0.0"
+    "nuxt": "^3.7.1",
+    "postcss": "^8.4.29",
+    "unstorage": "git://github.com:apparentvisuals/unstorage.git#dist",
+    "uuid": "^9.0.0",
+    "vue": "^3.2.47",
+    "vuedraggable": "^4.1.0"
   }
 }
