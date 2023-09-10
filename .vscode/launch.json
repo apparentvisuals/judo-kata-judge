@@ -9,11 +9,27 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
+      "env": {
+        "NODE_ENV": "development"
+      },
       "envFile": "${workspaceFolder}/.env",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
         "dev"
+      ]
+    },
+    {
+      "name": "prod",
+      "type": "node",
+      "request": "launch",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "envFile": "${workspaceFolder}/.env",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "start"
       ]
     }
   ]
