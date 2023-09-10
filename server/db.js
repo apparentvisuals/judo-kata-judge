@@ -118,6 +118,10 @@ class Tournament {
   async save() {
     await useStorage().setItem(`tournament:${this.#id}`, this.#tournament);
   }
+
+  replace(tournament) {
+    this.#tournament = tournament;
+  }
 }
 
 class DB {

@@ -10,7 +10,11 @@
         <div class="navbar-center">
           <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
         </div>
-        <div class="navbar-end"></div>
+        <div class="navbar-end">
+          <button class="btn btn-ghost" @click.prevent="save">
+            Save
+          </button>
+        </div>
       </div>
     </div>
     <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
@@ -48,50 +52,29 @@
           <caption>Competitor list</caption>
           <thead>
             <tr>
-              <th class="w-4">#</th>
               <th>Name</th>
-              <th class="text-right">Kata</th>
+              <th class="w-32">Kata</th>
               <th class="w-6"></th>
             </tr>
           </thead>
-          <!-- <tbody> -->
-          <ClientOnly fallback-tag="tr" fallback="Loading matches...">
-            <draggable v-model="mat.matches" handle=".handle" item-key="number" tag="tbody">
-              <template #item="{ element: match }">
-                <tr>
-                  <td>{{ match.number + 1 }}</td>
-                  <td>
-                    <div>{{ match.tori }}</div>
-                    <div>{{ match.uke }}</div>
-                  </td>
-                  <td>
-                    <div class="text-right">{{ getKataName(match.kata) }}</div>
-                  </td>
-                  <td>
-                    <button class="btn btn-square btn-sm btn-error" alt="delete match">
-                      <XMarkIcon class="w-5 h-5" @click.prevent="delMatch(mat.number, index)" />
-                    </button>
-                  </td>
-                </tr>
-              </template>
-            </draggable>
-          </ClientOnly>
-          <!-- <tr v-for="(match, index) in mat.matches">
-              <td>{{ match.number + 1 }}</td>
-              <td>
-                <div>{{ match.tori }}</div>
-                <div>{{ match.uke }}</div>
-              </td>
-              <td>
-                <div class="text-right">{{ getKataName(match.kata) }}</div>
-              </td>
-              <td>
-                <button class="btn btn-square btn-sm btn-error" alt="delete match">
-                  <XMarkIcon class="w-5 h-5" @click.prevent="delMatch(mat.number, index)" />
-                </button>
-              </td>
-            </tr> -->
-          <!-- </tbody> -->
+          <draggable v-model="mat.matches" item-key="tori" tag="tbody" group="matches">
+            <template #item="{ element: match }">
+              <tr>
+                <td>
+                  <div>{{ match.tori }}</div>
+                  <div>{{ match.uke }}</div>
+                </td>
+                <td>
+                  <div class="">{{ getKataName(match.kata) }}</div>
+                </td>
+                <td>
+                  <button class="btn btn-square btn-sm btn-error" alt="delete match">
+                    <XMarkIcon class="w-5 h-5" @click.prevent="delMatch(mat.number, index)" />
+                  </button>
+                </td>
+              </tr>
+            </template>
+          </draggable>
         </table>
       </div>
     </div>
@@ -164,7 +147,6 @@ import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon } from '@heroicons/vue/2
 import { format } from 'date-fns';
 import { getKataName, handleServerError } from '~~/src/utils';
 
-const admin = useAdmin();
 const cookie = useCookie('jkj', { default: () => ({}) });
 const tournament = useState('tournament', () => { return {} });
 const showAddMatch = useState('showAddMatch', () => false);
@@ -178,6 +160,7 @@ const numberOfJudges = useState('numberOfJudges', () => 5);
 const startTime = useState('startTime', () => format(new Date(), 'HH:mm'));
 const route = useRoute();
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
+const dragging = useState('dragging', () => false);
 
 try {
   tournament.value = await $fetch(`/api/tournament/${route.params.tournament}`, { headers });
@@ -198,7 +181,7 @@ async function showUpdate(selectedMat) {
 }
 
 async function addMatch() {
-  const body = { tournament: kata.value, tori: tori.value, uke: uke.value };
+  const body = { tournament: kata.value, tori: tori.value, uke: uke.value, kata: kata.value };
   const response = await $fetch(`/api/tournament/${route.params.tournament}/m/${mat.value}/match`, { method: 'POST', body, headers });
   tournament.value = response;
   showAddMatch.value = false;
@@ -215,5 +198,10 @@ async function updateMat() {
 async function delMatch(matNumber, matchId) {
   const response = await $fetch(`/api/tournament/${route.params.tournament}/m/${matNumber}/match/${matchId}`, { method: 'DELETE', headers });
   tournament.value = response;
+}
+
+async function save() {
+  const body = tournament.value;
+  await $fetch(`/api/tournament/${route.params.tournament}`, { method: 'POST', body, headers });
 }
 </script>
