@@ -17,7 +17,8 @@ body,
   z-index: 2;
 }
 
+/* 
 td {
   border: 1px solid;
   @apply border-base-200;
-}
+} */

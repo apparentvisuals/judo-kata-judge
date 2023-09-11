@@ -7,7 +7,7 @@ function isDev() {
 export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
   colorMode: {
-    preference: 'light', // default theme
+    preference: 'business', // default theme
     dataValue: 'theme', // activate data-theme in <html> tag
     classSuffix: '',
   },
@@ -25,6 +25,13 @@ export default defineNuxtConfig({
         endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
         accountKey: process.env.COSMOS_KEY,
         containerName: isDev() ? 'judges-dev' : 'judges',
+        databaseName: 'judo-kata-judge'
+      },
+      'athlete': {
+        driver: 'azureCosmos',
+        endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
+        accountKey: process.env.COSMOS_KEY,
+        containerName: isDev() ? 'athletes-dev' : 'athletes',
         databaseName: 'judo-kata-judge'
       },
       'archive': {
