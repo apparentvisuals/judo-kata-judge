@@ -1,26 +1,24 @@
 <template>
-  <div class="bg bg-base-200 h-full overflow-y-auto px-4">
-    <div class="py-4">
-      <div class="navbar bg-base-100 shadow-xl rounded-box">
-        <div class="navbar-start">
-          <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/admin')">
-            <ArrowLeftIcon class="w-6 h-6" />
-          </button>
-        </div>
-        <div class="navbar-center">
-          <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
-        </div>
-        <div class="navbar-end">
-          <button class="btn btn-ghost" @click.prevent="save">
-            Save
-          </button>
-        </div>
+  <div class="bg-base-200 h-full overflow-y-auto">
+    <div class="navbar bg-primary shadow-xl">
+      <div class="navbar-start text-primary-content">
+        <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/admin')">
+          <ArrowLeftIcon class="w-6 h-6" />
+        </button>
+      </div>
+      <div class="navbar-center text-primary-content">
+        <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
+      </div>
+      <div class="navbar-end text-primary-content">
+        <button class="btn btn-ghost" @click.prevent="save">
+          Save
+        </button>
       </div>
     </div>
     <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
       <h1 class="text-3xl font-bold uppercase">{{ error }}</h1>
     </div>
-    <div class="flex flex-row gap-2">
+    <div class="flex flex-row gap-2 m-4">
       <div v-for="mat in tournament.mats" class="w-1/3 p-6 bg-base-100 rounded-box">
         <div>
           <div class="flex justify-between mb-2">
@@ -57,15 +55,15 @@
               <th class="w-6"></th>
             </tr>
           </thead>
-          <draggable v-model="mat.matches" item-key="tori" tag="tbody" group="matches">
+          <draggable v-model="mat.matches" tag="tbody" group="matches" item-key="tori">
             <template #item="{ element: match }">
-              <tr>
+              <tr class="bg-white">
                 <td>
                   <div>{{ match.tori }}</div>
                   <div>{{ match.uke }}</div>
                 </td>
                 <td>
-                  <div class="">{{ getKataName(match.kata) }}</div>
+                  <div>{{ getKataName(match.kata) }}</div>
                 </td>
                 <td>
                   <button class="btn btn-square btn-sm btn-error" alt="delete match">
@@ -160,7 +158,6 @@ const numberOfJudges = useState('numberOfJudges', () => 5);
 const startTime = useState('startTime', () => format(new Date(), 'HH:mm'));
 const route = useRoute();
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
-const dragging = useState('dragging', () => false);
 
 try {
   tournament.value = await $fetch(`/api/tournament/${route.params.tournament}`, { headers });

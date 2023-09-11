@@ -125,7 +125,7 @@ class Tournament {
 }
 
 class DB {
-  async createTournament(name = 'Tournament 1', numberOfMats = 1) {
+  async createTournament({ name = 'Tournament 1', numberOfMats = 1 }) {
     const id = nanoid(6);
     const tournamentData = {
       name,
@@ -135,6 +135,20 @@ class DB {
     const tournament = new Tournament(id, tournamentData);
     await tournament.save();
     return { id, ...tournamentData };
+  }
+
+  async createJudge(data) {
+    const id = nanoid(6);
+    const judge = data;
+    await useStorage('judge').setItem(id, judge);
+    return { id, ...judge };
+  }
+
+  async createAthlete(data) {
+    const id = nanoid(6);
+    const athlete = data;
+    await useStorage('athlete').setItem(id, athlete);
+    return { id, ...athlete };
   }
 
   async tournament(id) {
@@ -159,6 +173,30 @@ class DB {
       });
     }
     return clients.get(key);
+  }
+
+  async getAllAthletes() {
+    const athleteIds = await useStorage('athlete').getKeys();
+    const loadAthletes = athleteIds.map((id) => {
+      return (async () => {
+        const athlete = await useStorage('athlete').getItem(id);
+        return { id, name: athlete.name, region: athlete.region, rank: athlete.rank };
+      })();
+    });
+    const athletes = await Promise.all(loadAthletes);
+    return athletes;
+  }
+
+  async getAllJudges() {
+    const judgeIds = await useStorage('judge').getKeys();
+    const loadJudges = judgeIds.map((id) => {
+      return (async () => {
+        const judge = await useStorage('judge').getItem(id);
+        return { id, name: judge.name, region: judge.region, rank: judge.rank };
+      })();
+    });
+    const judges = await Promise.all(loadJudges);
+    return judges;
   }
 
   async getAllTournaments() {
@@ -216,9 +254,6 @@ function _createMatInfo(mat) {
     matches: [],
     judges: Array(5).fill().map(() => ''),
     judgeCodes: Array(5).fill().map(() => nanoid(4)),
-    // clients: new Clients(),
-    // reportClients: new Clients(),
-    // summaryClients: new Clients(),
   }
 }
 function _defaultScore() {
