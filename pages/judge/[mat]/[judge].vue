@@ -1,17 +1,33 @@
 <template>
-  <div class="bg bg-base-200 h-full overflow-y-auto">
-    <div class="navbar bg-base-100 shadow-xl rounded-box">
+  <div v-if="!judge" class="bg bg-base-200 h-full flex">
+    <div class="m-auto max-w-xs max-h-96">
+      <form valid="isValid" @submit.prevent="submitJudge">
+        <div class="form-control w-full max-w-xs">
+          <label class="label" for="code">
+            <span class="label-text">Judge Code</span>
+          </label>
+          <input id="code" name="code" type="text" class="input input-bordered" v-model="code" />
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Submit</button>
+      </form>
+    </div>
+  </div>
+  <div v-if="judge" class="bg bg-base-200 h-full overflow-y-auto">
+    <div class="navbar bg-base-100 rounded-box" :class="inputState">
       <div class="navbar-start">
-        <NuxtLink to="/" class="btn btn-square btn-ghost">
-          <ArrowLeftIcon class="w-6 h-6" />
-        </NuxtLink>
+        <button class="btn btn-square btn-ghost" @click.prevent="changeJudge">
+          <ArrowPathRoundedSquareIcon class="w-6 h-6" />
+        </button>
       </div>
       <div class="navbar-center">
-        {{ `${match.number} - ${match.tori}/${match.uke} (${getKataName(match.kata)})` }}
+        <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
+        <div v-if="match">
+          <div>{{ judge.name }}</div>
+          <div>{{ `${match.tori}/${match.uke} (${getKataName(match.kata)})` }}</div>
+        </div>
       </div>
       <div class="navbar-end">
-        <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
-        <button v-else class="btn btn-primary" @click.prevent.stop="loadNext">submit</button>
+        <button class="btn btn-primary" @click.prevent.stop="submitScore">submit</button>
       </div>
     </div>
     <table v-show="!error" class="table w-full p-4 bg-base-100">
@@ -55,45 +71,38 @@
 </template>
 
 <script setup>
-import { CheckIcon, PlusIcon, MinusIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline';
+import { CheckIcon, PlusIcon, MinusIcon, ArrowPathRoundedSquareIcon } from '@heroicons/vue/24/outline';
 import { moveList, calculateMoveScore } from '~~/server/utils';
 import { getKataName, handleServerError } from '~~/src/utils';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 const route = useRoute();
 
-const error = useState('error', () => '');
-const tournament = useState('tournament', () => ({}));
-const match = useState('match', () => ({}));
-const scores = useState('scores', () => []);
-const majorIndex = useState('majorIndex', () => []);
-
 const matNumber = computed(() => route.params.mat);
-const judge = computed(() => route.params.judge);
-const hasMajor = computed(() => majorIndex.value.find((item) => item));
-const grandTotal = computed(() => {
-  const total = scores.value.reduce((acc, value) => acc += value.total, 0);
+const judgeNumber = computed(() => route.params.judge);
+
+const error = useState('error', () => '');
+const match = useState('match', () => undefined);
+const judge = useState('judge', () => undefined);
+const scores = useState('scores', () => []);
+const code = useState('code', () => '');
+
+const inputState = computed(() => {
   if (hasMajor.value) {
-    return total / 2;
+    return 'bg-warning';
+  } else {
+    return 'bg-success';
   }
-  return total;
 });
-const numberOfMats = computed(() => tournament.value.numberOfMats || 0);
+const hasMajor = computed(() => scores.value.find((score) => score.deductions[4] === '1'));
+const grandTotal = computed(() => scores.value.reduce((acc, value) => acc += value.total, 0));
 const moves = computed(() => moveList(match.value.kata));
-const numberOfTechniques = computed(() => moves.value.length);
 
 watch(hasMajor, () => {
-  computeScore();
+  _computeScore();
 });
 
-try {
-  tournament.value = await $fetch(`/api/tournaments/${cookie.value.tCode}`);
-  matNumber.value = 1;
-} catch (err) {
-  error.value = handleServerError(err);
-}
-
-async function loadNext() {
+async function submitScore() {
   await _getMatch();
 }
 
@@ -115,57 +124,64 @@ async function toggleScore(score, index) {
     }
   }
 
-  if (index === 4) {
-    if (deductions[index] === '1') {
-      majorIndex.value[score.number] = score.number + 1;
-    } else {
-      majorIndex.value[score.number] = 0;
-    }
-  }
-
-  computeScore();
-  await $fetch(`/api/${matNumber.value}/${judge.value}`, {
+  _computeScore();
+  await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, {
     method: 'POST',
     body: { move: score.number, deductions: score.deductions.join(':'), total: score.origTotal },
     headers: { authorization: `Bearer ${cookie.value.tCode}` }
   });
 }
 
-function computeScore() {
+function _computeScore() {
   const values = scores.value;
   for (let ii = 0; ii < values.length; ii++) {
     const score = values[ii];
-    score.total = calculateMoveScore(score.deductions);
+    let total = calculateMoveScore(score.deductions);
+    if (hasMajor.value) {
+      total = total / 2;
+    }
+    score.total = total;
   }
 }
 
-function calculateScore(judgeInfo) {
-  const count = numberOfTechniques.value;
-  const newMajorIndex = new Array(count);
+function _calculateScore(judgeInfo) {
+  const count = moves.value.length;
   const newScores = new Array(count);
   for (let ii = 0; ii < count; ii++) {
     const score = judgeInfo.scores[ii];
     const deductions = score.deductions.split(':');
     const total = score.value;
     newScores[ii] = { number: ii, deductions, total };
-    newMajorIndex[ii] = deductions[4] === '1';
   }
-  return { newScores, newMajorIndex };
+  return newScores;
+}
+
+async function submitJudge() {
+  try {
+    error.value = '';
+    judge.value = await $fetch(`/api/judges/${code.value}`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
+  } catch (err) {
+    error.value = handleServerError(err);
+  }
+}
+
+async function changeJudge() {
+  judge.value = undefined;
+  code.value = '';
 }
 
 async function _getMatch() {
   try {
     error.value = '';
     match.value = await $fetch(`/api/${matNumber.value}/match`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
-    const judgeInfo = await $fetch(`/api/${matNumber.value}/${judge.value}`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
-    const { newScores, newMajorIndex } = calculateScore(judgeInfo);
+
+    const judgeValues = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
+    const newScores = _calculateScore(judgeValues);
     scores.value = newScores;
-    majorIndex.value = newMajorIndex;
   } catch (err) {
     error.value = handleServerError(err);
   }
 }
-
 await _getMatch();
 
 </script>

@@ -12,11 +12,16 @@ export default class Judge {
     return { id, ...judge };
   }
 
+  static async get(id) {
+    const judge = await useStorage(key).getItem(id);
+    return judge;
+  }
+
   static async getAll() {
     const judgeIds = await useStorage(key).getKeys();
     const loadJudges = judgeIds.map((id) => {
       return (async () => {
-        const judge = await useStorage(key).getItem(id);
+        const judge = await Judge.get(id);
         return { id, name: judge.name, region: judge.region, rank: judge.rank };
       })();
     });
