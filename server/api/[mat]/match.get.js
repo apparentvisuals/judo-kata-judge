@@ -1,7 +1,6 @@
 import { pick } from 'lodash-es';
 
-import db from '../../db';
-import { getToken, moveList } from '../../utils';
+import { getToken } from '../../utils';
 import Tournament from '~/server/models/tournament';
 
 export default defineEventHandler(async (event) => {
