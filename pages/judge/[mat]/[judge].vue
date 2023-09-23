@@ -150,7 +150,7 @@ function _calculateScore(judgeInfo) {
   for (let ii = 0; ii < count; ii++) {
     const score = judgeInfo.scores[ii];
     const deductions = score.deductions.split(':');
-    const total = score.value;
+    const total = calculateMoveScore(deductions);
     newScores[ii] = { number: ii, deductions, total };
   }
   return newScores;
@@ -174,7 +174,6 @@ async function _getMatch() {
   try {
     error.value = '';
     match.value = await $fetch(`/api/${matNumber.value}/match`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
-
     const judgeValues = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
     const newScores = _calculateScore(judgeValues);
     scores.value = newScores;

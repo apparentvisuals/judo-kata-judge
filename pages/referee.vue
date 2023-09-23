@@ -2,9 +2,9 @@
   <div class="bg bg-base-200 h-full overflow-y-auto">
     <div class="navbar bg-base-100 shadow-xl rounded-box">
       <div class="navbar-start">
-        <!-- <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/code?from=/schedule')">
+        <NuxtLink to="/" class="btn btn-square btn-ghost">
           <ArrowLeftIcon class="w-6 h-6" />
-        </button> -->
+        </NuxtLink>
       </div>
       <div class="navbar-center">
         <div v-if="numberOfMats > 0">
@@ -51,7 +51,7 @@
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import { getKataName, handleServerError } from '~~/src/utils';
 
-const auth = useAuth();
+const cookie = useCookie('jkj', { default: () => ({}) });
 const error = useState('error', () => '');
 const tournament = useState('tournament', () => { return {}; });
 const scores = useState('scores', () => { return {}; });
@@ -59,7 +59,7 @@ const numberOfMats = computed(() => tournament.value.numberOfMats);
 const matNumber = useState('matNumber', () => 1);
 
 try {
-  tournament.value = await $fetch(`/api/tournaments/${auth.value}`);
+  tournament.value = await $fetch(`/api/tournaments/${cookie.value.tCode}`);
 } catch (err) {
   error.value = handleServerError(err);
 }
@@ -74,14 +74,14 @@ watch(matNumber, (newValue) => {
 });
 
 async function confirmScore() {
-  await $fetch(`/api/${matNumber.value}/complete-match`, { method: 'POST', headers: { authorization: `Bearer ${auth.value}` } });
+  await $fetch(`/api/${matNumber.value}/complete-match`, { method: 'POST', headers: { authorization: `Bearer ${cookie.value.tCode}` } });
 }
 
 function _subscribe(matNumber) {
   if (events) {
     events.close();
   }
-  events = new EventSource(`/api/${matNumber}/report?token=${auth.value}`);
+  events = new EventSource(`/api/${matNumber}/report?token=${cookie.value.tCode}`);
   events.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (!data.error) {

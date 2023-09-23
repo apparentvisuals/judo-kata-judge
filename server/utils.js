@@ -95,7 +95,7 @@ export function createReport(match) {
     for (let ii = 0; ii < techniquesCount; ii++) {
       const deductions = judge.scores[ii].deductions.split(':');
       let moveTotal = calculateMoveScore(deductions);
-      report[ii].values[judgeIndex]
+      report[ii].values[judgeIndex] = moveTotal;
       judgeTotal += moveTotal;
       if (deductions[4] === '1') {
         hasMajor = true;
