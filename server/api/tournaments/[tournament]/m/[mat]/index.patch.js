@@ -3,6 +3,7 @@ import { pick } from 'lodash-es';
 import db from '../../../../../db';
 import { getToken } from '../../../../../utils';
 import { getAuth } from '../../../../../utils/auth-key';
+import Tournament from '~/server/models/tournament';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
   const mat = parseInt(getRouterParam(event, 'mat'));
   const { numberOfJudges, startTime } = await readBody(event);
   try {
-    const tournament = await db.tournament(tournamentId);
+    const tournament = await Tournament.get(tournamentId);
     tournament.updateMat(mat, numberOfJudges, startTime);
     await tournament.save();
     return tournament.data;

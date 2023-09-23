@@ -1,7 +1,6 @@
 export default defineNuxtRouteMiddleware((to, from) => {
   const cookie = useCookie('jkj', { default: () => ({}) });
   const auth = useAuth();
-  const admin = useAdmin();
   if (to.path.startsWith('/admin')) {
     if (to.path === '/admin/code') {
       return;
@@ -19,7 +18,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     }
   }
   else if (to.path !== '/code' && to.path !== '/setup') {
-    if (auth.value === '') {
+    if (!cookie.value.tCode) {
       return navigateTo(
         {
           path: '/code',

@@ -2,6 +2,7 @@ import { pick } from 'lodash-es';
 
 import db from '../../db';
 import { getToken, moveList } from '../../utils';
+import Tournament from '~/server/models/tournament';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
 
   const mat = parseInt(event.context.params.mat - 1);
 
-  const tournament = await db.tournament(token);
+  const tournament = await Tournament.get(token);
   const matchInfo = tournament.getMatch(mat);
   if (!matchInfo) {
     throw createError({ statusCode: 400, message: 'no more matches' })

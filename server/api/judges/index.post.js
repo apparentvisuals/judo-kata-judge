@@ -1,4 +1,4 @@
-import db from '../../db';
+import Judge from '~/server/models/judge';
 import { getToken } from '../../utils';
 import { getAuth } from '../../utils/auth-key';
 
@@ -12,9 +12,9 @@ export default defineEventHandler(async (event) => {
   }
   try {
     const { name, rank, region } = await readBody(event);
-    const response = await db.createJudge({ name, rank, region });
+    const response = await Judge.create({ name, rank, region });
     return response;
   } catch (err) {
-    throw createError({ statusCode: 400, messsage: err.message });
+    throw createError({ statusCode: 400, statusMessage: err.message });
   }
 });

@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import db from '../../db';
 import { createSummaryMessage } from '../../utils';
+import Tournament from '~/server/models/tournament';
 
 export default defineEventHandler(async (event) => {
   const { token } = getQuery(event);
@@ -13,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const res = event.node.res;
 
   const mat = parseInt(event.context.params.mat - 1);
-  const tournament = await db.tournament(token);
+  const tournament = await Tournament.get(token);
   const matInfo = tournament.getMat(mat);
 
   const headers = {

@@ -8,7 +8,7 @@
           </label>
           <input id="code" name="code" type="text" class="input input-bordered" v-model="code" />
         </div>
-        <button type="submit" class="btn mt-4">Submit</button>
+        <button type="submit" class="btn btn-primary mt-4">Submit</button>
       </form>
     </div>
   </div>
@@ -16,13 +16,11 @@
 
 <script setup>
 const cookie = useCookie('jkj', { default: () => ({}) });
-const admin = useAdmin();
 const route = useRoute();
 
 const code = useState('code', () => '');
 
 function submit() {
-  admin.value = code;
   cookie.value.adminCode = code;
   if (route.query.from) {
     navigateTo(route.query.from);

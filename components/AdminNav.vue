@@ -27,5 +27,11 @@
 <script setup>
 import { ArrowLeftOnRectangleIcon, Bars3Icon } from '@heroicons/vue/24/outline';
 
-const props = defineProps(['name'])
+const props = defineProps(['name']);
+const cookie = useCookie('jkj', { default: () => ({}) });
+
+function logout() {
+  cookie.value.adminCode = '';
+  navigateTo('/admin/code');
+}
 </script>

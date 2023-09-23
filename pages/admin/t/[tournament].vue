@@ -18,17 +18,17 @@
     <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
       <h1 class="text-3xl font-bold uppercase">{{ error }}</h1>
     </div>
-    <div class="flex flex-row gap-2 m-4">
-      <div v-for="mat in tournament.mats" class="w-1/3 p-6 bg-base-100 rounded-box">
-        <div>
+    <div class="flex flex-row flex-wrap p-1">
+      <div v-for=" mat in tournament.mats" class="w-full md:w-1/2 xl:w-1/3 p-1">
+        <div class="bg-base-100 p-2">
           <div class="flex justify-between mb-2">
             <h2 class="text-lg font-semibold">Mat {{ mat.number + 1 }}</h2>
             <div class="flex">
-              <button class="btn btn-square mr-2 btn-accent" @click.prevent="showUpdate(mat.number)">
-                <PencilIcon class="w-6 h-6" />
+              <button class="btn btn-square btn-sm mr-2 btn-accent" @click.prevent="showUpdate(mat.number)">
+                <PencilIcon class="w-4 h-4" />
               </button>
-              <button class="btn btn-square btn-primary" @click.prevent="showAdd(mat.number)">
-                <PlusIcon class="w-6 h-6" />
+              <button class="btn btn-square btn-sm btn-primary" @click.prevent="showAdd(mat.number)">
+                <PlusIcon class="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -45,53 +45,45 @@
               </tr>
             </tbody>
           </table>
-        </div>
-        <table class="table w-full">
-          <caption>Competitor list</caption>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th class="w-32">Kata</th>
-              <th class="w-6"></th>
-            </tr>
-          </thead>
-          <draggable v-model="mat.matches" tag="tbody" group="matches" item-key="tori">
-            <template #item="{ element: match }">
-              <tr class="bg-white">
-                <td>
-                  <div>{{ match.tori }}</div>
-                  <div>{{ match.uke }}</div>
-                </td>
-                <td>
-                  <div>{{ getKataName(match.kata) }}</div>
-                </td>
-                <td>
-                  <button class="btn btn-square btn-sm btn-error" alt="delete match">
-                    <XMarkIcon class="w-5 h-5" @click.prevent="delMatch(mat.number, index)" />
-                  </button>
-                </td>
+          <table class="table w-full">
+            <caption>Competitor list</caption>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th class="w-32">Kata</th>
+                <th class="w-8"></th>
               </tr>
-            </template>
-          </draggable>
-        </table>
+            </thead>
+            <draggable v-model="mat.matches" tag="tbody" group="matches" item-key="tori">
+              <template #item="{ element: match }">
+                <tr class="bg-white">
+                  <td>
+                    <div>{{ match.tori }}</div>
+                    <div>{{ match.uke }}</div>
+                  </td>
+                  <td>
+                    <div>{{ getKataName(match.kata) }}</div>
+                  </td>
+                  <td>
+                    <button class="btn btn-square btn-sm btn-error" alt="delete match">
+                      <XMarkIcon class="w-4 h-4" @click.prevent="delMatch(mat.number, index)" />
+                    </button>
+                  </td>
+                </tr>
+              </template>
+            </draggable>
+          </table>
+        </div>
       </div>
     </div>
-    <div class="modal modal-bottom sm:modal-middle cursor-pointer" :class="showAddMatch ? 'modal-open' : ''">
+    <div class="modal modal-bottom sm:modal-middle cursor-pointer" :class="addingMatch ? 'modal-open' : ''">
       <div class="modal-box">
         <div class="form-control w-full">
           <label class="label" for="kata">
             <span class="label-text">Kata</span>
           </label>
           <select id="kata" class="select select-bordered" v-model="kata">
-            <option value="nnk3">Nage-no-kata (3 set)</option>
-            <option value="nnk">Nage-no-kata</option>
-            <option value="knk">Katame-no-kata</option>
-            <option value="jnk">Ju-no-kata</option>
-            <option value="kgj">Kodokan-goshin-jutsu</option>
-            <option value="kink">Kime-no-kata</option>
-            <option value="ko5">Kodomo-no-kata 5</option>
-            <option value="ko6">Kodomo-no-kata 6</option>
-            <option value="ko7">Kodomo-no-kata 7</option>
+            <option v-for="kata of Object.keys(KATA_MAP)" :value="kata">{{ getKataName(kata) }}</option>
           </select>
         </div>
         <div class="form-control w-full">
@@ -107,14 +99,14 @@
           <input id="uke" type="text" class="input input-bordered" v-model=uke />
         </div>
         <div class="modal-action">
-          <button for="add-match-modal" class="btn btn-error btn-outline" @click.prevent="showAddMatch = false">
+          <button for="add-match-modal" class="btn btn-error btn-outline" @click.prevent="addingMatch = false">
             Cancel
           </button>
           <button for="add-match-modal" class="btn btn-primary" @click.prevent="addMatch">Add</button>
         </div>
       </div>
     </div>
-    <div class="modal modal-bottom sm:modal-middle cursor-pointer" :class="showUpdateMat ? 'modal-open' : ''">
+    <div class="modal modal-bottom sm:modal-middle cursor-pointer" :class="updatingMat ? 'modal-open' : ''">
       <div class="modal-box">
         <div class="form-control w-full">
           <label class="label" for="numberOfJudges">
@@ -130,7 +122,7 @@
         </div>
 
         <div class="modal-action">
-          <button for="update-mat-modal" class="btn btn-error btn-outline" @click.prevent="showUpdateMat = false">
+          <button for="update-mat-modal" class="btn btn-error btn-outline" @click.prevent="updatingMat = false">
             Cancel
           </button>
           <button for="update-mat-modal" class="btn btn-primary" @click.prevent="updateMat">Update</button>
@@ -143,62 +135,64 @@
 <script setup>
 import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { format } from 'date-fns';
-import { getKataName, handleServerError } from '~~/src/utils';
+import { KATA_MAP, getKataName, handleServerError } from '~~/src/utils';
 
+const route = useRoute();
 const cookie = useCookie('jkj', { default: () => ({}) });
-const tournament = useState('tournament', () => { return {} });
-const showAddMatch = useState('showAddMatch', () => false);
+const tournament = useState('tournament', () => ({}));
+const athletes = useState('athletes', () => []);
+const addingMatch = useState('adding-match', () => false);
 const mat = useState('mat', () => 0);
 const kata = useState('kata', () => 'nnk');
 const tori = useState('tori', () => '');
 const uke = useState('uke', () => '');
 const error = useState('error', () => '');
-const showUpdateMat = useState('showUpdateMat', () => false);
+const updatingMat = useState('updating-mat', () => false);
 const numberOfJudges = useState('numberOfJudges', () => 5);
 const startTime = useState('startTime', () => format(new Date(), 'HH:mm'));
-const route = useRoute();
+
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
 try {
-  tournament.value = await $fetch(`/api/tournament/${route.params.tournament}`, { headers });
+  tournament.value = await $fetch(`/api/tournaments/${route.params.tournament}`, { headers });
 } catch (err) {
   error.value = handleServerError(err);
 }
 
 async function showAdd(selectedMat) {
   mat.value = selectedMat;
-  showAddMatch.value = true;
+  addingMatch.value = true;
 }
 
 async function showUpdate(selectedMat) {
   mat.value = selectedMat;
   numberOfJudges.value = tournament.value.mats[selectedMat].numberOfJudges;
   startTime.value = tournament.value.mats[selectedMat].startTime;
-  showUpdateMat.value = true;
+  updatingMat.value = true;
 }
 
 async function addMatch() {
   const body = { tournament: kata.value, tori: tori.value, uke: uke.value, kata: kata.value };
-  const response = await $fetch(`/api/tournament/${route.params.tournament}/m/${mat.value}/match`, { method: 'POST', body, headers });
+  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/match`, { method: 'POST', body, headers });
   tournament.value = response;
-  showAddMatch.value = false;
+  addingMatch.value = false;
   tori.value = '';
   uke.value = '';
 }
 
 async function updateMat() {
   const body = { mat: mat.value, numberOfJudges: numberOfJudges.value, startTime: startTime.value };
-  tournament.value = await $fetch(`/api/tournament/${route.params.tournament}/m/${mat.value}`, { method: 'PATCH', body, headers });
-  showUpdateMat.value = false;
+  tournament.value = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}`, { method: 'PATCH', body, headers });
+  updatingMat.value = false;
 }
 
 async function delMatch(matNumber, matchId) {
-  const response = await $fetch(`/api/tournament/${route.params.tournament}/m/${matNumber}/match/${matchId}`, { method: 'DELETE', headers });
+  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${matNumber}/match/${matchId}`, { method: 'DELETE', headers });
   tournament.value = response;
 }
 
 async function save() {
   const body = tournament.value;
-  await $fetch(`/api/tournament/${route.params.tournament}`, { method: 'POST', body, headers });
+  await $fetch(`/api/tournaments/${route.params.tournament}`, { method: 'POST', body, headers });
 }
 </script>

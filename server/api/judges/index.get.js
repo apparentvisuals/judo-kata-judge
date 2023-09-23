@@ -1,3 +1,4 @@
+import Judge from '~/server/models/judge';
 import db from '../../db';
 import { getToken } from '../../utils';
 import { getAuth } from '../../utils/auth-key';
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, messsage: 'forbidden' });
   }
   try {
-    const tournaments = await db.getAllJudges();
+    const tournaments = await Judge.getAll();
     return tournaments;
   } catch (err) {
     throw createError({ statusCode: 400, messsage: err.message });

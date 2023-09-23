@@ -17,14 +17,20 @@
             <th>Name</th>
             <th>Rank</th>
             <th>Region</th>
+            <th class="w-10"></th>
           </tr>
         </thead>
         <tbody class="bg-base-100">
           <tr v-for="t in athletes">
             <td>{{ t.id }}</td>
-            <td><a class="link" href="#" @click.prevent="navigateTo(`/admin/t/${t.id}`)">{{ t.name }}</a></td>
-            <td>{{ t.rank }}</td>
-            <td>{{ t.region }}</td>
+            <td>{{ t.name }}</td>
+            <td>{{ getRankName(t.rank) }}</td>
+            <td>{{ getProvinceName(t.region) }}</td>
+            <td>
+              <button class="btn btn-error btn-square btn-sm" @click.prevent="remove(t.id)">
+                <XMarkIcon class="w-4 h-4" />
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -42,8 +48,9 @@
             <span class="label-text">Province</span>
           </label>
           <select id="kata" class="select select-bordered" v-model="newAthlete.region">
-            <option value="on">Ontario</option>
-            <option value="qc">Quebec</option>
+            <option v-for="province of Object.keys(PROVINCE_MAP)" :value="province">
+              {{ getProvinceName(province) }}
+            </option>
           </select>
         </div>
         <div class="form-control w-full">
@@ -51,12 +58,7 @@
             <span class="label-text">Rank</span>
           </label>
           <select id="kata" class="select select-bordered" v-model="newAthlete.rank">
-            <option value="godan">Godan</option>
-            <option value="yondan">Yondan</option>
-            <option value="sandan">Sandan</option>
-            <option value="nidan">Nidan</option>
-            <option value="shodan">Shodan</option>
-            <option value="Ikkyu">Ikkyu</option>
+            <option v-for="rank of Object.keys(RANK_MAP)" :value="rank">{{ getRankName(rank) }}</option>
           </select>
         </div>
         <div class="modal-action">
@@ -71,9 +73,10 @@
 </template>
 
 <script setup>
-import { handleServerError } from '~~/src/utils';
+import { XMarkIcon } from '@heroicons/vue/24/outline';
+import { PROVINCE_MAP, RANK_MAP, getProvinceName, getRankName, handleServerError } from '~~/src/utils';
 
-const DEFAULT = { name: '', region: 'on', rank: 'shodan' };
+const DEFAULT = { name: '', region: 'on', rank: '1d' };
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 

@@ -1,6 +1,6 @@
 import { pick } from 'lodash-es';
 
-import db from '../../db';
+import Tournament from '~/server/models/tournament';
 
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +15,8 @@ export default defineEventHandler(async (event) => {
 
   const mat = parseInt(getRouterParam(event, 'mat')) - 1;
 
-  const matInfo = await db.getMat(token, mat);
+  const tournament = await Tournament.get(token);
+  const matInfo = tournament.getMat(mat);
   if (!matInfo) {
     return {};
   }
