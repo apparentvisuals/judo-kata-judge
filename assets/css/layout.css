@@ -11,10 +11,7 @@ body,
 }
 
 .table>thead>tr>th {
-  position: sticky;
-  position: -webkit-sticky;
-  top: 0;
-  z-index: 2;
+  @apply bg-base-100 z-40 top-0 sticky;
 }
 
 /* 

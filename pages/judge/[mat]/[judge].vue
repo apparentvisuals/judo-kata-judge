@@ -2,53 +2,39 @@
   <div class="bg bg-base-200 h-full overflow-y-auto">
     <div class="navbar bg-base-100 shadow-xl rounded-box">
       <div class="navbar-start">
-        <!-- <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/code?from=/schedule')">
+        <NuxtLink to="/" class="btn btn-square btn-ghost">
           <ArrowLeftIcon class="w-6 h-6" />
-        </button> -->
+        </NuxtLink>
       </div>
       <div class="navbar-center">
-        <div v-if="numberOfMats > 0">
-          <div class="btn-group pr-2">
-            <button class="btn" :class="matNumber === number ? 'btn-active' : ''" v-for="number in numberOfMats"
-              @click.stop="matNumber = number">
-              {{ `mat ${number}` }}
-            </button>
-          </div>
-          <div class="btn-group">
-            <button class="btn" :class="judge === number ? 'btn-active' : ''" v-for="number in 5"
-              @click.stop="judge = number">
-              {{ `judge ${number}` }}
-            </button>
-          </div>
-        </div>
+        {{ `${match.number} - ${match.tori}/${match.uke} (${getKataName(match.kata)})` }}
       </div>
       <div class="navbar-end">
         <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
-        <button v-else class="btn btn-primary" @click.prevent.stop="loadNext">Next</button>
+        <button v-else class="btn btn-primary" @click.prevent.stop="loadNext">submit</button>
       </div>
     </div>
-    <table v-show="!error" class="table w-full p-4">
-      <caption>{{ `${match.number} - ${match.tori}/${match.uke} (${getKataName(match.kata)})` }}</caption>
+    <table v-show="!error" class="table w-full p-4 bg-base-100">
       <thead>
         <tr>
           <th>Technique</th>
-          <th class="px-0 w-24 text-center">Small (1)</th>
-          <th class="px-0 w-24 text-center">Small (1)</th>
-          <th class="px-0 w-24 text-center">Medium (3)</th>
-          <th class="px-0 w-24 text-center">Big (5)</th>
-          <th class="px-0 w-24 text-center">Major (0)</th>
-          <th class="px-0 w-24 text-center">Correction</th>
-          <th class="px-0 w-24 text-center">Score</th>
+          <th class="score">S(1)</th>
+          <th class="score">S(1)</th>
+          <th class="score">M(3)</th>
+          <th class="score">B(5)</th>
+          <th class="score">F(0)</th>
+          <th class="score">C</th>
+          <th class="w-16 text-center">Score</th>
         </tr>
       </thead>
-      <tbody>
-        <tr class="hover" v-for="(score, index) in scores">
+      <tbody class="bg-base-100">
+        <tr v-for="(score, index) in scores">
           <td>{{ moves[index] }}</td>
-          <td v-for="(deduction, index) in score.deductions" class="p-0">
-            <button class="block h-16 w-full pl-8" @click.prevent="toggleScore(score, index)">
-              <CheckIcon class="w-8" v-if="deduction === '1'" />
-              <PlusIcon class="w-8" v-if="index === 5 && deduction === '+'" />
-              <MinusIcon class="w-8" v-if="index === 5 && deduction === '-'" />
+          <td v-for="(deduction, index) in score.deductions" class="p-0 pt-1">
+            <button class="btn btn-ghost btn-square" @click.prevent="toggleScore(score, index)">
+              <CheckIcon class="h-5 w-5" v-if="deduction === '1'" />
+              <PlusIcon class="h-6 w-6" v-if="index === 5 && deduction === '+'" />
+              <MinusIcon class="h-6 w-6" v-if="index === 5 && deduction === '-'" />
             </button>
           </td>
           <td class="text-center">{{ score.total }}</td>
@@ -73,15 +59,17 @@ import { CheckIcon, PlusIcon, MinusIcon, ArrowLeftIcon } from '@heroicons/vue/24
 import { moveList, calculateMoveScore } from '~~/server/utils';
 import { getKataName, handleServerError } from '~~/src/utils';
 
-const auth = useAuth();
+const cookie = useCookie('jkj', { default: () => ({}) });
+const route = useRoute();
+
 const error = useState('error', () => '');
-const tournament = useState('tournament', () => { return {}; });
-const match = useState('match', () => { return {}; });
-const judge = useState('judge', () => 1);
+const tournament = useState('tournament', () => ({}));
+const match = useState('match', () => ({}));
 const scores = useState('scores', () => []);
 const majorIndex = useState('majorIndex', () => []);
-const matNumber = useState('matNumber', () => 0);
 
+const matNumber = computed(() => route.params.mat);
+const judge = computed(() => route.params.judge);
 const hasMajor = computed(() => majorIndex.value.find((item) => item));
 const grandTotal = computed(() => {
   const total = scores.value.reduce((acc, value) => acc += value.total, 0);
@@ -98,16 +86,8 @@ watch(hasMajor, () => {
   computeScore();
 });
 
-watch(matNumber, async () => {
-  await _getMatch();
-});
-
-watch(judge, async () => {
-  await _getMatch();
-});
-
 try {
-  tournament.value = await $fetch(`/api/tournaments/${auth.value}`);
+  tournament.value = await $fetch(`/api/tournaments/${cookie.value.tCode}`);
   matNumber.value = 1;
 } catch (err) {
   error.value = handleServerError(err);
@@ -147,7 +127,7 @@ async function toggleScore(score, index) {
   await $fetch(`/api/${matNumber.value}/${judge.value}`, {
     method: 'POST',
     body: { move: score.number, deductions: score.deductions.join(':'), total: score.origTotal },
-    headers: { authorization: `Bearer ${auth.value}` }
+    headers: { authorization: `Bearer ${cookie.value.tCode}` }
   });
 }
 
@@ -176,8 +156,8 @@ function calculateScore(judgeInfo) {
 async function _getMatch() {
   try {
     error.value = '';
-    match.value = await $fetch(`/api/${matNumber.value}/match`, { headers: { authorization: `Bearer ${auth.value}` } });
-    const judgeInfo = await $fetch(`/api/${matNumber.value}/${judge.value}`, { headers: { authorization: `Bearer ${auth.value}` } });
+    match.value = await $fetch(`/api/${matNumber.value}/match`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
+    const judgeInfo = await $fetch(`/api/${matNumber.value}/${judge.value}`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
     const { newScores, newMajorIndex } = calculateScore(judgeInfo);
     scores.value = newScores;
     majorIndex.value = newMajorIndex;
@@ -185,4 +165,13 @@ async function _getMatch() {
     error.value = handleServerError(err);
   }
 }
+
+await _getMatch();
+
 </script>
+
+<style>
+.score {
+  @apply w-12 text-center p-0;
+}
+</style>

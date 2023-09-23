@@ -64,7 +64,7 @@ const error = useState('error', () => '');
 const adding = useState('adding', () => false)
 
 try {
-  tournaments.value = await $fetch(`/api/tournament`, { headers: { authorization: `Bearer ${cookie.value.adminCode}` } });
+  tournaments.value = await $fetch(`/api/tournaments`, { headers: { authorization: `Bearer ${cookie.value.adminCode}` } });
 } catch (err) {
   error.value = handleServerError(err);
 }
@@ -72,7 +72,7 @@ try {
 async function addTournament() {
   const body = newTournament.value;
   const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
-  const result = await $fetch(`/api/tournament`, { method: 'POST', body, headers });
+  const result = await $fetch(`/api/tournaments`, { method: 'POST', body, headers });
   tournaments.value.push({ id: result.id, name: result.name });
   newTournament.value = DEFAULT;
   adding.value = false;

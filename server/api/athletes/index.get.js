@@ -1,4 +1,4 @@
-import db from '../../db';
+import Athlete from '~/server/models/athlete';
 import { getToken } from '../../utils';
 import { getAuth } from '../../utils/auth-key';
 
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, messsage: 'forbidden' });
   }
   try {
-    const athletes = await db.getAllAthletes();
+    const athletes = await Athlete.getAll();
     return athletes;
   } catch (err) {
     throw createError({ statusCode: 400, messsage: err.message });

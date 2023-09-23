@@ -1,3 +1,4 @@
+import Tournament from '~/server/models/tournament';
 import db from '../../db';
 import { notifyAllClients, createUpdateMessage, createReportMessage, createReport } from '../../utils';
 
@@ -15,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const judge = parseInt(event.context.params.judge - 1);
   const { move, deductions, total } = await readBody(event);
 
-  const tournament = await db.tournament(token);
+  const tournament = await Tournament.get(token);
   const matchInfo = tournament.getMatch(mat);
   if (!matchInfo) {
     return {};

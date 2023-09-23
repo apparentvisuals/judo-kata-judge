@@ -22,9 +22,9 @@
         <tbody class="bg-base-100">
           <tr v-for="t in judges">
             <td>{{ t.id }}</td>
-            <td><a class="link" href="#" @click.prevent="navigateTo(`/admin/t/${t.id}`)">{{ t.name }}</a></td>
-            <td>{{ t.rank }}</td>
-            <td>{{ t.region }}</td>
+            <td>{{ t.name }}</td>
+            <td>{{ getLevelName(t.rank) }}</td>
+            <td>{{ getProvinceName(t.region) }}</td>
           </tr>
         </tbody>
       </table>
@@ -38,21 +38,21 @@
           <input id="name" name="name" type="text" class="input input-bordered" v-model="newJudge.name" />
         </div>
         <div class="form-control w-full">
-          <label class="label" for="mats">
+          <label class="label" for="province">
             <span class="label-text">Province</span>
           </label>
-          <select id="kata" class="select select-bordered" v-model="newJudge.region">
-            <option value="on">Ontario</option>
-            <option value="qc">Quebec</option>
+          <select id="province" class="select select-bordered" v-model="newJudge.region">
+            <option v-for="province of Object.keys(PROVINCE_MAP)" :value="province">
+              {{ getProvinceName(province) }}
+            </option>
           </select>
         </div>
         <div class="form-control w-full">
-          <label class="label" for="mats">
-            <span class="label-text">Rank</span>
+          <label class="label" for="level">
+            <span class="label-text">Level</span>
           </label>
-          <select id="kata" class="select select-bordered" v-model="newJudge.rank">
-            <option value="n">National</option>
-            <option value="p">Provincial</option>
+          <select id="level" class="select select-bordered" v-model="newJudge.rank">
+            <option v-for="level of Object.keys(LEVEL_MAP)" :value="level">{{ getLevelName(level) }}</option>
           </select>
         </div>
         <div class="modal-action">
@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-import { handleServerError } from '~~/src/utils';
+import { LEVEL_MAP, PROVINCE_MAP, getLevelName, getProvinceName, handleServerError } from '~~/src/utils';
 
 const DEFAULT = { name: '', region: 'on', rank: 'n' };
 

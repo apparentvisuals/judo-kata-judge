@@ -2,19 +2,11 @@
   <div class="bg bg-base-200 h-full overflow-y-auto">
     <div class="navbar bg-base-100 shadow-xl rounded-box">
       <div class="navbar-start">
-        <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/code?from=/schedule')">
+        <NuxtLink to="/" class="btn btn-square btn-ghost">
           <ArrowLeftIcon class="w-6 h-6" />
-        </button>
+        </NuxtLink>
       </div>
       <div class="navbar-center">
-        <div v-if="numberOfMats > 0">
-          <div class="btn-group">
-            <button class="btn" :class="matNumber === number ? 'btn-active' : ''" v-for="number in numberOfMats"
-              @click.stop="matNumber = number">
-              {{ `mat ${number}` }}
-            </button>
-          </div>
-        </div>
       </div>
       <div class="navbar-end">
         <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
@@ -43,15 +35,15 @@
 <script setup>
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import { addMinutes, format, parse } from 'date-fns';
-import { getKataName } from '@/src/utils';
+import { getKataName, handleServerError } from '@/src/utils';
 
-const auth = useAuth();
+const cookie = useCookie('jkj', { default: () => ({}) });
+const route = useRoute();
 const tournament = useState('tournament', () => { return {}; });
 const mat = useState('mat', () => { return { startTime: format(new Date(), 'HH:mm'), matches: [] } });
-const matNumber = useState('matNumber', () => 0);
+const matNumber = useState('matNumber', () => route.params.mat);
 const error = useState('error', () => '');
 
-const numberOfMats = computed(() => tournament.value.numberOfMats);
 const start = computed(() => parse(mat.value.startTime, 'HH:mm', new Date()));
 const matches = computed(() => mat.value.matches);
 
@@ -62,7 +54,7 @@ watch(matNumber, (newValue) => {
 });
 
 try {
-  tournament.value = await $fetch(`/api/tournament/${auth.value}`);
+  tournament.value = await $fetch(`/api/tournaments/${cookie.value.tCode}`);
   matNumber.value = 1;
 } catch (err) {
   error.value = handleServerError(err);
@@ -128,7 +120,7 @@ function updateTime(start) {
 }
 
 async function _schedule() {
-  mat.value = await $fetch(`/api/${matNumber.value}`, { headers: { authorization: `Bearer ${auth.value}` } });
+  mat.value = await $fetch(`/api/${matNumber.value}`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
   updateTime(start.value);
 }
 </script>

@@ -59,7 +59,7 @@ const numberOfMats = computed(() => tournament.value.numberOfMats);
 const matNumber = useState('matNumber', () => 1);
 
 try {
-  tournament.value = await $fetch(`/api/tournament/${auth.value}`);
+  tournament.value = await $fetch(`/api/tournaments/${auth.value}`);
 } catch (err) {
   error.value = handleServerError(err);
 }

@@ -17,7 +17,7 @@
       "runtimeArgs": [
         "run",
         "dev"
-      ]
+      ],
     },
     {
       "name": "prod",
