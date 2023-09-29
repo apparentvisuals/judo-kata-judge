@@ -15,7 +15,7 @@
   <div v-if="judge" class="bg bg-base-200 h-full overflow-y-auto">
     <div class="navbar bg-base-100 rounded-box" :class="inputState">
       <div class="navbar-start">
-        <button class="btn btn-square btn-ghost" @click.prevent="changeJudge">
+        <button class="btn btn-square btn-sm btn-ghost" @click.prevent="changeJudge">
           <ArrowPathRoundedSquareIcon class="w-6 h-6" />
         </button>
       </div>
@@ -27,7 +27,7 @@
         </div>
       </div>
       <div class="navbar-end">
-        <button class="btn btn-primary" @click.prevent.stop="submitScore">submit</button>
+        <button class="btn btn-sm btn-primary" @click.prevent.stop="submitScore">submit</button>
       </div>
     </div>
     <table v-show="!error" class="table w-full p-4 bg-base-100">

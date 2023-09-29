@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const req = event.node.req;
   const res = event.node.res;
 
-  const mat = parseInt(event.context.params.mat - 1);
+  const mat = parseInt(getRouterParam(event, 'mat'));
   const tournament = await Tournament.get(token);
   const matInfo = tournament.getMat(mat);
 

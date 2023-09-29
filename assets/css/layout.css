@@ -10,7 +10,7 @@ body,
   background-size: 5px 5px;
 }
 
-.table>thead>tr>th {
+.table>thead>tr>th.custom {
   @apply bg-base-100 z-40 top-0 sticky;
 }
 

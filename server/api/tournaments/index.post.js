@@ -1,4 +1,5 @@
 import Tournament from '~/server/models/tournament';
+
 import { getToken } from '../../utils';
 import { getAuth } from '../../utils/auth-key';
 
