@@ -1,10 +1,36 @@
 import { format } from 'date-fns';
 import { nanoid } from 'nanoid';
 
-import { createReport, isDev, numberOfTechniques } from '../utils';
+import { createReport, isDev, numberOfTechniques } from '~/server/utils';
 
 const tKey = isDev() ? 'tournament-dev' : 'tournament';
 
+/**
+ * {
+ *   id: string
+ *   name: string
+ *   numberOfMats: number
+ *   showJudgeTotals: boolean
+ *   mats: [{
+ *     groups: [{
+ *       numberOfJudges: number
+ *       startTime: string
+ *       matches: [{
+ *         kata: string
+ *         tori: string
+ *         uke: string
+ *         numberOfJudges: number
+ *         completed: boolean
+ *         judges: [{
+ *           id: string
+ *           scores: []
+ *         }]
+ *         results: []
+ *       }]
+ *     }]
+ *   }]
+ * }
+ */
 export default class Tournament {
   #id;
   #tournament;
@@ -14,21 +40,23 @@ export default class Tournament {
   }
 
   getMat(matNumber) {
-    const numberOfMats = this.#tournament.numberOfMats;
-    if (matNumber >= numberOfMats) {
-      return;
-    }
     const mat = this.#tournament.mats[matNumber];
-    mat.startTime = mat.startTime || format(new Date(), 'HH:mm');
+    // mat.startTime = mat.startTime || format(new Date(), 'HH:mm');
     return mat;
   }
 
   getMatch(matNumber) {
-    const mat = this.getMat(matNumber);
+    const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
     }
-    return mat.matches.find((match) => !match.completed);
+    for (const group of mat.groups) {
+      for (const match of group.matches) {
+        if (!match.completed) {
+          return match;
+        }
+      }
+    }
   }
 
   getJudgeNumber(matNumber, judge) {
@@ -37,72 +65,96 @@ export default class Tournament {
     return judgeIndex + 1;
   }
 
-  async updateMat(matNumber, numberOfJudges, startTime) {
-    const mat = this.getMat(matNumber);
-    if (!mat) {
-      return;
-    }
-    mat.numberOfJudges = numberOfJudges;
-    mat.startTime = startTime;
-    mat.judges = Array(5).fill().map(() => '');
-    mat.judgeCodes = Array(5).fill().map(() => nanoid(4));
-    switch (numberOfJudges) {
-      case 5:
-        break;
-      case 4:
-        mat.judgeCodes[0] = '-';
-        break;
-      case 3:
-        mat.judgeCodes[0] = mat.judgeCodes[4] = '-';
-        break;
-      case 2:
-        mat.judgeCodes[0] = mat.judgeCodes[1] = mat.judgeCodes[4] = '-';
-        break;
-      case 1:
-        mat.judgeCodes[0] = mat.judgeCodes[1] = mat.judgeCodes[3] = mat.judgeCodes[4] = '-';
-        break;
-    }
-    return mat;
+  async createMat() {
+    this.#tournament.mats.push({ groups: [] });
   }
 
-  async addMatch(matNumber, kata, tori, uke, numberOfJudges) {
-    const mat = this.getMat(matNumber);
+  async deleteMat(index) {
+    this.#tournament.mats.splice(index, 1);
+  }
+
+  async createGroup(mat, numberOfJudges) {
+    this.#tournament.mats[mat].groups.push({
+      numberOfJudges,
+      matches: []
+    });
+  }
+
+  async deleteGroup(mat, group) {
+    this.#tournament.mats[mat].groups.splice(group, 1);
+  }
+
+  // async updateMat(matNumber, numberOfJudges, startTime) {
+  //   const mat = this.getMat(matNumber);
+  //   if (!mat) {
+  //     return;
+  //   }
+  //   mat.numberOfJudges = numberOfJudges;
+  //   mat.startTime = startTime;
+  //   // mat.judges = Array(5).fill().map(() => '');
+  //   // mat.judgeCodes = Array(5).fill().map(() => nanoid(4));
+  //   // switch (numberOfJudges) {
+  //   //   case 5:
+  //   //     break;
+  //   //   case 4:
+  //   //     mat.judgeCodes[0] = '-';
+  //   //     break;
+  //   //   case 3:
+  //   //     mat.judgeCodes[0] = mat.judgeCodes[4] = '-';
+  //   //     break;
+  //   //   case 2:
+  //   //     mat.judgeCodes[0] = mat.judgeCodes[1] = mat.judgeCodes[4] = '-';
+  //   //     break;
+  //   //   case 1:
+  //   //     mat.judgeCodes[0] = mat.judgeCodes[1] = mat.judgeCodes[3] = mat.judgeCodes[4] = '-';
+  //   //     break;
+  //   // }
+  //   return mat;
+  // }
+
+  async createMatch(matNumber, groupNumber, data = { kata, tori, uke, numberOfJudges }) {
+    const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
     }
-    const matches = mat.matches;
-    numberOfJudges = numberOfJudges || mat.numberOfJudges;
+    const group = mat.groups[groupNumber];
+    if (!group) {
+      return;
+    }
+    const matches = group.matches || [];
+    const numberOfJudges = data.numberOfJudges = data.numberOfJudges || group.numberOfJudges || 5;
     const match = {
-      number: matches.length,
-      kata,
-      tori,
-      uke,
-      numberOfJudges,
+      ...data,
       completed: false,
       judges: [],
     };
     for (let ii = 0; ii < numberOfJudges; ii++) {
-      const scores = _getKataScoreSet(kata);
+      const scores = _getKataScoreSet(data.kata);
       match.judges.push({
         number: ii,
         name: '',
         scores,
-        total: numberOfTechniques(kata) * 10,
+        total: numberOfTechniques(data.kata) * 10,
         majorIndex: Array(scores.length).fill(0),
       })
     }
     match.results = createReport(match);
     matches.push(match);
+    group.matches = matches;
     return match;
   }
 
-  async deleteMatch(matNumber, matchNumber) {
-    const mat = this.getMat(matNumber);
+  async deleteMatch(matNumber, groupNumber, match) {
+    const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
     }
-    const matches = mat.matches;
-    matches.splice(matchNumber, 1);
+    const group = mat[groupNumber];
+    if (!group) {
+      return;
+    }
+    const matches = group.matches;
+    matches.splice(match, 1);
   }
 
   get id() {
@@ -142,17 +194,16 @@ export default class Tournament {
     return new Tournament(id, tournament);
   }
 
-  static async create({ name = 'Tournament 1', numberOfMats = 1 }) {
+  static async create({ name = 'Tournament 1', showJudgeTotals = true }) {
     const id = nanoid(6);
     const tournamentData = {
       name,
-      numberOfMats,
-      mats: Array(numberOfMats).fill(0).map((v, index) => _createMatInfo(index)),
+      showJudgeTotals,
+      mats: [],
     };
     const tournament = new Tournament(id, tournamentData);
     await tournament.save();
     return tournament;
-    // return { id, ...tournamentData };
   }
 }
 

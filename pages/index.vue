@@ -7,14 +7,14 @@
         <h1>{{ tournament.name }}</h1>
       </div>
       <div class="navbar-end">
-        <button class="btn btn-ghost text-error" @click.prevent="logout">
+        <button class="btn btn-sm btn-error" @click.prevent="logout">
           <ArrowLeftOnRectangleIcon class="w-5 h-5" />
           Logout
         </button>
       </div>
     </div>
     <div class="m-4 py-4">
-      <table class="table" v-if="numberOfMats > 0">
+      <table class="table" v-if="tournament.mats.length > 0">
         <thead>
           <tr>
             <th>Mat</th>
@@ -24,21 +24,21 @@
           </tr>
         </thead>
         <tbody class="bg-base-100">
-          <tr v-for="number in numberOfMats">
-            <td class="uppercase text-lg font-bold">{{ number }}</td>
+          <tr v-for="(mat, index) of tournament.mats">
+            <td class="uppercase text-lg font-bold">{{ index + 1 }}</td>
             <td>
-              <NuxtLink :to="`/schedule/${number}`" class="btn btn-sm btn-primary">schedule</NuxtLink>
+              <NuxtLink :to="`/schedule/${index}`" target="_blank" class="btn btn-sm btn-primary">schedule</NuxtLink>
             </td>
             <td>
-              <NuxtLink :to="`/results/${number}`" class="btn btn-sm btn-primary">results</NuxtLink>
+              <NuxtLink :to="`/results/${index}`" target="_blank" class="btn btn-sm btn-primary">results</NuxtLink>
             </td>
             <td>
               <div class="btn-group">
-                <NuxtLink :to="`/judge/${number}/1`" class="btn btn-sm btn-primary">judge 1</NuxtLink>
-                <NuxtLink :to="`/judge/${number}/2`" class="btn btn-sm btn-primary">judge 2</NuxtLink>
-                <NuxtLink :to="`/judge/${number}/3`" class="btn btn-sm btn-primary">judge 3</NuxtLink>
-                <NuxtLink :to="`/judge/${number}/4`" class="btn btn-sm btn-primary">judge 4</NuxtLink>
-                <NuxtLink :to="`/judge/${number}/5`" class="btn btn-sm btn-primary">judge 5</NuxtLink>
+                <NuxtLink :to="`/judge/${index}/1`" target="_blank" class="btn btn-sm btn-primary">judge 1</NuxtLink>
+                <NuxtLink :to="`/judge/${index}/2`" target="_blank" class="btn btn-sm btn-primary">judge 2</NuxtLink>
+                <NuxtLink :to="`/judge/${index}/3`" target="_blank" class="btn btn-sm btn-primary">judge 3</NuxtLink>
+                <NuxtLink :to="`/judge/${index}/4`" target="_blank" class="btn btn-sm btn-primary">judge 4</NuxtLink>
+                <NuxtLink :to="`/judge/${index}/5`" target="_blank" class="btn btn-sm btn-primary">judge 5</NuxtLink>
               </div>
             </td>
           </tr>

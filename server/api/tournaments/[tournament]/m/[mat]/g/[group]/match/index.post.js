@@ -1,7 +1,7 @@
 import Tournament from '~/server/models/tournament';
-import db from '../../../../../../db';
-import { getToken } from '../../../../../../utils';
-import { getAuth } from '../../../../../../utils/auth-key';
+
+import { getToken } from '~/server/utils';
+import { getAuth } from '~/server/utils/auth-key';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
@@ -13,9 +13,10 @@ export default defineEventHandler(async (event) => {
   }
   const tournamentId = getRouterParam(event, 'tournament');
   const matNumber = parseInt(getRouterParam(event, 'mat'));
-  const matchNumber = parseInt(getRouterParam(event, 'match'));
+  const groupNumber = parseInt(getRouterParam(event, 'group'));
+  const { kata, tori, uke } = await readBody(event);
   const tournament = await Tournament.get(tournamentId);
-  tournament.deleteMatch(matNumber, matchNumber);
+  await tournament.createMatch(matNumber, groupNumber, { kata, tori, uke });
   await tournament.save();
   return tournament.data;
 });

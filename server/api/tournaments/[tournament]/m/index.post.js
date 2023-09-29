@@ -1,7 +1,7 @@
 import Tournament from '~/server/models/tournament';
-import db from '../../../../../../db';
-import { getToken } from '../../../../../../utils';
-import { getAuth } from '../../../../../../utils/auth-key';
+
+import { getToken } from '~/server/utils';
+import { getAuth } from '~/server/utils/auth-key';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
@@ -12,10 +12,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, messsage: 'forbidden' });
   }
   const tournamentId = getRouterParam(event, 'tournament');
-  const matNumber = parseInt(getRouterParam(event, 'mat'));
-  const { kata, tori, uke } = await readBody(event);
   const tournament = await Tournament.get(tournamentId);
-  await tournament.addMatch(matNumber, kata, tori, uke);
+  await tournament.createMat();
   await tournament.save();
   return tournament.data;
 });

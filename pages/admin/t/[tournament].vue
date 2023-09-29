@@ -10,7 +10,10 @@
         <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
       </div>
       <div class="navbar-end text-primary-content">
-        <button class="btn btn-ghost" @click.prevent="save">
+        <button class="btn btn-square btn-ghost btn-sm" @click.prevent="addMat">
+          <PlusIcon />
+        </button>
+        <button class="btn btn-ghost btn-sm" @click.prevent="save">
           Save
         </button>
       </div>
@@ -18,61 +21,71 @@
     <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
       <h1 class="text-3xl font-bold uppercase">{{ error }}</h1>
     </div>
-    <div class="flex flex-row flex-wrap p-1">
-      <div v-for=" mat in tournament.mats" class="w-full md:w-1/2 xl:w-1/3 p-1">
-        <div class="bg-base-100 p-2">
-          <div class="flex justify-between mb-2">
-            <h2 class="text-lg font-semibold">Mat {{ mat.number + 1 }}</h2>
-            <div class="flex">
-              <button class="btn btn-square btn-sm mr-2 btn-accent" @click.prevent="showUpdate(mat.number)">
+    <div class="p-2 flex flex-col gap-2">
+      <div v-for="(mat, matIndex) in tournament.mats" class="bg-base-100">
+        <div class="flex justify-between mb-2 p-2">
+          <h2 class="text-lg font-semibold">Mat {{ matIndex + 1 }}</h2>
+          <div class="flex">
+            <!-- <button class="btn btn-square btn-sm mr-1 btn-accent" @click.prevent="showUpdate(index)">
                 <PencilIcon class="w-4 h-4" />
-              </button>
-              <button class="btn btn-square btn-sm btn-primary" @click.prevent="showAdd(mat.number)">
-                <PlusIcon class="w-4 h-4" />
-              </button>
-            </div>
+              </button> -->
+            <button class="btn btn-square btn-sm btn-primary mr-1" @click.prevent="addGroup(matIndex)">
+              <PlusIcon />
+            </button>
+            <button class="btn btn-square btn-sm btn-error" @click.prevent="deleteMat(matIndex)">
+              <XMarkIcon />
+            </button>
           </div>
-          <table class="table table-compact w-full mb-2">
-            <caption>Judge access codes</caption>
-            <thead>
-              <tr>
-                <th class="w-10 text-center" v-for="index in 5">{{ index }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td v-for="code in mat.judgeCodes">{{ code }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <table class="table w-full">
-            <caption>Competitor list</caption>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th class="w-32">Kata</th>
-                <th class="w-8"></th>
-              </tr>
-            </thead>
-            <draggable v-model="mat.matches" tag="tbody" group="matches" item-key="tori">
-              <template #item="{ element: match }">
-                <tr class="bg-white">
-                  <td>
-                    <div>{{ match.tori }}</div>
-                    <div>{{ match.uke }}</div>
-                  </td>
-                  <td>
-                    <div>{{ getKataName(match.kata) }}</div>
-                  </td>
-                  <td>
-                    <button class="btn btn-square btn-sm btn-error" alt="delete match">
-                      <XMarkIcon class="w-4 h-4" @click.prevent="delMatch(mat.number, index)" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <draggable v-model="mat.groups" tag="div" group="groups" item-key="name">
+            <template #item="{ element: group, index: groupIndex }">
+              <div class="bg-base-100 p-2">
+                <!-- <div v-for="(group, groupIndex) of mat" class="border p-2"> -->
+                <div class="flex justify-between mb-2">
+                  <h2 class="text-lg font-semibold">Group {{ groupIndex + 1 }}</h2>
+                  <div class="flex">
+                    <!-- <button class="btn btn-square btn-sm mr-1 btn-accent" @click.prevent="showUpdate(index)">
+                      <PencilIcon class="w-4 h-4" />
+                    </button> -->
+                    <button class="btn btn-square btn-sm btn-primary mr-1" @click.prevent="showAdd(matIndex, groupIndex)">
+                      <PlusIcon />
                     </button>
-                  </td>
-                </tr>
-              </template>
-            </draggable>
-          </table>
+                    <button class="btn btn-square btn-sm btn-error" @click.prevent="deleteGroup(matIndex, groupIndex)">
+                      <XMarkIcon />
+                    </button>
+                  </div>
+                </div>
+                <table class="table w-full border">
+                  <thead>
+                    <tr>
+                      <th>Tori</th>
+                      <th>Uke</th>
+                      <th class="w-32">Kata</th>
+                      <th class="w-8"></th>
+                    </tr>
+                  </thead>
+                  <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori">
+                    <template #item="{ element: match }">
+                      <tr class="bg-base-100">
+                        <td>{{ match.tori }}</td>
+                        <td>{{ match.uke }}</td>
+                        <td>
+                          <div>{{ getKataName(match.kata) }}</div>
+                        </td>
+                        <td>
+                          <button class="btn btn-square btn-sm btn-error" alt="delete match">
+                            <XMarkIcon class="w-4 h-4" @click.prevent="delMatch(mat.number, index)" />
+                          </button>
+                        </td>
+                      </tr>
+                    </template>
+                  </draggable>
+                </table>
+                <!-- </div> -->
+              </div>
+            </template>
+          </draggable>
         </div>
       </div>
     </div>
@@ -139,10 +152,11 @@ import { KATA_MAP, getKataName, handleServerError } from '~~/src/utils';
 
 const route = useRoute();
 const cookie = useCookie('jkj', { default: () => ({}) });
+
 const tournament = useState('tournament', () => ({}));
-const athletes = useState('athletes', () => []);
 const addingMatch = useState('adding-match', () => false);
 const mat = useState('mat', () => 0);
+const group = useState('group', () => 0);
 const kata = useState('kata', () => 'nnk');
 const tori = useState('tori', () => '');
 const uke = useState('uke', () => '');
@@ -159,8 +173,9 @@ try {
   error.value = handleServerError(err);
 }
 
-async function showAdd(selectedMat) {
+async function showAdd(selectedMat, selectedGroup) {
   mat.value = selectedMat;
+  group.value = selectedGroup;
   addingMatch.value = true;
 }
 
@@ -173,7 +188,7 @@ async function showUpdate(selectedMat) {
 
 async function addMatch() {
   const body = { tournament: kata.value, tori: tori.value, uke: uke.value, kata: kata.value };
-  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/match`, { method: 'POST', body, headers });
+  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}/match`, { method: 'POST', body, headers });
   tournament.value = response;
   addingMatch.value = false;
   tori.value = '';
@@ -194,5 +209,27 @@ async function delMatch(matNumber, matchId) {
 async function save() {
   const body = tournament.value;
   await $fetch(`/api/tournaments/${route.params.tournament}`, { method: 'POST', body, headers });
+}
+
+async function addMat() {
+  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m`, { method: 'POST', headers });
+  tournament.value = response;
+}
+
+async function deleteMat(mat) {
+  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}`, { method: 'DELETE', headers });
+  tournament.value = response;
+}
+
+async function addGroup(mat) {
+  const body = { numberOfJudges: numberOfJudges.value };
+  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g`, { method: 'POST', body, headers });
+  tournament.value = response;
+}
+
+async function deleteGroup(mat, group) {
+  console.log(`delete group: ${mat} ${group}`)
+  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}`, { method: 'DELETE', headers });
+  tournament.value = response;
 }
 </script>

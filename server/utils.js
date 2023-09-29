@@ -23,22 +23,26 @@ export function createReportMessage(report) {
 }
 
 export function createSummaryMessage(matInfo) {
-  const matches = matInfo.matches;
-  const summary = matches.map((match) => {
-    const matchSummary = {
-      number: match.number,
-      kata: match.kata,
-      tori: match.tori,
-      uke: match.uke,
-      scores: [],
-    }
-    if (match.completed) {
-      matchSummary.scores = match.results.summary.values;
-      matchSummary.total = match.results.summary.total;
-    }
-    return matchSummary;
-  })
-  return `data: ${JSON.stringify(summary)}\n\n`;
+  const groups = matInfo.groups;
+  const groupsSummary = groups.map((group) => {
+    const matches = group.matches;
+    const summary = matches.map((match) => {
+      const matchSummary = {
+        number: match.number,
+        kata: match.kata,
+        tori: match.tori,
+        uke: match.uke,
+        scores: [],
+      }
+      if (match.completed) {
+        matchSummary.scores = match.results.summary.values;
+        matchSummary.total = match.results.summary.total;
+      }
+      return matchSummary;
+    });
+    return summary;
+  });
+  return `data: ${JSON.stringify(groupsSummary)}\n\n`;
 }
 
 export function notifyAllClients(clients, message) {
