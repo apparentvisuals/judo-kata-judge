@@ -5,6 +5,14 @@ function isDev() {
 }
 
 export default defineNuxtConfig({
+  vite: {
+    vue: {
+      script: {
+        defineModel: true,
+        propsDestructure: true
+      }
+    }
+  },
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
   colorMode: {
     preference: 'business', // default theme

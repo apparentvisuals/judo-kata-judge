@@ -1,19 +1,19 @@
 <template>
-  <div v-if="!judge" class="bg bg-base-200 h-full flex">
-    <div class="m-auto max-w-xs max-h-96">
-      <form valid="isValid" @submit.prevent="submitJudge">
-        <div class="form-control w-full max-w-xs">
-          <label class="label" for="code">
-            <span class="label-text">Judge Code</span>
-          </label>
-          <input id="code" name="code" type="text" class="input input-bordered" v-model="code" />
-        </div>
-        <button type="submit" class="btn btn-primary mt-4">Submit</button>
-      </form>
+  <div v-if="match" class="bg bg-base-200 h-full">
+    <div v-if="!judge" class="h-full flex">
+      <div class="m-auto max-w-xs max-h-96">
+        <form valid="isValid" @submit.prevent="submitJudge">
+          <div class="form-control w-full max-w-xs">
+            <label class="label" for="code">
+              <span class="label-text">Judge Code</span>
+            </label>
+            <input id="code" name="code" type="text" class="input input-bordered" v-model="code" />
+          </div>
+          <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </form>
+      </div>
     </div>
-  </div>
-  <div v-if="judge" class="bg bg-base-200 h-full overflow-y-auto">
-    <div class="navbar bg-base-100 rounded-box" :class="inputState">
+    <div v-else class="navbar bg-base-100 rounded-box" :class="inputState">
       <div class="navbar-start">
         <button class="btn btn-square btn-sm btn-ghost" @click.prevent="changeJudge">
           <ArrowPathRoundedSquareIcon class="w-6 h-6" />
@@ -27,7 +27,7 @@
         </div>
       </div>
       <div class="navbar-end">
-        <button class="btn btn-sm btn-primary" @click.prevent.stop="submitScore">submit</button>
+        <button class="btn btn-sm btn-primary" @click.prevent="submitScore">submit</button>
       </div>
     </div>
     <table v-show="!error" class="table w-full p-4 bg-base-100">
@@ -46,14 +46,15 @@
       <tbody class="bg-base-100">
         <tr v-for="(score, index) in scores">
           <td>{{ moves[index] }}</td>
-          <td v-for="(deduction, index) in score.deductions" class="p-0 pt-1">
-            <button class="btn btn-ghost btn-square" @click.prevent="toggleScore(score, index)">
-              <CheckIcon class="h-5 w-5" v-if="deduction === '1'" />
-              <PlusIcon class="h-6 w-6" v-if="index === 5 && deduction === '+'" />
-              <MinusIcon class="h-6 w-6" v-if="index === 5 && deduction === '-'" />
-            </button>
+          <td v-for="(deduction, dIndex) in score.deductions || Array(6).fill(0)" class="score"
+            @click.prevent="toggleScore(score, dIndex)">
+            <div class="h-6 px-1">
+              <CheckIcon class="h-6 w-6" v-if="deduction === '1'" />
+              <PlusIcon class="h-6 w-6" v-if="dIndex === 5 && deduction === '+'" />
+              <MinusIcon class="h-6 w-6" v-if="dIndex === 5 && deduction === '-'" />
+            </div>
           </td>
-          <td class="text-center">{{ score.total }}</td>
+          <td class="text-center">{{ score.value }}</td>
         </tr>
         <tr>
           <td>Total</td>
@@ -63,10 +64,13 @@
           <td></td>
           <td></td>
           <td></td>
-          <td class="text-center">{{ grandTotal }}</td>
+          <td class="text-center">{{ total }}</td>
         </tr>
       </tbody>
     </table>
+  </div>
+  <div v-else>
+    <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
   </div>
 </template>
 
@@ -87,6 +91,8 @@ const judge = useState('judge', () => undefined);
 const scores = useState('scores', () => []);
 const code = useState('code', () => '');
 
+const headers = { authorization: `Bearer ${cookie.value.tCode}` };
+
 const inputState = computed(() => {
   if (hasMajor.value) {
     return 'bg-warning';
@@ -94,20 +100,30 @@ const inputState = computed(() => {
     return 'bg-success';
   }
 });
-const hasMajor = computed(() => scores.value.find((score) => score.deductions[4] === '1'));
-const grandTotal = computed(() => scores.value.reduce((acc, value) => acc += value.total, 0));
+const hasMajor = computed(() => scores.value.find((score) => score.deductions && score.deductions[4] === '1'));
+const total = computed(() => {
+  const total = scores.value.reduce((acc, score) => {
+    if (score.value != null) {
+      return acc += score.value;
+    } else {
+      return acc += 10;
+    }
+  }, 0);
+  if (hasMajor.value) {
+    return total / 2;
+  }
+  return total;
+});
 const moves = computed(() => moveList(match.value.kata));
 
-watch(hasMajor, () => {
-  _computeScore();
-});
-
 async function submitScore() {
-  await _getMatch();
+  const body = _scoreToPayload();
+  const judgeValues = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers });
+  scores.value = _payloadToScore(judgeValues);
 }
 
 async function toggleScore(score, index) {
-  const deductions = score.deductions;
+  const deductions = score.deductions = score.deductions || Array(6).fill('');
   if (index === 5) {
     if (deductions[index] === '+') {
       deductions[index] = '-';
@@ -123,43 +139,14 @@ async function toggleScore(score, index) {
       deductions[index] = '1';
     }
   }
-
-  _computeScore();
-  await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, {
-    method: 'POST',
-    body: { move: score.number, deductions: score.deductions.join(':'), total: score.origTotal },
-    headers: { authorization: `Bearer ${cookie.value.tCode}` }
-  });
-}
-
-function _computeScore() {
-  const values = scores.value;
-  for (let ii = 0; ii < values.length; ii++) {
-    const score = values[ii];
-    let total = calculateMoveScore(score.deductions);
-    if (hasMajor.value) {
-      total = total / 2;
-    }
-    score.total = total;
-  }
-}
-
-function _calculateScore(judgeInfo) {
-  const count = moves.value.length;
-  const newScores = new Array(count);
-  for (let ii = 0; ii < count; ii++) {
-    const score = judgeInfo.scores[ii];
-    const deductions = score.deductions.split(':');
-    const total = calculateMoveScore(deductions);
-    newScores[ii] = { number: ii, deductions, total };
-  }
-  return newScores;
+  const moveValue = calculateMoveScore(score.deductions);
+  score.value = moveValue;
 }
 
 async function submitJudge() {
   try {
     error.value = '';
-    judge.value = await $fetch(`/api/judges/${code.value}`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
+    judge.value = await $fetch(`/api/judges/${code.value}`, { headers });
   } catch (err) {
     error.value = handleServerError(err);
   }
@@ -173,20 +160,44 @@ async function changeJudge() {
 async function _getMatch() {
   try {
     error.value = '';
-    match.value = await $fetch(`/api/${matNumber.value}/match`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
-    const judgeValues = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { headers: { authorization: `Bearer ${cookie.value.tCode}` } });
-    const newScores = _calculateScore(judgeValues);
+    match.value = await $fetch(`/api/${matNumber.value}/match`, { headers });
+    const judgeValue = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { headers });
+    const newScores = _payloadToScore(judgeValue);
     scores.value = newScores;
   } catch (err) {
     error.value = handleServerError(err);
   }
 }
+
+function _payloadToScore(judgeValue) {
+  const count = moves.value.length;
+  const newScores = Array(count).fill().map(() => ({}));
+  for (let ii = 0; ii < count; ii++) {
+    const judgeScores = judgeValue.scores || [];
+    if (ii < judgeScores.length) {
+      const score = judgeValue.scores[ii];
+      const deductions = score.deductions.split(':');
+      const total = calculateMoveScore(deductions);
+      newScores[ii] = { deductions, value: total };
+    }
+  }
+  return newScores;
+}
+
+function _scoreToPayload() {
+  const payload = { id: judge.value.id, name: judge.value.name, scores: [] };
+  for (const score of scores.value) {
+    payload.scores.push({ deductions: (score.deductions || Array(6).fill('')).join(':') });
+  }
+  return payload;
+}
+
 await _getMatch();
 
 </script>
 
 <style>
 .score {
-  @apply w-12 text-center p-0;
+  @apply w-12 text-center p-2;
 }
 </style>

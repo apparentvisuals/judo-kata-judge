@@ -84,35 +84,7 @@ export default class Tournament {
     this.#tournament.mats[mat].groups.splice(group, 1);
   }
 
-  // async updateMat(matNumber, numberOfJudges, startTime) {
-  //   const mat = this.getMat(matNumber);
-  //   if (!mat) {
-  //     return;
-  //   }
-  //   mat.numberOfJudges = numberOfJudges;
-  //   mat.startTime = startTime;
-  //   // mat.judges = Array(5).fill().map(() => '');
-  //   // mat.judgeCodes = Array(5).fill().map(() => nanoid(4));
-  //   // switch (numberOfJudges) {
-  //   //   case 5:
-  //   //     break;
-  //   //   case 4:
-  //   //     mat.judgeCodes[0] = '-';
-  //   //     break;
-  //   //   case 3:
-  //   //     mat.judgeCodes[0] = mat.judgeCodes[4] = '-';
-  //   //     break;
-  //   //   case 2:
-  //   //     mat.judgeCodes[0] = mat.judgeCodes[1] = mat.judgeCodes[4] = '-';
-  //   //     break;
-  //   //   case 1:
-  //   //     mat.judgeCodes[0] = mat.judgeCodes[1] = mat.judgeCodes[3] = mat.judgeCodes[4] = '-';
-  //   //     break;
-  //   // }
-  //   return mat;
-  // }
-
-  async createMatch(matNumber, groupNumber, data = { kata, tori, uke, numberOfJudges }) {
+  async createMatch(matNumber, groupNumber, data) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -121,26 +93,24 @@ export default class Tournament {
     if (!group) {
       return;
     }
-    const matches = group.matches || [];
-    const numberOfJudges = data.numberOfJudges = data.numberOfJudges || group.numberOfJudges || 5;
+    const matches = group.matches;
+    // const numberOfJudges = data.numberOfJudges = data.numberOfJudges || group.numberOfJudges || 5;
     const match = {
       ...data,
       completed: false,
-      judges: [],
     };
-    for (let ii = 0; ii < numberOfJudges; ii++) {
-      const scores = _getKataScoreSet(data.kata);
-      match.judges.push({
-        number: ii,
-        name: '',
-        scores,
-        total: numberOfTechniques(data.kata) * 10,
-        majorIndex: Array(scores.length).fill(0),
-      })
-    }
-    match.results = createReport(match);
+    // for (let ii = 0; ii < numberOfJudges; ii++) {
+    //   const scores = _getKataScoreSet(data.kata);
+    //   match.judges.push({
+    //     number: ii,
+    //     name: '',
+    //     scores,
+    //     total: numberOfTechniques(data.kata) * 10,
+    //     majorIndex: Array(scores.length).fill(0),
+    //   })
+    // }
+    // match.results = createReport(match);
     matches.push(match);
-    group.matches = matches;
     return match;
   }
 
@@ -149,7 +119,7 @@ export default class Tournament {
     if (!mat) {
       return;
     }
-    const group = mat[groupNumber];
+    const group = mat.groups[groupNumber];
     if (!group) {
       return;
     }
