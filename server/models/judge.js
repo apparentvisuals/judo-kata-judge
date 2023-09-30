@@ -14,7 +14,9 @@ export default class Judge {
 
   static async get(id) {
     const judge = await useStorage(key).getItem(id);
-    return judge;
+    if (judge) {
+      return { id, ...judge };
+    }
   }
 
   static async getAll() {

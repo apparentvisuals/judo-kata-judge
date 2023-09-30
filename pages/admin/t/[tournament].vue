@@ -11,7 +11,7 @@
       </div>
       <div class="navbar-end text-primary-content">
         <button class="btn btn-square btn-ghost btn-sm" @click.prevent="addMat">
-          <PlusIcon />
+          <PlusIcon class="w-6 h-6" />
         </button>
         <button class="btn btn-ghost btn-sm" @click.prevent="save">
           Save
@@ -26,122 +26,60 @@
         <div class="flex justify-between mb-2 p-2">
           <h2 class="text-lg font-semibold">Mat {{ matIndex + 1 }}</h2>
           <div class="flex">
-            <!-- <button class="btn btn-square btn-sm mr-1 btn-accent" @click.prevent="showUpdate(index)">
-                <PencilIcon class="w-4 h-4" />
-              </button> -->
             <button class="btn btn-square btn-sm btn-primary mr-1" @click.prevent="addGroup(matIndex)">
-              <PlusIcon />
+              <PlusIcon class="w-6 h-6" />
             </button>
             <button class="btn btn-square btn-sm btn-error" @click.prevent="deleteMat(matIndex)">
-              <XMarkIcon />
+              <XMarkIcon class="w-6 h-6" />
             </button>
           </div>
         </div>
-        <div class="flex flex-col gap-2">
-          <draggable v-model="mat.groups" tag="div" group="groups" item-key="name">
-            <template #item="{ element: group, index: groupIndex }">
-              <div class="bg-base-100 p-2">
-                <!-- <div v-for="(group, groupIndex) of mat" class="border p-2"> -->
-                <div class="flex justify-between mb-2">
-                  <h2 class="text-lg font-semibold">Group {{ groupIndex + 1 }}</h2>
-                  <div class="flex">
-                    <!-- <button class="btn btn-square btn-sm mr-1 btn-accent" @click.prevent="showUpdate(index)">
-                      <PencilIcon class="w-4 h-4" />
-                    </button> -->
-                    <button class="btn btn-square btn-sm btn-primary mr-1" @click.prevent="showAdd(matIndex, groupIndex)">
-                      <PlusIcon />
-                    </button>
-                    <button class="btn btn-square btn-sm btn-error" @click.prevent="deleteGroup(matIndex, groupIndex)">
-                      <XMarkIcon />
-                    </button>
-                  </div>
+        <draggable v-model="mat.groups" tag="div" group="groups" item-key="name" class="flex flex-col gap-2 p-2">
+          <template #item="{ element: group, index: groupIndex }">
+            <div class="bg-base-100 p-2 border">
+              <div class="flex justify-between mb-2">
+                <h2 class="text-lg font-semibold">Group {{ groupIndex + 1 }}</h2>
+                <div class="flex">
+                  <button class="btn btn-square btn-sm btn-primary mr-1" @click.prevent="showAdd(matIndex, groupIndex)">
+                    <PlusIcon class="w-6 h-6" />
+                  </button>
+                  <button class="btn btn-square btn-sm btn-error" @click.prevent="deleteGroup(matIndex, groupIndex)">
+                    <XMarkIcon class="w-6 h-6" />
+                  </button>
                 </div>
-                <table class="table w-full border">
-                  <thead>
-                    <tr>
-                      <th>Tori</th>
-                      <th>Uke</th>
-                      <th class="w-32">Kata</th>
-                      <th class="w-8"></th>
-                    </tr>
-                  </thead>
-                  <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori">
-                    <template #item="{ element: match }">
-                      <tr class="bg-base-100">
-                        <td>{{ match.tori }}</td>
-                        <td>{{ match.uke }}</td>
-                        <td>
-                          <div>{{ getKataName(match.kata) }}</div>
-                        </td>
-                        <td>
-                          <button class="btn btn-square btn-sm btn-error" alt="delete match">
-                            <XMarkIcon class="w-4 h-4" @click.prevent="delMatch(mat.number, index)" />
-                          </button>
-                        </td>
-                      </tr>
-                    </template>
-                  </draggable>
-                </table>
-                <!-- </div> -->
               </div>
-            </template>
-          </draggable>
-        </div>
+              <table class="table w-full border">
+                <thead>
+                  <tr>
+                    <th>Tori</th>
+                    <th>Uke</th>
+                    <th class="w-32">Kata</th>
+                    <th class="w-8"></th>
+                  </tr>
+                </thead>
+                <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori">
+                  <template #item="{ element: match, index }">
+                    <tr class="bg-base-100">
+                      <td>{{ match.tori }}</td>
+                      <td>{{ match.uke }}</td>
+                      <td>
+                        <div>{{ getKataName(match.kata) }}</div>
+                      </td>
+                      <td>
+                        <button class="btn btn-square btn-sm btn-error" alt="delete match">
+                          <XMarkIcon class="w-4 h-4" @click.prevent="deleteMatch(matIndex, groupIndex, index)" />
+                        </button>
+                      </td>
+                    </tr>
+                  </template>
+                </draggable>
+              </table>
+            </div>
+          </template>
+        </draggable>
       </div>
     </div>
-    <div class="modal modal-bottom sm:modal-middle cursor-pointer" :class="addingMatch ? 'modal-open' : ''">
-      <div class="modal-box">
-        <div class="form-control w-full">
-          <label class="label" for="kata">
-            <span class="label-text">Kata</span>
-          </label>
-          <select id="kata" class="select select-bordered" v-model="kata">
-            <option v-for="kata of Object.keys(KATA_MAP)" :value="kata">{{ getKataName(kata) }}</option>
-          </select>
-        </div>
-        <div class="form-control w-full">
-          <label class="label" for="tori">
-            <span class="label-text">Tori</span>
-          </label>
-          <input id="tori" type="text" class="input input-bordered" v-model="tori" />
-        </div>
-        <div class="form-control w-full ">
-          <label class="label" for="uke">
-            <span class="label-text">Uke</span>
-          </label>
-          <input id="uke" type="text" class="input input-bordered" v-model=uke />
-        </div>
-        <div class="modal-action">
-          <button for="add-match-modal" class="btn btn-error btn-outline" @click.prevent="addingMatch = false">
-            Cancel
-          </button>
-          <button for="add-match-modal" class="btn btn-primary" @click.prevent="addMatch">Add</button>
-        </div>
-      </div>
-    </div>
-    <div class="modal modal-bottom sm:modal-middle cursor-pointer" :class="updatingMat ? 'modal-open' : ''">
-      <div class="modal-box">
-        <div class="form-control w-full">
-          <label class="label" for="numberOfJudges">
-            <span class="label-text">Number of Judges</span>
-          </label>
-          <input id="numberOfJudges" type="number" class="input input-bordered" v-model.number="numberOfJudges" />
-        </div>
-        <div class="form-control w-full">
-          <label class="label" for="startTime">
-            <span class="label-text">Start Time</span>
-          </label>
-          <input id="startTime" type="time" class="input input-bordered" v-model="startTime" />
-        </div>
-
-        <div class="modal-action">
-          <button for="update-mat-modal" class="btn btn-error btn-outline" @click.prevent="updatingMat = false">
-            Cancel
-          </button>
-          <button for="update-mat-modal" class="btn btn-primary" @click.prevent="updateMat">Update</button>
-        </div>
-      </div>
-    </div>
+    <MatchModal v-model="addingMatch" :data="newMatch" @submit="addMatch" />
   </div>
 </template>
 
@@ -155,15 +93,10 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 
 const tournament = useState('tournament', () => ({}));
 const addingMatch = useState('adding-match', () => false);
+const newMatch = useState('new-match', () => ({ tori: '', uke: '', kata: 'nnk', numberOfJudges: 5 }));
 const mat = useState('mat', () => 0);
 const group = useState('group', () => 0);
-const kata = useState('kata', () => 'nnk');
-const tori = useState('tori', () => '');
-const uke = useState('uke', () => '');
 const error = useState('error', () => '');
-const updatingMat = useState('updating-mat', () => false);
-const numberOfJudges = useState('numberOfJudges', () => 5);
-const startTime = useState('startTime', () => format(new Date(), 'HH:mm'));
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
@@ -177,33 +110,6 @@ async function showAdd(selectedMat, selectedGroup) {
   mat.value = selectedMat;
   group.value = selectedGroup;
   addingMatch.value = true;
-}
-
-async function showUpdate(selectedMat) {
-  mat.value = selectedMat;
-  numberOfJudges.value = tournament.value.mats[selectedMat].numberOfJudges;
-  startTime.value = tournament.value.mats[selectedMat].startTime;
-  updatingMat.value = true;
-}
-
-async function addMatch() {
-  const body = { tournament: kata.value, tori: tori.value, uke: uke.value, kata: kata.value };
-  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}/match`, { method: 'POST', body, headers });
-  tournament.value = response;
-  addingMatch.value = false;
-  tori.value = '';
-  uke.value = '';
-}
-
-async function updateMat() {
-  const body = { mat: mat.value, numberOfJudges: numberOfJudges.value, startTime: startTime.value };
-  tournament.value = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}`, { method: 'PATCH', body, headers });
-  updatingMat.value = false;
-}
-
-async function delMatch(matNumber, matchId) {
-  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${matNumber}/match/${matchId}`, { method: 'DELETE', headers });
-  tournament.value = response;
 }
 
 async function save() {
@@ -222,7 +128,7 @@ async function deleteMat(mat) {
 }
 
 async function addGroup(mat) {
-  const body = { numberOfJudges: numberOfJudges.value };
+  const body = { numberOfJudges: 5 };
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g`, { method: 'POST', body, headers });
   tournament.value = response;
 }
@@ -230,6 +136,20 @@ async function addGroup(mat) {
 async function deleteGroup(mat, group) {
   console.log(`delete group: ${mat} ${group}`)
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}`, { method: 'DELETE', headers });
+  tournament.value = response;
+}
+
+async function addMatch() {
+  const body = { ...newMatch.value, scores: Array(newMatch.value.numberOfJudges).fill({}) };
+  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}/match`, { method: 'POST', body, headers });
+  tournament.value = response;
+  addingMatch.value = false;
+  newMatch.value.tori = '';
+  newMatch.value.uke = '';
+}
+
+async function deleteMatch(mat, group, matchId) {
+  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}/match/${matchId}`, { method: 'DELETE', headers });
   tournament.value = response;
 }
 </script>

@@ -12,23 +12,29 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const mat = parseInt(event.context.params.mat - 1);
-  const judge = parseInt(event.context.params.judge - 1);
-  const { move, deductions } = await readBody(event);
+  const mat = parseInt(getRouterParam(event, 'mat'));
+  const judge = parseInt(getRouterParam(event, 'judge')) - 1;
+
+  const scores = await readBody(event);
 
   const tournament = await Tournament.get(token);
-  const matchInfo = tournament.getMatch(mat);
-  if (!matchInfo) {
+  const match = tournament.getMatch(mat);
+  if (!match) {
     return {};
   }
-  const judgeInfo = matchInfo.judges[judge];
-  judgeInfo.scores[move].deductions = deductions;
-  matchInfo.results = createReport(matchInfo);
+
+  match.scores[judge] = scores;
+  match.completed = _IsMatchComplete(match);
+  match.results = createReport(match);
   await tournament.save();
 
-  const clients = db.clients(`${token}-${mat}`);
-  notifyAllClients(clients.match.list, createUpdateMessage(judgeInfo));
-  notifyAllClients(clients.report.list, createReportMessage(matchInfo.results));
+  // const clients = db.clients(`${token}-${mat}`);
+  // notifyAllClients(clients.match.list, createUpdateMessage(judgeInfo));
+  // notifyAllClients(clients.report.list, createReportMessage(match.results));
 
-  return {};
+  return match.scores[judge];
 });
+
+function _IsMatchComplete(match) {
+  return match.scores.every((judgeScore) => judgeScore.name);
+}

@@ -1,7 +1,7 @@
 <template>
   <div class="bg-base-100 h-full overflow-y-auto">
     <ClientOnly>
-      <ResultTable :mat="route.params.mat" :show-sub-total="tournament.showJudgeTotals" />
+      <ResultTable :mat="route.params.mat" :show-sub-total="true" />
     </ClientOnly>
   </div>
 </template>

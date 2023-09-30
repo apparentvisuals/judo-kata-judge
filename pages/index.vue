@@ -13,7 +13,7 @@
         </button>
       </div>
     </div>
-    <div class="m-4 py-4">
+    <div class="m-4 py-4" v-if="tournament.mats">
       <table class="table" v-if="tournament.mats.length > 0">
         <thead>
           <tr>
@@ -60,13 +60,15 @@ function logout() {
 const cookie = useCookie('jkj', { default: () => ({}) });
 
 const error = useState('error', () => '');
-const tournament = useState('tournament', () => { return {}; });
+const tournament = useState('tournament', () => ({}));
 
 const numberOfMats = computed(() => tournament.value.numberOfMats);
 
 try {
   tournament.value = await $fetch(`/api/tournaments/${cookie.value.tCode}`);
 } catch (err) {
+  cookie.value.tCode = '';
+  navigateTo('/code');
   error.value = handleServerError(err);
 }
 

@@ -81,34 +81,34 @@ export function calculateMoveScore(deductions) {
 }
 
 export function createReport(match) {
-  const judges = match.judges;
+  const scores = match.scores;
   const kata = match.kata;
-  const number = match.number;
   const numberOfJudges = match.numberOfJudges;
   const techniquesCount = numberOfTechniques(kata);
-  const judgesCount = judges.length;
   const report = _defaultTechniqueScore(match);
   const summary = {
     total: 0,
-    values: new Array(judgesCount).fill(0),
+    values: new Array(numberOfJudges),
   }
-  for (const judge of judges) {
-    const judgeIndex = judge.number;
+  for (let ii = 0; ii < numberOfJudges; ii++) {
+    const judgeScores = scores[ii];
     let hasMajor = false;
-    let judgeTotal = 0;
-    for (let ii = 0; ii < techniquesCount; ii++) {
-      const deductions = judge.scores[ii].deductions.split(':');
-      let moveTotal = calculateMoveScore(deductions);
-      report[ii].values[judgeIndex] = moveTotal;
-      judgeTotal += moveTotal;
-      if (deductions[4] === '1') {
-        hasMajor = true;
+    let total = 0;
+    if (judgeScores.scores) {
+      for (let jj = 0; jj < techniquesCount; jj++) {
+        const deductions = judgeScores.scores[jj].deductions.split(':');
+        let value = calculateMoveScore(deductions);
+        report[jj].values[ii] = value;
+        total += value;
+        if (deductions[4] === '1') {
+          hasMajor = true;
+        }
       }
+      if (hasMajor) {
+        total = total / 2;
+      }
+      summary.values[ii] = total;
     }
-    if (hasMajor) {
-      judgeTotal = judgeTotal / 2;
-    }
-    summary.values[judgeIndex] = judgeTotal;
   }
 
   let total = 0;
@@ -116,7 +116,7 @@ export function createReport(match) {
     let min = 11;
     let max = -1;
     let subTotal = 0;
-    for (let ii = 0; ii < judgesCount; ii++) {
+    for (let ii = 0; ii < numberOfJudges; ii++) {
       const value = technique.values[ii];
       subTotal += value;
       min = Math.min(min, value);
@@ -133,7 +133,7 @@ export function createReport(match) {
   });
   summary.total = total;
 
-  return { numberOfJudges, kata, number, report, summary };
+  return { report, summary };
 }
 
 function _defaultTechniqueScore(match) {
@@ -141,8 +141,8 @@ function _defaultTechniqueScore(match) {
   const numberOfJudges = match.numberOfJudges;
   const techniquesCount = numberOfTechniques(kata);
   const list = moveList(kata);
-  const report = new Array(techniquesCount).fill().map((el, index) => {
-    return { technique: list[index], values: new Array(numberOfJudges).fill().map(() => 10) };
+  const report = new Array(techniquesCount).fill().map((_el) => {
+    return { values: new Array(numberOfJudges).fill().map(() => 10) };
   });
   return report;
 }
