@@ -62,8 +62,6 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 const error = useState('error', () => '');
 const tournament = useState('tournament', () => ({}));
 
-const numberOfMats = computed(() => tournament.value.numberOfMats);
-
 try {
   tournament.value = await $fetch(`/api/tournaments/${cookie.value.tCode}`);
 } catch (err) {

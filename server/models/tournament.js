@@ -51,12 +51,13 @@ export default class Tournament {
       return;
     }
     for (const group of mat.groups) {
-      for (const match of group.matches) {
+      for (const [index, match] of group.matches.entries()) {
         if (!match.completed) {
-          return match;
+          return { match, index };
         }
       }
     }
+    return {};
   }
 
   getJudgeNumber(matNumber, judge) {

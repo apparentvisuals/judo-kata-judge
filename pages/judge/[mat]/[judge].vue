@@ -1,5 +1,8 @@
 <template>
-  <div v-if="match" class="bg bg-base-200 h-full">
+  <div v-if="error">
+    <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
+  </div>
+  <div v-else class="bg bg-base-200 h-full">
     <div v-if="!judge" class="h-full flex">
       <div class="m-auto max-w-xs max-h-96">
         <form valid="isValid" @submit.prevent="submitJudge">
@@ -69,9 +72,6 @@
       </tbody>
     </table>
   </div>
-  <div v-else>
-    <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
-  </div>
 </template>
 
 <script setup>
@@ -87,9 +87,9 @@ const judgeNumber = computed(() => route.params.judge);
 
 const error = useState('error', () => '');
 const match = useState('match', () => undefined);
+const code = useState('code', () => '');
 const judge = useState('judge', () => undefined);
 const scores = useState('scores', () => []);
-const code = useState('code', () => '');
 
 const headers = { authorization: `Bearer ${cookie.value.tCode}` };
 
@@ -116,10 +116,18 @@ const total = computed(() => {
 });
 const moves = computed(() => moveList(match.value.kata));
 
-async function submitScore() {
-  const body = _scoreToPayload();
-  const judgeValues = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers });
-  scores.value = _payloadToScore(judgeValues);
+async function submitJudge() {
+  try {
+    error.value = '';
+    judge.value = await $fetch(`/api/judges/${code.value}`, { headers });
+  } catch (err) {
+    error.value = handleServerError(err);
+  }
+}
+
+async function changeJudge() {
+  judge.value = undefined;
+  code.value = '';
 }
 
 async function toggleScore(score, index) {
@@ -143,27 +151,24 @@ async function toggleScore(score, index) {
   score.value = moveValue;
 }
 
-async function submitJudge() {
-  try {
-    error.value = '';
-    judge.value = await $fetch(`/api/judges/${code.value}`, { headers });
-  } catch (err) {
-    error.value = handleServerError(err);
-  }
-}
-
-async function changeJudge() {
-  judge.value = undefined;
-  code.value = '';
+async function submitScore() {
+  const body = _scoreToPayload();
+  const judgeValues = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers });
+  scores.value = _payloadToScore(judgeValues);
+  _subscribe();
 }
 
 async function _getMatch() {
   try {
     error.value = '';
     match.value = await $fetch(`/api/${matNumber.value}/match`, { headers });
-    const judgeValue = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { headers });
-    const newScores = _payloadToScore(judgeValue);
-    scores.value = newScores;
+    if (judgeNumber.value > match.value.numberOfJudges) {
+      error.value = 'Invalid Judge Position';
+    } else {
+      const judgeValue = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { headers });
+      const newScores = _payloadToScore(judgeValue);
+      scores.value = newScores;
+    }
   } catch (err) {
     error.value = handleServerError(err);
   }
@@ -190,6 +195,30 @@ function _scoreToPayload() {
     payload.scores.push({ deductions: (score.deductions || Array(6).fill('')).join(':') });
   }
   return payload;
+}
+
+let events;
+function _subscribe() {
+  if (events) {
+    events.close();
+  }
+  events = new EventSource(`/api/${matNumber.value}/updates?token=${cookie.value.tCode}`);
+  events.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (!data.error) {
+      if (data.completed) {
+        error.value = '';
+        events.close();
+        scores.value = [];
+        _getMatch();
+      } else {
+        error.value = 'Please wait until all judges have submitted their score';
+      }
+    } else {
+      error.value = data.error;
+      events.close();
+    }
+  };
 }
 
 await _getMatch();

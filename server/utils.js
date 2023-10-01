@@ -14,8 +14,14 @@ export function getToken(event) {
   return token;
 }
 
-export function createUpdateMessage(judge) {
-  return `data: ${judge.number};${judge.name};${JSON.stringify(judge.scores)}\n\n`;
+export function createNoMatchMessage() {
+  return `data: ${JSON.stringify({ error: 'no more matches' })}\n\n`
+}
+
+export function createUpdateMessage(scores, index) {
+  const completed = scores.every((judgeScore) => judgeScore.name);
+  const update = { index, completed };
+  return `data: ${JSON.stringify(update)}\n\n`;
 }
 
 export function createReportMessage(report) {

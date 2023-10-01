@@ -18,23 +18,23 @@ export default defineEventHandler(async (event) => {
   const scores = await readBody(event);
 
   const tournament = await Tournament.get(token);
-  const match = tournament.getMatch(mat);
+  const { match, index } = tournament.getMatch(mat);
   if (!match) {
-    return {};
+    return createError({ statusCode: 404, message: 'no more matches' })
   }
 
   match.scores[judge] = scores;
-  match.completed = _IsMatchComplete(match);
   match.results = createReport(match);
+  match.completed = _IsMatchComplete(match.scores);
   await tournament.save();
 
-  // const clients = db.clients(`${token}-${mat}`);
-  // notifyAllClients(clients.match.list, createUpdateMessage(judgeInfo));
+  const clients = db.clients(`${token}-${mat}`);
+  notifyAllClients(clients.match.list, createUpdateMessage(match.scores, index));
   // notifyAllClients(clients.report.list, createReportMessage(match.results));
 
   return match.scores[judge];
 });
 
-function _IsMatchComplete(match) {
-  return match.scores.every((judgeScore) => judgeScore.name);
+function _IsMatchComplete(scores) {
+  return scores.every((judgeScore) => judgeScore.name);
 }
