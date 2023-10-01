@@ -20,8 +20,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="match in group">
-                <td class="text-center">{{ index + 1 }}</td>
+              <tr v-for="(match, matchIndex) in group">
+                <td class="text-center">{{ matchIndex + 1 }}</td>
                 <td>{{ match.tori }}</td>
                 <td>{{ match.uke }}</td>
                 <td v-if="props.showSubTotal" class="text-center">{{ match.scores[0] }}</td>
