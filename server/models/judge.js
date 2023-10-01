@@ -23,7 +23,7 @@ export default class Judge {
     const judgeIds = await useStorage(key).getKeys();
     const loadJudges = judgeIds.map((id) => {
       return (async () => {
-        const judge = await Judge.get(id);
+        const judge = await useStorage(key).getItem(id);
         return { id, name: judge.name, region: judge.region, rank: judge.rank };
       })();
     });
