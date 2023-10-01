@@ -31,6 +31,16 @@ export const KATA_MAP = {
   'ko7': 'Kodomo-no-kata 7',
 }
 
+export function getGroupName(group, index) {
+  if (group.name) {
+    return group.name;
+  }
+  if (group.kata) {
+    return getKataName(group.kata);
+  }
+  return `Group ${index + 1}`;
+}
+
 export function getKataName(kata) {
   return KATA_MAP[kata] || '';
 };
