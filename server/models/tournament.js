@@ -74,8 +74,10 @@ export default class Tournament {
     this.#tournament.mats.splice(index, 1);
   }
 
-  async createGroup(mat, numberOfJudges) {
+  async createGroup(mat, { name, kata, numberOfJudges }) {
     this.#tournament.mats[mat].groups.push({
+      name,
+      kata,
       numberOfJudges,
       matches: []
     });
