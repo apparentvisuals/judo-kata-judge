@@ -1,6 +1,6 @@
 import Tournament from '~/server/models/tournament';
 import db from '../../db';
-import { notifyAllClients, createUpdateMessage, createReportMessage, createReport } from '../../utils';
+import { notifyAllClients, createUpdateMessage, createReportMessage, createReport, createSummaryMessage } from '../../utils';
 
 export default defineEventHandler(async (event) => {
   const authorization = getHeader(event, 'authorization');
@@ -12,27 +12,30 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const mat = parseInt(getRouterParam(event, 'mat'));
-  const judge = parseInt(getRouterParam(event, 'judge')) - 1;
+  const matNumber = parseInt(getRouterParam(event, 'mat'));
+  const judgeNumber = parseInt(getRouterParam(event, 'judge')) - 1;
 
   const scores = await readBody(event);
 
   const tournament = await Tournament.get(token);
-  const { match, index } = tournament.getMatch(mat);
+  const { match, index } = tournament.getMatch(matNumber);
   if (!match) {
     return createError({ statusCode: 404, message: 'no more matches' })
   }
 
-  match.scores[judge] = scores;
+  match.scores[judgeNumber] = scores;
   match.results = createReport(match);
   match.completed = _IsMatchComplete(match.scores);
   await tournament.save();
 
-  const clients = db.clients(`${token}-${mat}`);
+  const clients = db.clients(`${token}-${matNumber}`);
   notifyAllClients(clients.match.list, createUpdateMessage(match.scores, index));
-  // notifyAllClients(clients.report.list, createReportMessage(match.results));
-
-  return match.scores[judge];
+  notifyAllClients(clients.report.list, createReportMessage(match.results));
+  if (match.completed) {
+    const mat = tournament.getMat(matNumber);
+    notifyAllClients(clients.summary.list, createSummaryMessage(mat));
+  }
+  return match.scores[judgeNumber];
 });
 
 function _IsMatchComplete(scores) {

@@ -1,76 +1,76 @@
 <template>
-  <div v-if="error">
-    <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
-  </div>
-  <div v-else class="bg bg-base-200 h-full">
-    <div v-if="!judge" class="h-full flex">
-      <div class="m-auto max-w-xs max-h-96">
-        <form valid="isValid" @submit.prevent="submitJudge">
-          <div class="form-control w-full max-w-xs">
-            <label class="label" for="code">
-              <span class="label-text">Judge Code</span>
-            </label>
-            <input id="code" name="code" type="text" class="input input-bordered" v-model="code" />
-          </div>
-          <button type="submit" class="btn btn-primary mt-4">Submit</button>
-        </form>
-      </div>
+  <div class="h-full flex">
+    <div v-if="error" class="m-auto max-h-96 text-center">
+      <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
     </div>
-    <div v-else class="navbar bg-base-100 rounded-box" :class="inputState">
-      <div class="navbar-start">
-        <button class="btn btn-square btn-sm btn-ghost" @click.prevent="changeJudge">
-          <ArrowPathRoundedSquareIcon class="w-6 h-6" />
-        </button>
-      </div>
-      <div class="navbar-center">
-        <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
-        <div v-if="match">
-          <div>{{ judge.name }}</div>
-          <div>{{ `${match.tori}/${match.uke} (${getKataName(match.kata)})` }}</div>
+    <div v-else-if="!judge" class="m-auto w-full p-1 xs:w-80 xs:p-0 max-h-96">
+      <form valid="isValid" @submit.prevent="submitJudge">
+        <div class="form-control w-full">
+          <label class="label" for="code">
+            <span class="label-text">Judge Code</span>
+          </label>
+          <input id="code" name="code" type="text" class="input input-bordered" v-model="code" />
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Submit</button>
+      </form>
+    </div>
+    <div v-else class="w-full overflow-auto">
+      <div class="navbar bg-base-100 rounded-box" :class="inputState">
+        <div class="navbar-start">
+          <button class="btn btn-square btn-sm btn-ghost" @click.prevent="changeJudge">
+            <ArrowPathRoundedSquareIcon class="w-6 h-6" />
+          </button>
+        </div>
+        <div class="navbar-center">
+          <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
+          <div v-if="match">
+            <div>{{ judge.name }}</div>
+            <div>{{ `${match.tori}/${match.uke} (${getKataName(match.kata)})` }}</div>
+          </div>
+        </div>
+        <div class="navbar-end">
+          <button class="btn btn-sm btn-primary" @click.prevent="submitScore">submit</button>
         </div>
       </div>
-      <div class="navbar-end">
-        <button class="btn btn-sm btn-primary" @click.prevent="submitScore">submit</button>
-      </div>
+      <table class="table w-full bg-base-100">
+        <thead>
+          <tr>
+            <th>Technique</th>
+            <th class="score">S(1)</th>
+            <th class="score">S(1)</th>
+            <th class="score">M(3)</th>
+            <th class="score">B(5)</th>
+            <th class="score">F(0)</th>
+            <th class="score">C</th>
+            <th class="w-16 text-center">Score</th>
+          </tr>
+        </thead>
+        <tbody class="bg-base-100">
+          <tr v-for="(score, index) in scores">
+            <td>{{ moves[index] }}</td>
+            <td v-for="(deduction, dIndex) in score.deductions || Array(6).fill(0)" class="score"
+              @click.prevent="toggleScore(score, dIndex)">
+              <div class="h-6 px-1">
+                <CheckIcon class="h-6 w-6" v-if="deduction === '1'" />
+                <PlusIcon class="h-6 w-6" v-if="dIndex === 5 && deduction === '+'" />
+                <MinusIcon class="h-6 w-6" v-if="dIndex === 5 && deduction === '-'" />
+              </div>
+            </td>
+            <td class="text-center">{{ score.value }}</td>
+          </tr>
+          <tr>
+            <td>Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-center">{{ total }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <table v-show="!error" class="table w-full p-4 bg-base-100">
-      <thead>
-        <tr>
-          <th>Technique</th>
-          <th class="score">S(1)</th>
-          <th class="score">S(1)</th>
-          <th class="score">M(3)</th>
-          <th class="score">B(5)</th>
-          <th class="score">F(0)</th>
-          <th class="score">C</th>
-          <th class="w-16 text-center">Score</th>
-        </tr>
-      </thead>
-      <tbody class="bg-base-100">
-        <tr v-for="(score, index) in scores">
-          <td>{{ moves[index] }}</td>
-          <td v-for="(deduction, dIndex) in score.deductions || Array(6).fill(0)" class="score"
-            @click.prevent="toggleScore(score, dIndex)">
-            <div class="h-6 px-1">
-              <CheckIcon class="h-6 w-6" v-if="deduction === '1'" />
-              <PlusIcon class="h-6 w-6" v-if="dIndex === 5 && deduction === '+'" />
-              <MinusIcon class="h-6 w-6" v-if="dIndex === 5 && deduction === '-'" />
-            </div>
-          </td>
-          <td class="text-center">{{ score.value }}</td>
-        </tr>
-        <tr>
-          <td>Total</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td class="text-center">{{ total }}</td>
-        </tr>
-      </tbody>
-    </table>
   </div>
 </template>
 

@@ -28,8 +28,8 @@ export function createReportMessage(report) {
   return `data: ${JSON.stringify(report)}\n\n`;
 }
 
-export function createSummaryMessage(matInfo) {
-  const groups = matInfo.groups;
+export function createSummaryMessage(mat) {
+  const groups = mat.groups;
   const groupsSummary = groups.map((group) => {
     const matches = group.matches;
     const summary = matches.map((match) => {
