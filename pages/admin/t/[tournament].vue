@@ -115,7 +115,6 @@ try {
 async function showAddGroup(selectedMat) {
   mat.value = selectedMat;
   addingGroup.value = true;
-  addGroup(matIndex)
 }
 
 async function showAddMatch(selectedMat, selectedGroup) {
