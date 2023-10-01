@@ -15,6 +15,6 @@ export default defineEventHandler(async (event) => {
     const response = await Judge.create({ name, rank, region });
     return response;
   } catch (err) {
-    throw createError({ statusCode: 400, statusMessage: err.message });
+    return createError({ statusCode: 400, statusMessage: err.message });
   }
 });

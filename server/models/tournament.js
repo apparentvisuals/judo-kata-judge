@@ -1,7 +1,6 @@
-import { format } from 'date-fns';
 import { nanoid } from 'nanoid';
 
-import { createReport, isDev, numberOfTechniques } from '~/server/utils';
+import { isDev, numberOfTechniques } from '~/server/utils';
 
 const tKey = isDev() ? 'tournament-dev' : 'tournament';
 
@@ -97,22 +96,10 @@ export default class Tournament {
       return;
     }
     const matches = group.matches;
-    // const numberOfJudges = data.numberOfJudges = data.numberOfJudges || group.numberOfJudges || 5;
     const match = {
       ...data,
       completed: false,
     };
-    // for (let ii = 0; ii < numberOfJudges; ii++) {
-    //   const scores = _getKataScoreSet(data.kata);
-    //   match.judges.push({
-    //     number: ii,
-    //     name: '',
-    //     scores,
-    //     total: numberOfTechniques(data.kata) * 10,
-    //     majorIndex: Array(scores.length).fill(0),
-    //   })
-    // }
-    // match.results = createReport(match);
     matches.push(match);
     return match;
   }
