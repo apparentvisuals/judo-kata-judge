@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 
 import { isDev, numberOfTechniques } from '~/server/utils';
 
-const tKey = isDev() ? 'tournament-dev' : 'tournament';
+const key = isDev() ? 'tournament-dev' : 'tournament';
 
 /**
  * {
@@ -126,7 +126,7 @@ export default class Tournament {
   }
 
   async save() {
-    await useStorage().setItem(`${tKey}:${this.#id}`, this.#tournament);
+    await useStorage(key).setItem(this.#id, this.#tournament);
   }
 
   replace(tournament) {
@@ -134,7 +134,7 @@ export default class Tournament {
   }
 
   static async getAll() {
-    const tournamentsIds = await useStorage(tKey).getKeys();
+    const tournamentsIds = await useStorage(key).getKeys();
     const loadTournaments = tournamentsIds.map((id) => {
       return (async () => {
         const tournament = await Tournament.get(id);
@@ -146,11 +146,7 @@ export default class Tournament {
   }
 
   static async get(id) {
-    const tournament = await useStorage().getItem(`${tKey}:${id}`);
-    if (!tournament) {
-      const error = new Error('no such tournament');
-      throw error;
-    }
+    const tournament = await useStorage(key).getItem(id);
     return new Tournament(id, tournament);
   }
 

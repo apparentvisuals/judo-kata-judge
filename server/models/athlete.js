@@ -3,7 +3,6 @@ import { nanoid } from 'nanoid';
 import { isDev } from "../utils";
 
 const key = isDev() ? 'athlete-dev' : 'athlete';
-
 export default class Athlete {
   static async create(data) {
     const id = nanoid(6);

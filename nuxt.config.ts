@@ -1,15 +1,10 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 
-function isDev() {
-  return process.env.NODE_ENV === 'development';
-}
-
 export default defineNuxtConfig({
   vite: {
     vue: {
       script: {
         defineModel: true,
-        propsDestructure: true
       }
     }
   },
@@ -25,7 +20,7 @@ export default defineNuxtConfig({
         driver: 'azureCosmos',
         endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
         accountKey: process.env.COSMOS_KEY,
-        containerName: isDev() ? 'tournaments-dev' : 'tournaments',
+        containerName: 'tournaments',
         databaseName: 'judo-kata-judge'
       },
       'tournament-dev': {
@@ -36,7 +31,7 @@ export default defineNuxtConfig({
         driver: 'azureCosmos',
         endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
         accountKey: process.env.COSMOS_KEY,
-        containerName: isDev() ? 'judges-dev' : 'judges',
+        containerName: 'judges',
         databaseName: 'judo-kata-judge'
       },
       'judge-dev': {
@@ -47,7 +42,7 @@ export default defineNuxtConfig({
         driver: 'azureCosmos',
         endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
         accountKey: process.env.COSMOS_KEY,
-        containerName: isDev() ? 'athletes-dev' : 'athletes',
+        containerName: 'athletes',
         databaseName: 'judo-kata-judge'
       },
       'athlete-dev': {
