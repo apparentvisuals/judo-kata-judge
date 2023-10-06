@@ -13,7 +13,8 @@ export default defineEventHandler(async (event) => {
   try {
     const judgeId = getRouterParam(event, 'judge');
     await Judge.remove(judgeId);
-    return {};
+    const judges = await Judge.getAll();
+    return judges;
   } catch (err) {
     throw createError({ statusCode: 400, statusMessage: err.message });
   }

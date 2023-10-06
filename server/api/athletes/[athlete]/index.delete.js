@@ -13,7 +13,8 @@ export default defineEventHandler(async (event) => {
   try {
     const athleteId = getRouterParam(event, 'athlete');
     await Athlete.remove(athleteId);
-    return {};
+    const athletes = await Athlete.getAll();
+    return athletes;
   } catch (err) {
     throw createError({ statusCode: 400, statusMessage: err.message });
   }

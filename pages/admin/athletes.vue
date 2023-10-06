@@ -6,7 +6,7 @@
     </div>
     <div class="m-4 py-4">
       <div class="pb-4">
-        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="adding = true">
+        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="adding = true" :disabled="inAction">
           <span>Add Athlete</span>
         </button>
       </div>
@@ -27,7 +27,7 @@
             <td>{{ getRankName(t.rank) }}</td>
             <td>{{ getProvinceName(t.region) }}</td>
             <td>
-              <button class="btn btn-error btn-square btn-sm" @click.prevent="remove(t.id)">
+              <button class="btn btn-error btn-square btn-sm" @click.prevent="remove(t.id)" :disabled="inAction">
                 <XMarkIcon class="w-4 h-4" />
               </button>
             </td>
@@ -62,10 +62,11 @@
           </select>
         </div>
         <div class="modal-action">
-          <button for="add-t-modal" class="btn btn-sm btn-error btn-outline" @click.prevent="adding = false">
+          <button for="add-t-modal" class="btn btn-sm btn-error btn-outline" @click.prevent="adding = false"
+            :disabled="inAction">
             Cancel
           </button>
-          <button for="add-t-modal" class="btn btn-sm btn-success" @click.prevent="addAthlete">Add</button>
+          <button for="add-t-modal" class="btn btn-sm btn-success" @click.prevent="add" :disabled="inAction">Add</button>
         </div>
       </div>
     </div>
@@ -84,19 +85,44 @@ const error = useState('error', () => '');
 const athletes = useState('athletes', () => ({}));
 const newAthlete = useState('new-athlete', () => (DEFAULT));
 const adding = useState('adding', () => false)
+const inAction = useState('in-action', () => false);
 
+const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 try {
-  athletes.value = await $fetch(`/api/athletes`, { headers: { authorization: `Bearer ${cookie.value.adminCode}` } });
+  inAction.value = true;
+  athletes.value = await $fetch(`/api/athletes`, { headers });
+  error.value = '';
 } catch (err) {
   error.value = handleServerError(err);
+} finally {
+  inAction.value = false;
 }
 
-async function addAthlete() {
-  const body = newAthlete.value;
-  const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
-  const result = await $fetch(`/api/athletes`, { method: 'POST', body, headers });
-  athletes.value.push(result);
-  newAthlete.value = DEFAULT;
-  adding.value = false;
+async function add() {
+  inAction.value = true;
+  try {
+    const body = newAthlete.value;
+    const result = await $fetch(`/api/athletes`, { method: 'POST', body, headers });
+    athletes.value.push(result);
+    newAthlete.value = DEFAULT;
+    error.value = '';
+  } catch (err) {
+    error.value = handleServerError(err);
+  } finally {
+    inAction.value = false;
+    adding.value = false;
+  }
+}
+
+async function remove(id) {
+  try {
+    inAction.value = true;
+    athletes.value = await $fetch(`/api/athletes/${id}`, { method: 'DELETE', headers });
+    error.value = '';
+  } catch (err) {
+    error.value = handleServerError(err);
+  } finally {
+    inAction.value = false;
+  }
 }
 </script>
