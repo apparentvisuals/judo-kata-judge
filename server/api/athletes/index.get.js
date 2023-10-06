@@ -14,6 +14,6 @@ export default defineEventHandler(async (event) => {
     const athletes = await Athlete.getAll();
     return athletes;
   } catch (err) {
-    throw createError({ statusCode: 400, messsage: err.message });
+    throw createError({ statusCode: 400, statusMessage: err.message });
   }
 });
