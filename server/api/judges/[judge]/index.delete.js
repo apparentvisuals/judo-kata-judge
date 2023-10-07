@@ -5,10 +5,10 @@ import Judge from '~/server/models/judge';
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
   if (!token) {
-    throw createError({ statusCode: 401, messsage: 'unauthorized' });
+    return createError({ statusCode: 401, messsage: 'unauthorized' });
   }
   if (token !== getAuth()) {
-    throw createError({ statusCode: 403, messsage: 'forbidden' });
+    return createError({ statusCode: 403, messsage: 'forbidden' });
   }
   try {
     const judgeId = getRouterParam(event, 'judge');
@@ -16,6 +16,6 @@ export default defineEventHandler(async (event) => {
     const judges = await Judge.getAll();
     return judges;
   } catch (err) {
-    throw createError({ statusCode: 400, statusMessage: err.message });
+    return createError({ statusCode: 400, statusMessage: err.message });
   }
 });
