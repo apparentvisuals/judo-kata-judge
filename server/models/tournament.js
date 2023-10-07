@@ -161,6 +161,10 @@ export default class Tournament {
     await tournament.save();
     return tournament;
   }
+
+  static async remove(id) {
+    await useStorage(key).removeItem(id);
+  }
 }
 
 function _getKataScoreSet(kata) {

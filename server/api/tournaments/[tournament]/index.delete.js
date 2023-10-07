@@ -1,3 +1,4 @@
+import Tournament from '~/server/models/tournament';
 import db from '../../../db';
 import { getToken } from '../../../utils';
 import { getAuth } from '../../../utils/auth-key';
@@ -5,17 +6,19 @@ import { getAuth } from '../../../utils/auth-key';
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
   if (!token) {
-    throw createError({ statusCode: 401, messsage: 'unauthorized' });
+    return createError({ statusCode: 401, messsage: 'unauthorized' });
   }
   if (token !== getAuth()) {
-    throw createError({ statusCode: 403, messsage: 'forbidden' });
+    return createError({ statusCode: 403, messsage: 'forbidden' });
   }
   try {
-    // TODO
     const tournamentId = getRouterParam(event, 'tournament');
+    await Tournament.remove(tournamentId);
+    const tournaments = await Tournament.getAll();
+    return tournaments;
     return {};
   } catch (err) {
-    throw createError({ statusCode: 400, messsage: err.message });
+    return createError({ statusCode: 400, messsage: err.message });
   }
 
 });

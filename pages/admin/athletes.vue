@@ -6,7 +6,7 @@
     </div>
     <div class="m-4 py-4">
       <div class="pb-4">
-        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="adding = true" :disabled="inAction">
+        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" :disabled="inAction">
           <span>Add Athlete</span>
         </button>
       </div>
@@ -27,7 +27,7 @@
             <td>{{ getRankName(t.rank) }}</td>
             <td>{{ getProvinceName(t.region) }}</td>
             <td>
-              <button class="btn btn-error btn-square btn-sm" @click.prevent="remove(t.id)" :disabled="inAction">
+              <button class="btn btn-error btn-square btn-sm" @click.prevent="showRemove(t.id)" :disabled="inAction">
                 <XMarkIcon class="w-4 h-4" />
               </button>
             </td>
@@ -35,41 +35,35 @@
         </tbody>
       </table>
     </div>
-    <div class="modal modal-bottom sm:modal-middle" :class="adding ? 'modal-open' : ''">
-      <div class="modal-box">
-        <div class="form-control w-full">
-          <label class="label" for="name">
-            <span class="label-text">Name</span>
-          </label>
-          <input id="name" name="name" type="text" class="input input-bordered" v-model="newAthlete.name" />
-        </div>
-        <div class="form-control w-full">
-          <label class="label" for="mats">
-            <span class="label-text">Province</span>
-          </label>
-          <select id="kata" class="select select-bordered" v-model="newAthlete.region">
-            <option v-for="province of Object.keys(PROVINCE_MAP)" :value="province">
-              {{ getProvinceName(province) }}
-            </option>
-          </select>
-        </div>
-        <div class="form-control w-full">
-          <label class="label" for="mats">
-            <span class="label-text">Rank</span>
-          </label>
-          <select id="kata" class="select select-bordered" v-model="newAthlete.rank">
-            <option v-for="rank of Object.keys(RANK_MAP)" :value="rank">{{ getRankName(rank) }}</option>
-          </select>
-        </div>
-        <div class="modal-action">
-          <button for="add-t-modal" class="btn btn-sm btn-error btn-outline" @click.prevent="adding = false"
-            :disabled="inAction">
-            Cancel
-          </button>
-          <button for="add-t-modal" class="btn btn-sm btn-success" @click.prevent="add" :disabled="inAction">Add</button>
-        </div>
+    <Prompt name="add_athlete_modal" @submit="add" :disabled="inAction" text="Add">
+      <div class="form-control w-full">
+        <label class="label" for="name">
+          <span class="label-text">Name</span>
+        </label>
+        <input id="name" name="name" type="text" class="input input-bordered" v-model="newAthlete.name" required />
       </div>
-    </div>
+      <div class="form-control w-full">
+        <label class="label" for="mats">
+          <span class="label-text">Province</span>
+        </label>
+        <select id="kata" class="select select-bordered" v-model="newAthlete.region">
+          <option v-for="province of Object.keys(PROVINCE_MAP)" :value="province">
+            {{ getProvinceName(province) }}
+          </option>
+        </select>
+      </div>
+      <div class="form-control w-full">
+        <label class="label" for="mats">
+          <span class="label-text">Rank</span>
+        </label>
+        <select id="kata" class="select select-bordered" v-model="newAthlete.rank">
+          <option v-for="rank of Object.keys(RANK_MAP)" :value="rank">{{ getRankName(rank) }}</option>
+        </select>
+      </div>
+    </Prompt>
+    <Prompt name="delete_athlete_modal" @submit="remove" text="Yes">
+      <span>Delete this athlete?</span>
+    </Prompt>
   </div>
 </template>
 
@@ -83,9 +77,9 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 
 const error = useState('error', () => '');
 const athletes = useState('athletes', () => ({}));
-const newAthlete = useState('new-athlete', () => (DEFAULT));
-const adding = useState('adding', () => false)
 const inAction = useState('in-action', () => false);
+const newAthlete = useState('new-athlete', () => (DEFAULT));
+const athleteToDelete = useState('athlete-to-delete', () => undefined);
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 try {
@@ -96,6 +90,10 @@ try {
   error.value = handleServerError(err);
 } finally {
   inAction.value = false;
+}
+
+async function showAdd() {
+  add_athlete_modal.showModal();
 }
 
 async function add() {
@@ -110,19 +108,27 @@ async function add() {
     error.value = handleServerError(err);
   } finally {
     inAction.value = false;
-    adding.value = false;
   }
 }
 
-async function remove(id) {
-  try {
-    inAction.value = true;
-    athletes.value = await $fetch(`/api/athletes/${id}`, { method: 'DELETE', headers });
-    error.value = '';
-  } catch (err) {
-    error.value = handleServerError(err);
-  } finally {
-    inAction.value = false;
+async function showRemove(id) {
+  athleteToDelete.value = id;
+  delete_athlete_modal.showModal();
+}
+
+async function remove() {
+  if (athleteToDelete.value) {
+    const id = athleteToDelete.value;
+    try {
+      inAction.value = true;
+      athletes.value = await $fetch(`/api/athletes/${id}`, { method: 'DELETE', headers });
+      error.value = '';
+      athleteToDelete.value = undefined;
+    } catch (err) {
+      error.value = handleServerError(err);
+    } finally {
+      inAction.value = false;
+    }
   }
 }
 </script>
