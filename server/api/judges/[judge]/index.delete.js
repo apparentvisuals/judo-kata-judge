@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   }
   try {
     const judgeId = getRouterParam(event, 'judge');
-    await Judge.remove(judgeId);
+    await Judge.remove(judgeId.toUpperCase());
     const judges = await Judge.getAll();
     return judges;
   } catch (err) {
