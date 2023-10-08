@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   const tournament = await Tournament.get(token);
   const { match, index } = tournament.getMatch(matNumber);
   if (!match) {
-    return createError({ statusCode: 404, message: 'no more matches' })
+    return createError({ statusCode: 404, statusMessage: 'no more matches' })
   }
 
   match.scores[judgeNumber] = scores;

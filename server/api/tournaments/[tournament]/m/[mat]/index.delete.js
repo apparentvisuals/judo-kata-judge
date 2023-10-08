@@ -6,10 +6,10 @@ import { getAuth } from '~/server/utils/auth-key';
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
   if (!token) {
-    throw createError({ statusCode: 401, messsage: 'unauthorized' });
+    return createError({ statusCode: 401, statusMessage: 'unauthorized' });
   }
   if (token !== getAuth()) {
-    throw createError({ statusCode: 403, messsage: 'forbidden' });
+    return createError({ statusCode: 403, statusMessage: 'forbidden' });
   }
   const tournamentId = getRouterParam(event, 'tournament');
   const matNumber = parseInt(getRouterParam(event, 'mat'));
