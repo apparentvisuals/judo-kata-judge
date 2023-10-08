@@ -12,8 +12,8 @@ export default defineEventHandler(async (event) => {
     return createError({ statusCode: 403, messsage: 'forbidden' });
   }
   try {
-    const { name, numberOfMats, showJudgeTotals } = await readBody(event);
-    const tournament = await Tournament.create({ name, numberOfMats, showJudgeTotals });
+    const { name, showJudgeTotals } = await readBody(event);
+    const tournament = await Tournament.create({ name, showJudgeTotals });
     return tournament.data;
   } catch (err) {
     return createError({ statusCode: 400, statusMessage: err.message });

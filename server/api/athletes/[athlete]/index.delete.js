@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   }
   try {
     const athleteId = getRouterParam(event, 'athlete');
-    await Athlete.remove(athleteId);
+    await Athlete.remove(athleteId.toUpperCase());
     const athletes = await Athlete.getAll();
     return athletes;
   } catch (err) {

@@ -32,25 +32,7 @@
       </table>
     </div>
     <Prompt name="add_t_modal" @submit="add" :disabled="inAction" text="Add">
-      <div class="form-control w-full">
-        <label class="label" for="name">
-          <span class="label-text">Name</span>
-        </label>
-        <input id="name" name="name" type="text" class="input input-bordered" v-model="newTournament.name" required />
-      </div>
-      <div class="form-control w-full">
-        <label class="label" for="mats">
-          <span class="label-text">Number of Mats</span>
-        </label>
-        <input id="mats" name="mats" type="number" min="1" max="5" class="input input-bordered"
-          v-model.number="newTournament.numberOfMats" />
-      </div>
-      <div class="form-control">
-        <label class="label" for="showJudgeTotal">
-          <span class="label-text">Show individual judge total on results?</span>
-          <input type="checkbox" v-model="newTournament.showJudgeTotals" />
-        </label>
-      </div>
+      <TournamentInputs :tournament="newTournament" />
     </Prompt>
     <Prompt name="delete_t_modal" @submit="remove" text="Yes">
       <span>Delete this tournament?</span>
@@ -62,14 +44,14 @@
 import { XMarkIcon } from '@heroicons/vue/24/outline';
 import { handleServerError } from '~~/src/utils';
 
-const DEFAULT = { name: '', numberOfMats: 1, showJudgeTotals: true };
+const DEFAULT = { name: '', showJudgeTotals: true };
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 
 const error = useState('error', () => '');
 const tournaments = useState('tournaments', () => ({}));
 const inAction = useState('in-action', () => false);
-const newTournament = useState('new-tournament', () => DEFAULT);
+const newTournament = useState('new-tournament', () => Object.assign(DEFAULT));
 const tournamentToDelete = useState('tournament-to-delete', () => undefined);
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
@@ -94,7 +76,7 @@ async function add() {
     const body = newTournament.value;
     const result = await $fetch(`/api/tournaments`, { method: 'POST', body, headers });
     tournaments.value.push({ id: result.id, name: result.name });
-    newTournament.value = DEFAULT;
+    newTournament.value = Object.assign(DEFAULT);
     error.value = '';
   } catch (err) {
     error.value = handleServerError(err);

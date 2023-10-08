@@ -1,3 +1,7 @@
+import { customAlphabet } from 'nanoid';
+
+export const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+
 export function isDev() {
   return process.env.NODE_ENV !== 'production';
 }

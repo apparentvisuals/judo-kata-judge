@@ -1,12 +1,10 @@
-import { nanoid } from 'nanoid';
-
-import { isDev } from "../utils";
+import { isDev, nanoid } from "~/server/utils";
 
 const key = isDev() ? 'judge-dev' : 'judge';
 
 export default class Judge {
   static async create(data) {
-    const id = nanoid(6);
+    const id = nanoid(4);
     const judge = data;
     await useStorage(key).setItem(id, judge);
     return { id, ...judge };

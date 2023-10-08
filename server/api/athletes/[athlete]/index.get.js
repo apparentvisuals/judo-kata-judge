@@ -1,5 +1,5 @@
+import Athlete from '~/server/models/athlete';
 import { getToken } from '../../../utils';
-import Judge from '~/server/models/judge';
 import Tournament from '~/server/models/tournament';
 
 export default defineEventHandler(async (event) => {
@@ -14,12 +14,12 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const judgeId = getRouterParam(event, 'judge');
-    const judge = await Judge.get(judgeId.toUpperCase());
-    if (!judge) {
+    const athleteId = getRouterParam(event, 'judge');
+    const athlete = await Athlete.get(athleteId.toUpperCase());
+    if (!athlete) {
       return createError({ statusCode: 404, statusMessage: 'Judge not found' });
     }
-    return judge;
+    return athlete;
   } catch (err) {
     throw createError({ statusCode: 400, statusMessage: err.message });
   }
