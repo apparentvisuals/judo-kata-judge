@@ -10,6 +10,12 @@ export default class Judge {
     return { id, ...judge };
   }
 
+  static async update(id, data) {
+    const judge = data;
+    await useStorage(key).setItem(id, judge);
+    return { id, ...judge };
+  }
+
   static async get(id) {
     const judge = await useStorage(key).getItem(id);
     if (judge) {

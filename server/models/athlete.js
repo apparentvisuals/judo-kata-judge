@@ -11,6 +11,12 @@ export default class Athlete {
     return { id, ...athlete };
   }
 
+  static async update(id, data) {
+    const athlete = data;
+    await useStorage(key).setItem(id, athlete);
+    return { id, ...athlete };
+  }
+
   static async getAll() {
     const athleteIds = await useStorage(key).getKeys();
     const loadAthletes = athleteIds.map((id) => {

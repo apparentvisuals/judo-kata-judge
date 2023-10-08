@@ -17,19 +17,26 @@
             <th>Name</th>
             <th>Rank</th>
             <th>Region</th>
-            <th class="w-10"></th>
+            <th class="w-16"></th>
           </tr>
         </thead>
         <tbody class="bg-base-100">
-          <tr v-for="t in judges">
-            <td>{{ t.id }}</td>
-            <td>{{ t.name }}</td>
-            <td>{{ getLevelName(t.rank) }}</td>
-            <td>{{ getProvinceName(t.region) }}</td>
+          <tr v-for="j in judges">
+            <td>{{ j.id }}</td>
+            <td>{{ j.name }}</td>
+            <td>{{ getLevelName(j.rank) }}</td>
+            <td>{{ getProvinceName(j.region) }}</td>
             <td>
-              <button class="btn btn-error btn-square btn-sm" @click.prevent="showRemove(t.id)" :disabled="inAction">
-                <XMarkIcon class="w-4 h-4" />
-              </button>
+              <div class="join">
+                <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(j)"
+                  :disabled="inAction">
+                  <PencilIcon class="w-4 h-4" />
+                </button>
+                <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(j.id)"
+                  :disabled="inAction">
+                  <XMarkIcon class="w-4 h-4" />
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -38,6 +45,9 @@
     <Prompt name="add_judge_modal" @submit="add" :disabled="inAction" text="Add">
       <JudgeInput :judge="newJudge" />
     </Prompt>
+    <Prompt name="edit_judge_modal" @submit="update" :disabled="inAction" text="Update">
+      <JudgeInput :judge="judgeToUpdate" />
+    </Prompt>
     <Prompt name="delete_judge_modal" @submit="remove" text="Yes">
       <span>Delete this judge?</span>
     </Prompt>
@@ -45,7 +55,8 @@
 </template>
 
 <script setup>
-import { XMarkIcon } from '@heroicons/vue/24/outline';
+import { clone, pick } from 'lodash-es';
+import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
 import { getLevelName, getProvinceName, handleServerError } from '~~/src/utils';
 
 const DEFAULT = { name: '', region: 'on', rank: 'n' };
@@ -55,8 +66,9 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 const error = useState('error', () => '');
 const judges = useState('judges', () => ({}));
 const inAction = useState('in-action', () => false);
-const newJudge = useState('new-judge', () => (DEFAULT));
+const newJudge = useState('new-judge', () => clone(DEFAULT));
 const judgeToDelete = useState('judge-to-delete', () => undefined);
+const judgeToUpdate = useState('judge-to-update', () => clone(DEFAULT));
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
@@ -79,7 +91,31 @@ async function add() {
     const body = newJudge.value;
     const result = await $fetch(`/api/judges`, { method: 'POST', body, headers });
     judges.value.push(result);
-    newJudge.value = DEFAULT;
+    newJudge.value = clone(DEFAULT);
+    error.value = '';
+  } catch (err) {
+    error.value = handleServerError(err);
+  } finally {
+    inAction.value = false;
+  }
+}
+
+function showUpdate(judge) {
+  judgeToUpdate.value = clone(judge);
+  judgeToUpdate.value.originalJudge = judge;
+  edit_judge_modal.showModal();
+}
+
+async function update() {
+  try {
+    const id = judgeToUpdate.value.id;
+    const body = pick(judgeToUpdate.value, ["name", "rank", "region"]);
+    const result = await $fetch(`/api/judges/${id}`, { method: 'POST', body, headers });
+    const originalJudge = judgeToUpdate.value.originalJudge;
+    originalJudge.name = result.name;
+    originalJudge.rank = result.rank;
+    originalJudge.region = result.region;
+    judgeToUpdate.value = clone(DEFAULT);
     error.value = '';
   } catch (err) {
     error.value = handleServerError(err);
