@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   const tournament = await Tournament.get(token);
   if (!tournament) {
-    throw createError({ statusCode: 403, statusMessage: 'forbidden' });
+    return createError({ statusCode: 403, statusMessage: 'forbidden' });
   }
 
   try {
@@ -24,6 +24,6 @@ export default defineEventHandler(async (event) => {
     }
     return judge;
   } catch (err) {
-    throw createError({ statusCode: 400, statusMessage: err.message });
+    return createError({ statusCode: 400, statusMessage: err.message });
   }
 });

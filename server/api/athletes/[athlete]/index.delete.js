@@ -5,10 +5,10 @@ import { getAuth } from '../../../utils/auth-key';
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
   if (!token) {
-    throw createError({ statusCode: 401, messsage: 'unauthorized' });
+    return createError({ statusCode: 401, statusMessage: 'unauthorized' });
   }
   if (token !== getAuth()) {
-    throw createError({ statusCode: 403, messsage: 'forbidden' });
+    return createError({ statusCode: 403, statusMessage: 'forbidden' });
   }
   try {
     const athleteId = getRouterParam(event, 'athlete');
@@ -16,6 +16,6 @@ export default defineEventHandler(async (event) => {
     const athletes = await Athlete.getAll();
     return athletes;
   } catch (err) {
-    throw createError({ statusCode: 400, statusMessage: err.message });
+    return createError({ statusCode: 400, statusMessage: err.message });
   }
 });

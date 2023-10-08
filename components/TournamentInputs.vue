@@ -8,7 +8,7 @@
   <div class="form-control">
     <label class="label" for="showJudgeTotal">
       <span class="label-text">Show individual judge total on results?</span>
-      <input type="checkbox" v-model="tournament.showJudgeTotals" />
+      <input id="showJudgeTotal" type="checkbox" v-model="tournament.showJudgeTotals" />
     </label>
   </div>
 </template>

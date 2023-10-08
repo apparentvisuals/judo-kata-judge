@@ -149,7 +149,9 @@ export default class Tournament {
 
   static async get(id) {
     const tournament = await useStorage(key).getItem(id);
-    return new Tournament(id, tournament);
+    if (tournament) {
+      return new Tournament(id, tournament);
+    }
   }
 
   static async create({ name = 'Tournament 1', showJudgeTotals = true }) {
