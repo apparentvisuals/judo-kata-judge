@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { pick } from 'lodash-es';
 
 import { isDev, numberOfTechniques } from '~/server/utils';
 
@@ -130,7 +131,8 @@ export default class Tournament {
   }
 
   replace(tournament) {
-    this.#tournament = tournament;
+    this.#tournament.name = tournament.name;
+    this.#tournament.showJudgeTotals = tournament.showJudgeTotals;
   }
 
   static async getAll() {
@@ -138,7 +140,7 @@ export default class Tournament {
     const loadTournaments = tournamentsIds.map((id) => {
       return (async () => {
         const tournament = await Tournament.get(id);
-        return { id: tournament.data.id, name: tournament.data.name };
+        return pick(tournament.data, ['id', 'name', 'showJudgeTotals']);
       })();
     });
     const tournaments = await Promise.all(loadTournaments);

@@ -15,6 +15,9 @@ export default defineEventHandler(async (event) => {
 
   try {
     const judgeId = getRouterParam(event, 'judge');
+    if (!judgeId) {
+      return createError({ statusCode: 404, statusMessage: 'Judge not found' });
+    }
     const judge = await Judge.get(judgeId.toUpperCase());
     if (!judge) {
       return createError({ statusCode: 404, statusMessage: 'Judge not found' });

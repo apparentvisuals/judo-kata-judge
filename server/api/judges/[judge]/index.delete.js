@@ -12,6 +12,9 @@ export default defineEventHandler(async (event) => {
   }
   try {
     const judgeId = getRouterParam(event, 'judge');
+    if (!judgeId) {
+      return createError({ statusCode: 404, statusMessage: 'Judge not found' });
+    }
     await Judge.remove(judgeId.toUpperCase());
     const judges = await Judge.getAll();
     return judges;
