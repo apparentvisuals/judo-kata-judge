@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { KATA_MAP, getKataName } from '~~/src/utils';
+import { KATA_MAP, getKataName } from '~/src/utils';
 
 const props = defineProps(['data']);
 const model = defineModel();

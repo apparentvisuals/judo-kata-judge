@@ -57,7 +57,7 @@
 <script setup>
 import { clone, pick } from 'lodash-es';
 import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
-import { getProvinceName, getRankName, handleServerError } from '~~/src/utils';
+import { getProvinceName, getRankName, handleServerError } from '~/src/utils';
 
 const DEFAULT = { name: '', region: 'on', rank: '1d' };
 

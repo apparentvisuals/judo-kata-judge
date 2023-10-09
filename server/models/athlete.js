@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 
-import { isDev } from "../utils";
+import { isDev } from "~/server/utils";
 
 const key = isDev() ? 'athlete-dev' : 'athlete';
 export default class Athlete {

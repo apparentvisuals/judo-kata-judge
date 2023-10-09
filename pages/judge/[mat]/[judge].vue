@@ -1,15 +1,15 @@
 <template>
   <div class="h-full flex">
-    <div v-if="error" class="m-auto max-h-96 text-center">
-      <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
-    </div>
-    <div v-else-if="!judge" class="m-auto w-full p-1 xs:w-80 xs:p-0 max-h-96">
-      <form valid="isValid" @submit.prevent="submitJudge">
+    <div v-if="!judge" class="m-auto w-full p-1 xs:w-80 xs:p-0 max-h-96">
+      <form valid="isValid" @submit.prevent="submitCode">
         <div class="form-control w-full">
           <label class="label" for="code">
             <span class="label-text">Judge Code</span>
           </label>
           <input id="code" name="code" type="text" class="input input-bordered" v-model="code" />
+          <label class="label">
+            <span for="code" class="label-text-alt text-error" v-if="error">{{ error }}</span>
+          </label>
         </div>
         <button type="submit" class="btn btn-primary mt-4">Submit</button>
       </form>
@@ -76,8 +76,8 @@
 
 <script setup>
 import { CheckIcon, PlusIcon, MinusIcon, ArrowPathRoundedSquareIcon } from '@heroicons/vue/24/outline';
-import { moveList, calculateMoveScore } from '~~/server/utils';
-import { getKataName, handleServerError } from '~~/src/utils';
+import { moveList, calculateMoveScore } from '~/server/utils';
+import { getKataName, handleServerError } from '~/src/utils';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 const route = useRoute();
@@ -90,6 +90,7 @@ const match = useState('match', () => undefined);
 const code = useState('code', () => '');
 const judge = useState('judge', () => undefined);
 const scores = useState('scores', () => []);
+const inAction = useState('in-action', () => false);
 
 const headers = { authorization: `Bearer ${cookie.value.tCode}` };
 
@@ -116,12 +117,15 @@ const total = computed(() => {
 });
 const moves = computed(() => moveList(match.value.kata));
 
-async function submitJudge() {
+async function submitCode() {
   try {
+    inAction.value = true;
     error.value = '';
     judge.value = await $fetch(`/api/judges/${code.value}`, { headers });
   } catch (err) {
     error.value = handleServerError(err);
+  } finally {
+    inAction.value = false;
   }
 }
 

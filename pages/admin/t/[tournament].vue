@@ -90,7 +90,7 @@
 <script setup>
 import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { format } from 'date-fns';
-import { KATA_MAP, getKataName, getGroupName, handleServerError } from '~~/src/utils';
+import { KATA_MAP, getKataName, getGroupName, handleServerError } from '~/src/utils';
 
 const route = useRoute();
 const cookie = useCookie('jkj', { default: () => ({}) });

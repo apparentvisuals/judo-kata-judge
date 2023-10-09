@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import db from '../../db';
-import { createNoMatchMessage, createUpdateMessage, getToken } from '../../utils';
+import { createNoMatchMessage, createUpdateMessage } from '~/server/utils';
 import Tournament from '~/server/models/tournament';
 
 export default defineEventHandler(async (event) => {
@@ -10,10 +10,12 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const mat = parseInt(getRouterParam(event, 'mat'));
+  const matNumber = parseInt(getRouterParam(event, 'mat'));
 
   const tournament = await Tournament.get(token);
-  const { match, index } = tournament.getMatch(mat);
+  const mat = tournament.getMat(matNumber);
+  const { match, index } = tournament.getMatch(matNumber);
+
   const headers = {
     'Content-Type': 'text/event-stream',
     'Connection': 'keep-alive',
@@ -23,26 +25,28 @@ export default defineEventHandler(async (event) => {
 
   const req = event.node.req;
   const res = event.node.res;
+
   if (!match) {
     res.write(createNoMatchMessage());
     res.end();
     return;
   }
+
   if (match.completed) {
-    res.write(createUpdateMessage(match.scores, index));
+    res.write(createUpdateMessage(tournament, matNumber, match.scores, index));
     res.end();
     return;
   }
+
   const id = uuidv4();
-  const clients = db.clients(`${token}-${mat}`);
+  const clients = db.clients(`${token}-${matNumber}`);
   clients.match.add(id, res);
 
   req.on('close', () => {
     console.log(`m${mat}:${id} connection closed`);
     clients.match.remove(id);
   });
-  const message = createUpdateMessage(match.scores, index);
-  console.log(message);
+  const message = createUpdateMessage(tournament, matNumber, match.scores, index);
   res.write(message);
 
   event._handled = true;

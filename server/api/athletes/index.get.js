@@ -1,6 +1,5 @@
 import Athlete from '~/server/models/athlete';
-import { getToken } from '../../utils';
-import { getAuth } from '../../utils/auth-key';
+import { getAuth, getToken } from '~/server/utils';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);

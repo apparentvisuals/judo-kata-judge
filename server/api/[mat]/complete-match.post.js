@@ -1,7 +1,7 @@
 import Tournament from '~/server/models/tournament';
 import db from '../../db';
 
-import { notifyAllClients, createSummaryMessage, createReportMessage, getToken } from '../../utils';
+import { notifyAllClients, createSummaryMessage, createReportMessage, getToken } from '~/server/utils';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);

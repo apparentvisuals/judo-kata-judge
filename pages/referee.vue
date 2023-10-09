@@ -49,7 +49,7 @@
 
 <script setup>
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
-import { getKataName, handleServerError } from '~~/src/utils';
+import { getKataName, handleServerError } from '~/src/utils';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 const error = useState('error', () => '');

@@ -26,6 +26,6 @@
 </template>
 
 <script setup>
-import { LEVEL_MAP, PROVINCE_MAP, getLevelName, getProvinceName } from '~~/src/utils';
+import { LEVEL_MAP, PROVINCE_MAP, getLevelName, getProvinceName } from '~/src/utils';
 const props = defineProps(['judge']);
 </script>

@@ -1,5 +1,5 @@
 import Athlete from '~/server/models/athlete';
-import { getToken } from '../../../utils';
+import { getToken } from '~/server/utils';
 import Tournament from '~/server/models/tournament';
 
 export default defineEventHandler(async (event) => {

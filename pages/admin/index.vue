@@ -52,7 +52,7 @@
 <script setup>
 import { clone, pick } from 'lodash-es';
 import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
-import { handleServerError } from '~~/src/utils';
+import { handleServerError } from '~/src/utils';
 
 const DEFAULT = { name: '', showJudgeTotals: true };
 

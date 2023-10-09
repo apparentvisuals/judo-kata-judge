@@ -50,7 +50,7 @@
 
 <script setup>
 import { ArrowLeftOnRectangleIcon } from '@heroicons/vue/24/outline';
-import { handleServerError } from '@/src/utils';
+import { handleServerError } from '~/src/utils';
 
 function logout() {
   cookie.value.tCode = '';

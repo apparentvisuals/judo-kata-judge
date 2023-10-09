@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import { handleServerError } from '@/src/utils';
+import { handleServerError } from '~/src/utils';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 const route = useRoute();
