@@ -1,7 +1,5 @@
 import Tournament from '~/server/models/tournament';
-import db from '../../../db';
-import { getToken } from '../../../utils';
-import { getAuth } from '../../../utils/auth-key';
+import { getAuth, getToken } from '~/server/utils';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);

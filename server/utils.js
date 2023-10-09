@@ -18,13 +18,17 @@ export function getToken(event) {
   return token;
 }
 
+export function getAuth() {
+  return process.env.AUTH_KEY;
+}
+
 export function createNoMatchMessage() {
   return `data: ${JSON.stringify({ error: 'no more matches' })}\n\n`
 }
 
-export function createUpdateMessage(scores, index) {
+export function createUpdateMessage(tournament, mat, scores, index) {
   const completed = scores.every((judgeScore) => judgeScore.name);
-  const update = { index, completed };
+  const update = { tournament: tournament.name, mat, index, completed };
   return `data: ${JSON.stringify(update)}\n\n`;
 }
 

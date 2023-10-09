@@ -1,6 +1,5 @@
-import { getToken } from '../../../utils';
-import { getAuth } from '../../../utils/auth-key';
 import Judge from '~/server/models/judge';
+import { getAuth, getToken } from '~/server/utils';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import db from '../../db';
-import { createReportMessage, getToken } from '../../utils';
+import { createReportMessage } from '~/server/utils';
 import Tournament from '~/server/models/tournament';
 
 export default defineEventHandler(async (event) => {

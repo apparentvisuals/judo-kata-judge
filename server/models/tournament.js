@@ -41,7 +41,6 @@ export default class Tournament {
 
   getMat(matNumber) {
     const mat = this.#tournament.mats[matNumber];
-    // mat.startTime = mat.startTime || format(new Date(), 'HH:mm');
     return mat;
   }
 

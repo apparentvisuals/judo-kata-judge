@@ -35,7 +35,7 @@
 <script setup>
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import { addMinutes, format, parse } from 'date-fns';
-import { getKataName, handleServerError } from '@/src/utils';
+import { getKataName, handleServerError } from '~/src/utils';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 const route = useRoute();

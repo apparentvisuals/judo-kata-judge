@@ -26,6 +26,6 @@
 </template>
 
 <script setup>
-import { PROVINCE_MAP, RANK_MAP, getProvinceName, getRankName } from '~~/src/utils';
+import { PROVINCE_MAP, RANK_MAP, getProvinceName, getRankName } from '~/src/utils';
 const props = defineProps(['athlete']);
 </script>

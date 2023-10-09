@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-import { getGroupName } from '@/src/utils';
+import { getGroupName } from '~/src/utils';
 
 const props = defineProps(['tournament', 'mat', 'show-sub-total']);
 const cookie = useCookie('jkj', { default: () => ({}) });

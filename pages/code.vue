@@ -9,7 +9,7 @@
           <input id="code" name="code" type="text" class="input input-bordered" v-model="code"
             :class="error ? 'input-error' : ''" />
           <label class="label">
-            <span class="label-text-alt text-error" v-if="error">{{ error }}</span>
+            <span for="code" class="label-text-alt text-error" v-if="error">{{ error }}</span>
           </label>
         </div>
         <button type="submit" class="btn btn-primary mt-4">Submit</button>
@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { handleServerError } from '@/src/utils';
+import { handleServerError } from '~/src/utils';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 const auth = useAuth();

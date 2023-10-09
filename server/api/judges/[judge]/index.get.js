@@ -1,4 +1,4 @@
-import { getToken } from '../../../utils';
+import { getToken } from '~/server/utils';
 import Judge from '~/server/models/judge';
 import Tournament from '~/server/models/tournament';
 
