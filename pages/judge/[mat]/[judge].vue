@@ -1,6 +1,28 @@
 <template>
+  <div class="navbar bg-primary fixed text-primary-content">
+    <div class="navbar-start">
+      <div>
+        <div class="text-xl">{{ tournament }}</div>
+        <div class="text-md">{{ getKataName(match.kata) }}</div>
+      </div>
+    </div>
+    <div class="navbar-end">
+      <button class="btn btn-sm btn-error" @click.prevent="changeJudge">
+        <ArrowLeftOnRectangleIcon class="w-5 h-5" />
+        Logout
+      </button>
+    </div>
+  </div>
   <div class="h-full flex">
-    <div v-if="!judge" class="m-auto w-full p-1 xs:w-80 xs:p-0 max-h-96">
+    <div v-if="wait" class="m-auto max-h-96 text-center">
+      <div>
+        <span class="text-3xl font-bold">{{ wait }}</span>
+      </div>
+      <div class="p-4">
+        <span class="loading loading-ring loading-lg"></span>
+      </div>
+    </div>
+    <div v-else-if="match && !judge" class="m-auto w-full p-1 xs:w-80 xs:p-0 max-h-96 mt-16">
       <form valid="isValid" @submit.prevent="submitCode">
         <div class="form-control w-full">
           <label class="label" for="code">
@@ -14,19 +36,15 @@
         <button type="submit" class="btn btn-primary mt-4">Submit</button>
       </form>
     </div>
-    <div v-else class="w-full overflow-auto">
-      <div class="navbar bg-base-100 rounded-box" :class="inputState">
+    <div v-else-if="match" class="w-full overflow-auto mt-16">
+      <div class="navbar bg-base-100" :class="inputState">
         <div class="navbar-start">
-          <button class="btn btn-square btn-sm btn-ghost" @click.prevent="changeJudge">
-            <ArrowPathRoundedSquareIcon class="w-6 h-6" />
-          </button>
+          <div>
+            <div>{{ judge.name }}</div>
+            <div>{{ `${match.tori} / ${match.uke}` }}</div>
+          </div>
         </div>
         <div class="navbar-center">
-          <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
-          <div v-if="match">
-            <div>{{ judge.name }}</div>
-            <div>{{ `${match.tori}/${match.uke} (${getKataName(match.kata)})` }}</div>
-          </div>
         </div>
         <div class="navbar-end">
           <button class="btn btn-sm btn-primary" @click.prevent="submitScore">submit</button>
@@ -75,9 +93,10 @@
 </template>
 
 <script setup>
-import { CheckIcon, PlusIcon, MinusIcon, ArrowPathRoundedSquareIcon } from '@heroicons/vue/24/outline';
-import { moveList, calculateMoveScore } from '~/server/utils';
-import { getKataName, handleServerError } from '~/src/utils';
+import { CheckIcon, PlusIcon, MinusIcon, ArrowLeftOnRectangleIcon } from '@heroicons/vue/24/outline';
+import { calculateMoveScore } from '~/server/utils';
+import { getKataName, handleServerError, moveList } from '~/src/utils';
+import { UpdateEvents } from '~/src/event-sources';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 const route = useRoute();
@@ -86,11 +105,14 @@ const matNumber = computed(() => route.params.mat);
 const judgeNumber = computed(() => route.params.judge);
 
 const error = useState('error', () => '');
-const match = useState('match', () => undefined);
 const code = useState('code', () => '');
+const tournament = useState('tournament', () => '');
+const matchIndex = useState('match-index', () => -1);
+const match = useState('match', () => undefined);
 const judge = useState('judge', () => undefined);
 const scores = useState('scores', () => []);
 const inAction = useState('in-action', () => false);
+const wait = useState('wait', () => '');
 
 const headers = { authorization: `Bearer ${cookie.value.tCode}` };
 
@@ -101,6 +123,7 @@ const inputState = computed(() => {
     return 'bg-success';
   }
 });
+const moves = computed(() => moveList(match.value.kata));
 const hasMajor = computed(() => scores.value.find((score) => score.deductions && score.deductions[4] === '1'));
 const total = computed(() => {
   const total = scores.value.reduce((acc, score) => {
@@ -115,7 +138,6 @@ const total = computed(() => {
   }
   return total;
 });
-const moves = computed(() => moveList(match.value.kata));
 
 async function submitCode() {
   try {
@@ -159,24 +181,53 @@ async function submitScore() {
   const body = _scoreToPayload();
   const judgeValues = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers });
   scores.value = _payloadToScore(judgeValues);
-  _subscribe();
 }
 
-async function _getMatch() {
-  try {
-    error.value = '';
-    match.value = await $fetch(`/api/${matNumber.value}/match`, { headers });
+/**
+ * @type UpdateEvents
+ */
+let event;
+onMounted(async () => {
+  event = new UpdateEvents(matNumber.value, cookie.value.tCode);
+  event.connect((data) => {
+    if (data.error) {
+      wait.value = data.error;
+      event.close();
+      return;
+    }
+    wait.value = '';
+    tournament.value = data.tournament;
+    if (data.index === -1) {
+      wait.value = 'no more matches';
+    } else {
+      if (data.index !== matchIndex.value) {
+        matchIndex.value = data.index;
+        match.value = data.match;
+      }
+      if (!data.completed && data.state[judgeNumber.value - 1]) {
+        wait.value = 'Please wait until all judges have submitted their score...';
+      }
+    }
+  });
+});
+
+onUnmounted(() => {
+  if (event) {
+    event.close();
+  }
+});
+
+watch(match, async () => {
+  if (match) {
     if (judgeNumber.value > match.value.numberOfJudges) {
-      error.value = 'Invalid Judge Position';
+      wait.value = 'Invalid Judge Position';
     } else {
       const judgeValue = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { headers });
       const newScores = _payloadToScore(judgeValue);
       scores.value = newScores;
     }
-  } catch (err) {
-    error.value = handleServerError(err);
   }
-}
+});
 
 function _payloadToScore(judgeValue) {
   const count = moves.value.length;
@@ -200,32 +251,6 @@ function _scoreToPayload() {
   }
   return payload;
 }
-
-let events;
-function _subscribe() {
-  if (events) {
-    events.close();
-  }
-  events = new EventSource(`/api/${matNumber.value}/updates?token=${cookie.value.tCode}`);
-  events.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (!data.error) {
-      if (data.completed) {
-        error.value = '';
-        events.close();
-        scores.value = [];
-        _getMatch();
-      } else {
-        error.value = 'Please wait until all judges have submitted their score';
-      }
-    } else {
-      error.value = data.error;
-      events.close();
-    }
-  };
-}
-
-await _getMatch();
 
 </script>
 

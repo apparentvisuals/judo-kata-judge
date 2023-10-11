@@ -18,8 +18,7 @@ export default defineEventHandler(async (event) => {
   const scores = await readBody(event);
 
   const tournament = await Tournament.get(token);
-  const mat = tournament.getMat(matNumber);
-  const { match, index } = tournament.getMatch(matNumber);
+  const { match } = tournament.getMatch(matNumber);
   if (!match) {
     return createError({ statusCode: 404, statusMessage: 'no more matches' })
   }
@@ -30,7 +29,7 @@ export default defineEventHandler(async (event) => {
   await tournament.save();
 
   const clients = db.clients(`${token}-${matNumber}`);
-  notifyAllClients(clients.match.list, createUpdateMessage(tournament, matNumber, match.scores, index));
+  notifyAllClients(clients.match.list, createUpdateMessage(tournament, matNumber));
   // notifyAllClients(clients.report.list, createReportMessage(match.results));
   if (match.completed) {
     const mat = tournament.getMat(matNumber);

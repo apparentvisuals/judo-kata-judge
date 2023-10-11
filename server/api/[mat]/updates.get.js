@@ -26,27 +26,15 @@ export default defineEventHandler(async (event) => {
   const req = event.node.req;
   const res = event.node.res;
 
-  if (!match) {
-    res.write(createNoMatchMessage());
-    res.end();
-    return;
-  }
-
-  if (match.completed) {
-    res.write(createUpdateMessage(tournament, matNumber, match.scores, index));
-    res.end();
-    return;
-  }
-
   const id = uuidv4();
   const clients = db.clients(`${token}-${matNumber}`);
   clients.match.add(id, res);
 
   req.on('close', () => {
-    console.log(`m${mat}:${id} connection closed`);
+    console.log(`m${matNumber}:${id} connection closed`);
     clients.match.remove(id);
   });
-  const message = createUpdateMessage(tournament, matNumber, match.scores, index);
+  const message = createUpdateMessage(tournament, matNumber);
   res.write(message);
 
   event._handled = true;

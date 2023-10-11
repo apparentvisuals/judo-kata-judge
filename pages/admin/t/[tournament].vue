@@ -154,7 +154,6 @@ async function addGroup() {
 }
 
 async function deleteGroup(mat, group) {
-  console.log(`delete group: ${mat} ${group}`)
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}`, { method: 'DELETE', headers });
   tournament.value = response;
 }
