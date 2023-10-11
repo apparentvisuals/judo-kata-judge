@@ -70,8 +70,8 @@
 
 <script setup>
 import { CheckIcon, PlusIcon, MinusIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline';
-import { moveList, calculateMoveScore } from '~/server/utils';
-import { getKataName, handleServerError } from '~/src/utils';
+import { calculateMoveScore } from '~/server/utils';
+import { getKataName, handleServerError, moveList } from '~/src/utils';
 
 const auth = useAuth();
 const error = useState('error', () => '');

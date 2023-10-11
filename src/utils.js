@@ -31,6 +31,40 @@ export const KATA_MAP = {
   'ko7': 'Kodomo-no-kata 7',
 }
 
+const NNK3_MOVE_LIST = ['Opening Ceremony', 'Uki-otoshi', 'Seoi-nage', 'Kata-guruma', 'Uki-goshi', 'Harai-goshi', 'Tsurikomi-goshi', 'Okuri-ashi-harai', 'Sasae-tsurikomi-ashi', 'Uchi-mata', 'Closing Ceremony'];
+const NNK_MOVE_LIST = ['Opening Ceremony', 'Uki-otoshi', 'Seoi-nage', 'Kata-guruma', 'Uki-goshi', 'Harai-goshi', 'Tsurikomi-goshi', 'Okuri-ashi-harai', 'Sasae-tsurikomi-ashi', 'Uchi-mata', 'Tomoe-nage', 'Ura-nage', 'Sumi-gaeshi', 'Yoko-gake', 'Yoko-guruma', 'Uki-waza', 'Closing Ceremony'];
+const KNK_MOVE_LIST = ['Opening Ceremony', 'Kesa-gatame', 'Kata-gatame', 'Kami-shiho-gatame', 'Yoko-shiho-gatame', 'Kuzure-kami-shiho-gatame', 'Kata-juji-jime', 'Hadaka-jime', 'Okuri-eri-jime', 'Kataha-jime', 'Gyaku-juji-jime', 'Ude-garami', 'Ude-hishigi-juji-gatame', 'Ude-hishigi-ude-gatame', 'Ude-hishigi-hiza-hatame', 'Ashi-garami', 'Closing Ceremony'];
+const JNK_MOVE_LIST = ['Opening Ceremony', 'Tsuki-dashi', 'Kata-oshi', 'Ryote-dori', 'Kata-mawashi', 'Ago-oshi', 'Kiri-oroshi', 'Ryokata-oshi', 'Nanami-uchi', 'Katate-dori', 'Katate-age', 'Obi-tori', 'Mune-oshi', 'Tsuki-age', 'Uchi-oroshi', 'Ryogan-tsuki', 'Closing Ceremony'];
+const KGJ_MOVE_LIST = ['Opening Ceremony', 'Ryote-dori', 'Hidari-eri-dori', 'Migi-eri-dori', 'Kataude-dori', 'Ushiro-eri-dori', 'Ushiro-jime', 'Kakae-dori', 'Naname-uchi', 'Ago-tsuki', 'Ganmen-tsuki', 'Mae-geri', 'Yoko-geri', 'Tsukkake', 'Choku-tsuki', 'Naname-tsuki', 'Furi-age', 'Furi-oroshi', 'Morote-tsuki', 'Shomen-zuke', 'Koshi-gamae', 'Haimen-zuke', 'Closing Ceremony'];
+const KINK_MOVE_LIST = ['Opening Ceremony', 'Ryote-dori', 'Tsukkake', 'Suri-age', ' Yoko-uchi', 'Ushiro-dori', 'Tsukkomi', 'Kiri-komi', 'Yoko-tsuki', 'Ryote-dori', 'Sode-tori', 'Tsukkake', 'Tsuki-age', 'Suri-age', ' Yoko-uchi', 'Ke-age', 'Ushiro-dori', 'Tsukkomi', 'Kiri-komi', 'Nuki-gake', 'Kiri-oroshi', 'Closing Ceremony'];
+const KO5_MOVE_LIST = ['Opening Ceremony', 'Ushiro-ukemi', 'Yoko-ukemi', 'Mae-mawari-ukemi', 'Kumi-kata & Ugoki-kata', 'Happo-no-kuzushi', 'De-ashi-harai', 'Uki-otoshi', 'Uki-goshi', 'Closing Ceremony'];
+const KO6_MOVE_LIST = ['Opening Ceremony', 'Ushiro-ukemi Sit x2', 'Ushiro-ukemi Grip x2', 'Yoko-ukemi 1/Side', 'Mae-mawari-ukemi', 'Mae-mawari-sabaki', 'Ushiro-mawari-sabaki', 'Ayumi-ashi', 'Tsugi-ashi Side', 'Tsugi-ashi Circle', 'Hiza-guruma', 'Tai-otoshi', 'Closing Ceremony'];
+const KO7_MOVE_LIST = ['Opening Ceremony', 'Ushiro-ukemi Back x2', 'Ushiro-ukemi Sit x2', 'Yoko-ukemi 1/Side', 'Outen-ukemi 1/Side', 'Ma-sabaki', 'Ushiro-sabaki', 'Ayumi-ashi', 'Tsugi-ashi', 'Mae-sabaki Throwing', 'Ushiro-sabaki Throwing', 'Closing Ceremony'];
+
+export function moveList(kata) {
+  switch (kata) {
+    case 'nnk3':
+      return NNK3_MOVE_LIST;
+    case 'nnk':
+      return NNK_MOVE_LIST;
+    case 'knk':
+      return KNK_MOVE_LIST;
+    case 'jnk':
+      return JNK_MOVE_LIST;
+    case 'kgj':
+      return KGJ_MOVE_LIST;
+    case 'kink':
+      return KINK_MOVE_LIST;
+    case 'ko5':
+      return KO5_MOVE_LIST;
+    case 'ko6':
+      return KO6_MOVE_LIST;
+    case 'ko7':
+      return KO7_MOVE_LIST;
+    default: return [];
+  }
+}
+
 export function getGroupName(group, index) {
   if (group.name) {
     return group.name;
