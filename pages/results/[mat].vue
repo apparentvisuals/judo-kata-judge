@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-base-100 h-full overflow-y-auto">
+  <div class="h-full overflow-auto">
     <ClientOnly>
       <ResultTable :tournament="tournament" :mat="route.params.mat" :show-sub-total="true" />
     </ClientOnly>
