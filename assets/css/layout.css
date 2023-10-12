@@ -5,8 +5,10 @@ body,
   height: 100%;
 }
 
-#__nuxt {
-  @apply bg bg-base-100;
+@media screen {
+  #__nuxt {
+    @apply bg bg-base-100;
+  }
 }
 
 .bg {

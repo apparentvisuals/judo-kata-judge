@@ -3,10 +3,10 @@
     <div class="navbar-start">
       <div>
         <div class="text-xl">{{ tournament }}</div>
-        <div class="text-md">{{ getKataName(match.kata) }}</div>
+        <div class="text-md">{{ match ? getKataName(match.kata) : '' }}</div>
       </div>
     </div>
-    <div class="navbar-end">
+    <div class="navbar-end print:hidden">
       <button class="btn btn-sm btn-error" @click.prevent="changeJudge">
         <ArrowLeftOnRectangleIcon class="w-5 h-5" />
         Logout
@@ -22,7 +22,7 @@
         <span class="loading loading-ring loading-lg"></span>
       </div>
     </div>
-    <div v-else-if="match && !judge" class="m-auto w-full p-1 xs:w-80 xs:p-0 max-h-96 mt-16">
+    <div v-else-if="match && !judge" class="m-auto w-full p-1 xs:w-80 xs:p-0 max-h-96">
       <form valid="isValid" @submit.prevent="submitCode">
         <div class="form-control w-full">
           <label class="label" for="code">
@@ -37,7 +37,7 @@
       </form>
     </div>
     <div v-else-if="match" class="w-full overflow-auto mt-16">
-      <div class="navbar bg-base-100" :class="inputState">
+      <div class="navbar bg-primary text-primary-content">
         <div class="navbar-start">
           <div>
             <div>{{ judge.name }}</div>
@@ -46,8 +46,8 @@
         </div>
         <div class="navbar-center">
         </div>
-        <div class="navbar-end">
-          <button class="btn btn-sm btn-primary" @click.prevent="submitScore">submit</button>
+        <div class="navbar-end print:hidden">
+          <button class="btn btn-sm btn-success" @click.prevent="submitScore">submit</button>
         </div>
       </div>
       <table class="table w-full bg-base-100">
@@ -64,7 +64,8 @@
           </tr>
         </thead>
         <tbody class="bg-base-100">
-          <tr v-for="(score, index) in scores">
+          <tr v-for="(score, index) in scores"
+            :class="score.deductions && score.deductions[4] === '1' ? 'bg-warning' : ''">
             <td>{{ moves[index] }}</td>
             <td v-for="(deduction, dIndex) in score.deductions || Array(6).fill(0)" class="score"
               @click.prevent="toggleScore(score, dIndex)">
@@ -254,8 +255,18 @@ function _scoreToPayload() {
 
 </script>
 
-<style>
+<style scoped>
 .score {
-  @apply w-12 text-center p-2;
+  @apply w-14 text-center p-2.5;
+}
+
+td {
+  @apply border;
+}
+
+@media print {
+  table {
+    @apply border;
+  }
 }
 </style>
