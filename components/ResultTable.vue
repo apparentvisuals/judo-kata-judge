@@ -10,7 +10,7 @@
           </div>
           <div class="navbar-end"></div>
         </div>
-        <table class="table bg-base-100">
+        <table class="table bg-base-100 overflow-auto">
           <thead>
             <tr>
               <th class="w-8 text-center"></th>

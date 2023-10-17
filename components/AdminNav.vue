@@ -6,9 +6,9 @@
           <Bars3Icon class="w=5 h-5" />
         </label>
         <ul tabindex="0" class="menu dropdown-content mt-3 z-50 p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a href="#" @click.prevent="navigateTo('/admin')">Tournaments</a></li>
-          <li><a href="#" @click.prevent="navigateTo('/admin/judges')">Judges</a></li>
-          <li><a href="#" @click.prevent="navigateTo('/admin/athletes')">Athletes</a></li>
+          <li><nuxt-link to="/admin">Tournaments</nuxt-link></li>
+          <li><nuxt-link to="/admin/judges">Judges</nuxt-link></li>
+          <li><nuxt-link to="/admin/athletes">Athletes</nuxt-link></li>
         </ul>
       </div>
     </div>

@@ -25,12 +25,13 @@
       <div v-for="(mat, matIndex) in tournament.mats" class="bg-base-100">
         <div class="flex justify-between mb-2 p-2">
           <h2 class="text-lg font-semibold">Mat {{ matIndex + 1 }}</h2>
-          <div class="flex">
-            <button class="btn btn-square btn-sm btn-primary mr-1" @click.prevent="showAddGroup(matIndex)"
-              aria-label="add group" @submit="addGroup">
+          <div class="join">
+            <button class="btn btn-square btn-sm btn-primary join-item" @click.prevent="showAddGroup(matIndex)"
+              aria-label="add group">
               <PlusIcon class="w-6 h-6" />
             </button>
-            <button class="btn btn-square btn-sm btn-error" @click.prevent="deleteMat(matIndex)" aria-label="delete mat">
+            <button class="btn btn-square btn-sm btn-error join-item" @click.prevent="deleteMat(matIndex)"
+              aria-label="delete mat">
               <XMarkIcon class="w-6 h-6" />
             </button>
           </div>
@@ -39,15 +40,20 @@
           <template #item="{ element: group, index: groupIndex }">
             <div class="bg-base-100 p-2 border">
               <div class="flex justify-between mb-2">
-                <h2 class="text-lg font-semibold">{{ getGroupName(group, groupIndex) }}</h2>
-                <div class="flex">
-                  <button class="btn btn-square btn-sm btn-primary mr-1"
+                <h2 class="text-lg font-semibold">{{ getGroupName(group, groupIndex) + ` (${group.numberOfJudges})` }}
+                </h2>
+                <div class="join">
+                  <button class="btn btn-square btn-sm btn-success join-item"
                     @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match">
-                    <PlusIcon class="w-6 h-6" />
+                    <PlusIcon class="w-5 h-5" />
                   </button>
-                  <button class="btn btn-square btn-sm btn-error" @click.prevent="deleteGroup(matIndex, groupIndex)"
-                    aria-label="delete group">
-                    <XMarkIcon class="w-6 h-6" />
+                  <button class="btn btn-primary btn-square btn-sm join-item"
+                    @click.prvent="showUpdateGroup(matIndex, groupIndex, group)">
+                    <PencilIcon class="w-4 h-4" />
+                  </button>
+                  <button class="btn btn-square btn-sm btn-error join-item"
+                    @click.prevent="deleteGroup(matIndex, groupIndex)" aria-label="delete group">
+                    <XMarkIcon class="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -56,7 +62,7 @@
                   <tr>
                     <th>Tori</th>
                     <th>Uke</th>
-                    <th class="w-32">Kata</th>
+                    <th class="w-48">Kata</th>
                     <th class="w-8"></th>
                   </tr>
                 </thead>
@@ -66,12 +72,22 @@
                       <td>{{ match.tori }}</td>
                       <td>{{ match.uke }}</td>
                       <td>
-                        <div>{{ getKataName(match.kata) }}</div>
+                        {{ getKataName(match.kata) }}
                       </td>
                       <td>
-                        <button class="btn btn-square btn-sm btn-error" alt="delete match">
-                          <XMarkIcon class="w-4 h-4" @click.prevent="deleteMatch(matIndex, groupIndex, index)" />
-                        </button>
+                        <div class="join">
+                          <button class="btn btn-primary btn-square btn-sm join-item" :disabled="!match.completed">
+                            <CheckIcon class="w-5 h-5" />
+                          </button>
+                          <button class="btn btn-primary btn-square btn-sm join-item"
+                            @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
+                            :disabled="match.completed || inAction">
+                            <PencilIcon class="w-4 h-4" />
+                          </button>
+                          <button class="btn btn-square btn-sm btn-error join-item" alt="delete match">
+                            <XMarkIcon class="w-5 h-5" @click.prevent="deleteMatch(matIndex, groupIndex, index)" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </template>
@@ -82,27 +98,42 @@
         </draggable>
       </div>
     </div>
-    <GroupModal v-model="addingGroup" :data="newGroup" @submit="addGroup" />
-    <MatchModal v-model="addingMatch" :data="newMatch" @submit="addMatch" />
+    <Prompt name="add_group_modal" @submit="addGroup" :disabled="inAction" text="Add">
+      <GroupInput :group="newGroup" />
+    </Prompt>
+    <Prompt name="edit_group_modal" @submit="updateGroup" :disabled="inAction" text="update">
+      <GroupInput :group="groupToUpdate" />
+    </Prompt>
+    <Prompt name="add_match_modal" @submit="addMatch" :disabled="inAction" text="Add">
+      <MatchInput :match="newMatch" />
+    </Prompt>
+    <Prompt name="edit_match_modal" @submit="updateMatch" :disabled="inAction" text="Update">
+      <MatchInput :match="matchToUpdate" />
+    </Prompt>
   </div>
 </template>
 
 <script setup>
-import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon } from '@heroicons/vue/24/outline';
-import { format } from 'date-fns';
-import { KATA_MAP, getKataName, getGroupName, handleServerError } from '~/src/utils';
+import { clone, pick } from 'lodash-es';
+import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon } from '@heroicons/vue/24/outline';
+import { getKataName, getGroupName, handleServerError } from '~/src/utils';
+
+const DEFAULT_GROUP = { name: '', kata: '', numberOfJudges: 5 };
+const DEFAULT_MATCH = { tori: '', uke: '', kata: 'nnk', numberOfJudges: 5 };
 
 const route = useRoute();
 const cookie = useCookie('jkj', { default: () => ({}) });
 
-const tournament = useState('tournament', () => ({}));
-const addingMatch = useState('adding-match', () => false);
-const newMatch = useState('new-match', () => ({ tori: '', uke: '', kata: 'nnk', numberOfJudges: 5 }));
-const addingGroup = useState('adding-group', () => false);
-const newGroup = useState('new-group', () => ({ name: '', kata: '', numberOfJudges: 5 }));
-const mat = useState('mat', () => 0);
-const group = useState('group', () => 0);
 const error = useState('error', () => '');
+const inAction = useState('in-action', () => false);
+const tournament = useState('tournament', () => ({}));
+const newGroup = useState('new-group', () => clone(DEFAULT_GROUP));
+const newMatch = useState('new-match', () => clone(DEFAULT_MATCH));
+const mat = useState('mat', () => undefined);
+const group = useState('group', () => undefined);
+const match = useState('match', () => undefined);
+const groupToUpdate = useState('group-to-update', () => clone(DEFAULT_GROUP));
+const matchToUpdate = useState('match-to-update', () => clone(DEFAULT_MATCH));
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
@@ -110,29 +141,6 @@ try {
   tournament.value = await $fetch(`/api/tournaments/${route.params.tournament}`, { headers });
 } catch (err) {
   error.value = handleServerError(err);
-}
-
-async function showAddGroup(selectedMat) {
-  mat.value = selectedMat;
-  addingGroup.value = true;
-}
-
-async function showAddMatch(selectedMat, selectedGroup) {
-  mat.value = selectedMat;
-  group.value = selectedGroup;
-  const groupValue = tournament.value.mats[selectedMat].groups[selectedGroup];
-  if (groupValue.kata) {
-    newMatch.value.kata = groupValue.kata;
-  }
-  if (groupValue.numberOfJudges) {
-    newMatch.value.numberOfJudges = groupValue.numberOfJudges;
-  }
-  addingMatch.value = true;
-}
-
-async function save() {
-  const body = tournament.value;
-  await $fetch(`/api/tournaments/${route.params.tournament}`, { method: 'POST', body, headers });
 }
 
 async function addMat() {
@@ -145,12 +153,34 @@ async function deleteMat(mat) {
   tournament.value = response;
 }
 
+async function save() {
+  const body = tournament.value;
+  await $fetch(`/api/tournaments/${route.params.tournament}`, { method: 'POST', body, headers });
+}
+
+async function showAddGroup(matIndex) {
+  mat.value = matIndex;
+  add_group_modal.showModal();
+}
+
 async function addGroup() {
   const body = newGroup.value;
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g`, { method: 'POST', body, headers });
   tournament.value = response;
-  addingGroup.value = false;
   newGroup.value.name = '';
+}
+
+async function showUpdateGroup(matIndex, groupIndex, groupValue) {
+  mat.value = matIndex;
+  group.value = groupIndex;
+  groupToUpdate.value = clone(groupValue);
+  edit_group_modal.showModal();
+}
+
+async function updateGroup() {
+  const body = pick(groupToUpdate.value, ["name", "kata", "numberOfJudges"]);
+  const result = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}`, { method: 'POST', body, headers });
+  tournament.value = result;
 }
 
 async function deleteGroup(mat, group) {
@@ -158,13 +188,39 @@ async function deleteGroup(mat, group) {
   tournament.value = response;
 }
 
+async function showAddMatch(selectedMat, selectedGroup) {
+  mat.value = selectedMat;
+  group.value = selectedGroup;
+  const groupValue = tournament.value.mats[selectedMat].groups[selectedGroup];
+  if (groupValue.kata) {
+    newMatch.value.kata = groupValue.kata;
+  }
+  if (groupValue.numberOfJudges) {
+    newMatch.value.numberOfJudges = groupValue.numberOfJudges;
+  }
+  add_match_modal.showModal();
+}
+
 async function addMatch() {
   const body = { ...newMatch.value, scores: Array(newMatch.value.numberOfJudges).fill({}) };
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}/match`, { method: 'POST', body, headers });
   tournament.value = response;
-  addingMatch.value = false;
   newMatch.value.tori = '';
   newMatch.value.uke = '';
+}
+
+async function showUpdateMatch(selectedMat, selectedGroup, selectedMatch, matchValue) {
+  mat.value = selectedMat;
+  group.value = selectedGroup;
+  match.value = selectedMatch;
+  matchToUpdate.value = clone(matchValue);
+  edit_match_modal.showModal();
+}
+
+async function updateMatch() {
+  const body = pick(matchToUpdate.value, ["kata", "uke", 'tori', "numberOfJudges"]);
+  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}/match/${match.value}`, { method: 'POST', body, headers });
+  tournament.value = response;
 }
 
 async function deleteMatch(mat, group, matchId) {
