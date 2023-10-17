@@ -39,101 +39,6 @@ export default class Tournament {
     this.#tournament = data;
   }
 
-  getMat(matNumber) {
-    const mat = this.#tournament.mats[matNumber];
-    return mat;
-  }
-
-  getMatch(matNumber) {
-    const mat = this.#tournament.mats[matNumber];
-    if (!mat) {
-      return;
-    }
-    for (const group of mat.groups) {
-      for (const [index, match] of group.matches.entries()) {
-        if (!match.completed) {
-          return { match, index };
-        }
-      }
-    }
-    return {};
-  }
-
-  getJudgeNumber(matNumber, judge) {
-    const mat = this.getMat(matNumber);
-    const judgeIndex = mat.judges.indexOf(judge);
-    return judgeIndex + 1;
-  }
-
-  async createMat() {
-    this.#tournament.mats.push({ groups: [] });
-  }
-
-  async deleteMat(index) {
-    this.#tournament.mats.splice(index, 1);
-  }
-
-  async createGroup(mat, { name, kata, numberOfJudges }) {
-    this.#tournament.mats[mat].groups.push({
-      name,
-      kata,
-      numberOfJudges,
-      matches: []
-    });
-  }
-
-  async deleteGroup(mat, group) {
-    this.#tournament.mats[mat].groups.splice(group, 1);
-  }
-
-  async createMatch(matNumber, groupNumber, data) {
-    const mat = this.#tournament.mats[matNumber];
-    if (!mat) {
-      return;
-    }
-    const group = mat.groups[groupNumber];
-    if (!group) {
-      return;
-    }
-    const matches = group.matches;
-    const match = {
-      ...data,
-      completed: false,
-    };
-    matches.push(match);
-    return match;
-  }
-
-  async deleteMatch(matNumber, groupNumber, match) {
-    const mat = this.#tournament.mats[matNumber];
-    if (!mat) {
-      return;
-    }
-    const group = mat.groups[groupNumber];
-    if (!group) {
-      return;
-    }
-    const matches = group.matches;
-    matches.splice(match, 1);
-  }
-
-  get id() {
-    return this.#id;
-  }
-
-  get data() {
-    return { ...this.#tournament, id: this.#id };
-  }
-
-  async save() {
-    await useStorage(key).setItem(this.#id, this.#tournament);
-  }
-
-  replace(tournament) {
-    this.#tournament.name = tournament.name;
-    this.#tournament.showJudgeTotals = tournament.showJudgeTotals;
-  }
-
   static async getAll() {
     const tournamentsIds = await useStorage(key).getKeys();
     const loadTournaments = tournamentsIds.map((id) => {
@@ -167,6 +72,135 @@ export default class Tournament {
 
   static async remove(id) {
     await useStorage(key).removeItem(id);
+  }
+
+  getMat(matNumber) {
+    const mat = this.#tournament.mats[matNumber];
+    return mat;
+  }
+
+  async createMat() {
+    this.#tournament.mats.push({ groups: [] });
+  }
+
+  async deleteMat(index) {
+    this.#tournament.mats.splice(index, 1);
+  }
+
+  async createGroup(mat, { name, kata, numberOfJudges }) {
+    this.#tournament.mats[mat].groups.push({
+      name,
+      kata,
+      numberOfJudges,
+      matches: []
+    });
+  }
+
+  async updateGroup(matNumber, groupNumber, { name, kata, numberOfJudges }) {
+    const mat = this.#tournament.mats[matNumber];
+    if (!mat) {
+      return;
+    }
+    const group = mat.groups[groupNumber];
+    if (!group) {
+      return;
+    }
+    group.name = name;
+    group.kata = kata;
+    group.numberOfJudges = numberOfJudges;
+  }
+
+  async deleteGroup(mat, group) {
+    this.#tournament.mats[mat].groups.splice(group, 1);
+  }
+
+  getMatch(matNumber) {
+    const mat = this.#tournament.mats[matNumber];
+    if (!mat) {
+      return;
+    }
+    for (const group of mat.groups) {
+      for (const [index, match] of group.matches.entries()) {
+        if (!match.completed) {
+          return { match, index };
+        }
+      }
+    }
+    return {};
+  }
+
+  async createMatch(matNumber, groupNumber, { kata, tori, uke, numberOfJudges, scores }) {
+    const mat = this.#tournament.mats[matNumber];
+    if (!mat) {
+      return;
+    }
+    const group = mat.groups[groupNumber];
+    if (!group) {
+      return;
+    }
+    const matches = group.matches;
+    const match = {
+      kata,
+      tori,
+      uke,
+      numberOfJudges,
+      scores,
+      completed: false,
+    };
+    matches.push(match);
+    return match;
+  }
+
+  async updateMatch(matNumber, groupNumber, matchNumber, { kata, tori, uke, numberOfJudges, scores }) {
+    const mat = this.#tournament.mats[matNumber];
+    if (!mat) {
+      return;
+    }
+    const group = mat.groups[groupNumber];
+    if (!group) {
+      return;
+    }
+    const match = group.matches[matchNumber];
+    if (!match) {
+      return;
+    }
+    if (match.completed) {
+      return;
+    }
+    match.kata = kata;
+    match.tori = tori;
+    match.uke = uke;
+    match.numberOfJudges = numberOfJudges;
+  }
+
+  async deleteMatch(matNumber, groupNumber, matchNumber) {
+    const mat = this.#tournament.mats[matNumber];
+    if (!mat) {
+      return;
+    }
+    const group = mat.groups[groupNumber];
+    if (!group) {
+      return;
+    }
+    const matches = group.matches;
+    matches.splice(matchNumber, 1);
+  }
+
+  get id() {
+    return this.#id;
+  }
+
+  get data() {
+    return { ...this.#tournament, id: this.#id };
+  }
+
+  async save() {
+    await useStorage(key).setItem(this.#id, this.#tournament);
+  }
+
+  replace(tournament) {
+    this.#tournament.name = tournament.name;
+    this.#tournament.showJudgeTotals = tournament.showJudgeTotals;
   }
 }
 

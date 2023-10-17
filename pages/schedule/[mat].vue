@@ -1,5 +1,5 @@
 <template>
-  <div class="bg bg-base-200 h-full overflow-y-auto">
+  <div class="bg bg-base-100 h-full overflow-y-auto">
     <div class="navbar bg-base-100 shadow-xl rounded-box">
       <div class="navbar-start">
         <NuxtLink to="/" class="btn btn-square btn-ghost">

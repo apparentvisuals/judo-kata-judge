@@ -64,8 +64,8 @@ const DEFAULT = { name: '', region: 'on', rank: 'n' };
 const cookie = useCookie('jkj', { default: () => ({}) });
 
 const error = useState('error', () => '');
-const judges = useState('judges', () => ({}));
 const inAction = useState('in-action', () => false);
+const judges = useState('judges', () => ({}));
 const newJudge = useState('new-judge', () => clone(DEFAULT));
 const judgeToDelete = useState('judge-to-delete', () => undefined);
 const judgeToUpdate = useState('judge-to-update', () => clone(DEFAULT));
