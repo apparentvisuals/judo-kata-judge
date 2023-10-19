@@ -82,7 +82,9 @@ function _subscribe(matNumber) {
   };
 }
 
-_subscribe(props.mat);
+onMounted(() => {
+  _subscribe(props.mat);
+});
 
 </script>
 

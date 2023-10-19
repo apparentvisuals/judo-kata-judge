@@ -20,6 +20,13 @@
     <input id="group-numberOfJudges" type="number" min="1" max="5" class="input input-bordered"
       v-model="group.numberOfJudges" />
   </div>
+  <div class="form-control w-full">
+    <label class="label" for="group-startTime">
+      <span class="label-text">Start Time</span>
+    </label>
+    <input id="group-startTime" type="text" class="input input-bordered join-item" placeholder="09:00"
+      v-model="group.startTime" />
+  </div>
 </template>
 
 <script setup>

@@ -15,11 +15,9 @@ const route = useRoute();
 const error = useState('error', () => '');
 const tournament = useState('tournament', () => ({}));
 
-onMounted(async () => {
-  try {
-    tournament.value = await $fetch(`/api/tournaments/${cookie.value.tCode}`);
-  } catch (err) {
-    error.value = handleServerError(err);
-  }
-});
+try {
+  tournament.value = await $fetch(`/api/tournaments/${cookie.value.tCode}`);
+} catch (err) {
+  error.value = handleServerError(err);
+}
 </script>

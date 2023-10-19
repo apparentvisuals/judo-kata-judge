@@ -65,6 +65,29 @@ export function moveList(kata) {
   }
 }
 
+export function duration(kata) {
+  switch (kata) {
+    case 'nnk3':
+      return 4;
+    case 'nnk':
+      return 7;
+    case 'knk':
+      return 10;
+    case 'jnk':
+      return 9;
+    case 'kgj':
+      return 8;
+    case 'kink':
+      return 11;
+    case 'ko5':
+    case 'ko6':
+    case 'ko7':
+      return 3;
+    default:
+      return 0;
+  }
+}
+
 export function getGroupName(group, index) {
   if (group.name) {
     return group.name;

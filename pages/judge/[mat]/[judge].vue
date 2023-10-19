@@ -117,13 +117,6 @@ const wait = useState('wait', () => '');
 
 const headers = { authorization: `Bearer ${cookie.value.tCode}` };
 
-const inputState = computed(() => {
-  if (hasMajor.value) {
-    return 'bg-warning';
-  } else {
-    return 'bg-success';
-  }
-});
 const moves = computed(() => moveList(match.value.kata));
 const hasMajor = computed(() => scores.value.find((score) => score.deductions && score.deductions[4] === '1'));
 const total = computed(() => {

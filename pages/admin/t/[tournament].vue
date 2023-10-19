@@ -40,8 +40,13 @@
           <template #item="{ element: group, index: groupIndex }">
             <div class="bg-base-100 p-2 border">
               <div class="flex justify-between mb-2">
-                <h2 class="text-lg font-semibold">{{ getGroupName(group, groupIndex) + ` (${group.numberOfJudges})` }}
-                </h2>
+                <div>
+                  <span class="text-lg font-semibold">{{ getGroupName(group, groupIndex) }}</span>
+                  <div class="flex gap-2">
+                    <div class="badge badge-info gap-2">Judges: {{ group.numberOfJudges }}</div>
+                    <div v-if="group.startTime" class="badge badge-info gap-2">Start Time: {{ group.startTime }}</div>
+                  </div>
+                </div>
                 <div class="join">
                   <button class="btn btn-square btn-sm btn-success join-item"
                     @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match">
@@ -118,7 +123,7 @@ import { clone, pick } from 'lodash-es';
 import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon } from '@heroicons/vue/24/outline';
 import { getKataName, getGroupName, handleServerError } from '~/src/utils';
 
-const DEFAULT_GROUP = { name: '', kata: '', numberOfJudges: 5 };
+const DEFAULT_GROUP = { name: '', kata: '', numberOfJudges: 5, startTime: '' };
 const DEFAULT_MATCH = { tori: '', uke: '', kata: 'nnk', numberOfJudges: 5 };
 
 const route = useRoute();
@@ -178,7 +183,7 @@ async function showUpdateGroup(matIndex, groupIndex, groupValue) {
 }
 
 async function updateGroup() {
-  const body = pick(groupToUpdate.value, ["name", "kata", "numberOfJudges"]);
+  const body = pick(groupToUpdate.value, ["name", "kata", "numberOfJudges", "startTime"]);
   const result = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}`, { method: 'POST', body, headers });
   tournament.value = result;
 }
