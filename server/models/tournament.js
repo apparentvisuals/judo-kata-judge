@@ -87,16 +87,17 @@ export default class Tournament {
     this.#tournament.mats.splice(index, 1);
   }
 
-  async createGroup(mat, { name, kata, numberOfJudges }) {
+  async createGroup(mat, { name, kata, numberOfJudges, startTime }) {
     this.#tournament.mats[mat].groups.push({
       name,
       kata,
       numberOfJudges,
+      startTime,
       matches: []
     });
   }
 
-  async updateGroup(matNumber, groupNumber, { name, kata, numberOfJudges }) {
+  async updateGroup(matNumber, groupNumber, { name, kata, numberOfJudges, startTime }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -108,6 +109,7 @@ export default class Tournament {
     group.name = name;
     group.kata = kata;
     group.numberOfJudges = numberOfJudges;
+    group.startTime = startTime;
   }
 
   async deleteGroup(mat, group) {
