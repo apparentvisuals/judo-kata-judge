@@ -66,19 +66,18 @@
                 <thead>
                   <tr>
                     <th>Tori</th>
-                    <th>Uke</th>
-                    <th class="w-48">Kata</th>
+                    <th class="hidden sm:table-cell">Uke</th>
                     <th class="w-8"></th>
                   </tr>
                 </thead>
                 <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori">
                   <template #item="{ element: match, index }">
                     <tr class="bg-base-100">
-                      <td>{{ match.tori }}</td>
-                      <td>{{ match.uke }}</td>
                       <td>
-                        {{ getKataName(match.kata) }}
+                        <div>{{ match.tori }}</div>
+                        <div class="sm:hidden">{{ match.uke }}</div>
                       </td>
+                      <td class="hidden sm:table-cell">{{ match.uke }}</td>
                       <td>
                         <div class="join">
                           <button class="btn btn-primary btn-square btn-sm join-item" :disabled="!match.completed">
@@ -197,12 +196,6 @@ async function showAddMatch(selectedMat, selectedGroup) {
   mat.value = selectedMat;
   group.value = selectedGroup;
   const groupValue = tournament.value.mats[selectedMat].groups[selectedGroup];
-  if (groupValue.kata) {
-    newMatch.value.kata = groupValue.kata;
-  }
-  if (groupValue.numberOfJudges) {
-    newMatch.value.numberOfJudges = groupValue.numberOfJudges;
-  }
   add_match_modal.showModal();
 }
 

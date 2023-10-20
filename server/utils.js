@@ -59,7 +59,7 @@ export function createSummaryMessage(mat) {
     const summary = matches.map((match) => {
       const matchSummary = {
         number: match.number,
-        kata: match.kata,
+        kata: group.kata,
         tori: match.tori,
         uke: match.uke,
         scores: [],
