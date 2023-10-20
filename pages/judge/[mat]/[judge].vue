@@ -47,7 +47,7 @@
         <div class="navbar-center">
         </div>
         <div class="navbar-end print:hidden">
-          <button class="btn btn-sm btn-success" @click.prevent="submitScore">submit</button>
+          <button class="btn btn-sm btn-success" @click.prevent="showSubmitScore">submit</button>
         </div>
       </div>
       <table class="table w-full bg-base-100">
@@ -91,6 +91,9 @@
       </table>
     </div>
   </div>
+  <Prompt name="submit_score_modal" @submit="submitScore" text="Yes">
+    <span>Submit final scores? (it can not be undone.)</span>
+  </Prompt>
 </template>
 
 <script setup>
@@ -169,6 +172,10 @@ async function toggleScore(score, index) {
   }
   const moveValue = calculateMoveScore(score.deductions);
   score.value = moveValue;
+}
+
+function showSubmitScore() {
+  submit_score_modal.showModal();
 }
 
 async function submitScore() {
