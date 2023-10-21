@@ -52,6 +52,11 @@
                     @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match">
                     <PlusIcon class="w-5 h-5" />
                   </button>
+                  <button class="btn btn-square btn-sm btn-success join-item"
+                    :disabled="!canRandomize(matIndex, groupIndex)" @click.prevent="randomizeGroup(matIndex, groupIndex)"
+                    aria-label="randomize matches in group">
+                    <ArrowPathIcon class="w-5 h-5" />
+                  </button>
                   <button class="btn btn-primary btn-square btn-sm join-item"
                     @click.prvent="showUpdateGroup(matIndex, groupIndex, group)">
                     <PencilIcon class="w-4 h-4" />
@@ -119,8 +124,8 @@
 
 <script setup>
 import { clone, pick } from 'lodash-es';
-import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon } from '@heroicons/vue/24/outline';
-import { getKataName, getGroupName, handleServerError } from '~/src/utils';
+import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { getGroupName, handleServerError } from '~/src/utils';
 
 const DEFAULT_GROUP = { name: '', kata: '', numberOfJudges: 5, startTime: '' };
 const DEFAULT_MATCH = { tori: '', uke: '', kata: 'nnk', numberOfJudges: 5 };
@@ -174,6 +179,16 @@ async function addGroup() {
   newGroup.value.name = '';
 }
 
+function canRandomize(matIndex, groupIndex) {
+  const matches = tournament.value.mats[matIndex].groups[groupIndex].matches;
+  return matches.every((match) => !match.completed);
+}
+
+function randomizeGroup(matIndex, groupIndex) {
+  const matches = tournament.value.mats[matIndex].groups[groupIndex].matches;
+  _shuffle(matches);
+}
+
 async function showUpdateGroup(matIndex, groupIndex, groupValue) {
   mat.value = matIndex;
   group.value = groupIndex;
@@ -195,7 +210,6 @@ async function deleteGroup(mat, group) {
 async function showAddMatch(selectedMat, selectedGroup) {
   mat.value = selectedMat;
   group.value = selectedGroup;
-  const groupValue = tournament.value.mats[selectedMat].groups[selectedGroup];
   add_match_modal.showModal();
 }
 
@@ -224,5 +238,23 @@ async function updateMatch() {
 async function deleteMatch(mat, group, matchId) {
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}/match/${matchId}`, { method: 'DELETE', headers });
   tournament.value = response;
+}
+
+function _shuffle(array) {
+  let currentIndex = array.length, randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex > 0) {
+
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
 }
 </script>
