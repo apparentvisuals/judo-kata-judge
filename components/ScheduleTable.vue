@@ -49,8 +49,8 @@ const schedule = computed(() => {
       for (const match of group.matches) {
         const matSchedule = { uke: match.uke, tori: match.tori };
         if (lastTime) {
-          matSchedule.startTime = addMinutes(lastTime, duration(group.kata));
-          lastTime = matSchedule.startTime;
+          matSchedule.startTime = lastTime;
+          lastTime = addMinutes(lastTime, duration(group.kata));
         }
         groupSchedule.matches.push(matSchedule);
       }
