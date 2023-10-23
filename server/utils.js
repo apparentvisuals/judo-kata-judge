@@ -33,13 +33,14 @@ export function createUpdateMessage(tournament, mat) {
     tournament: tournament.data.name,
     mat,
   };
-  const { match, index } = tournament.getMatch(mat);
+  const { match, index, groupIndex } = tournament.getMatch(mat);
   if (match) {
     const scores = match.scores;
     const completed = scores.every((judgeScore) => judgeScore.name);
     const judgeState = scores.map((judgeScore) => !!judgeScore.name);
     update.match = pick(match, ['kata', 'tori', 'uke', 'numberOfJudges']);
     update.index = index;
+    update.groupIndex = groupIndex;
     update.state = judgeState;
     update.completed = completed;
   } else {

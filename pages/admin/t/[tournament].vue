@@ -1,4 +1,9 @@
 <template>
+  <div v-if="error" class="toast toast-top">
+    <div class="alert alert-error">
+      <h1 class="text-xl font-bold uppercase">{{ error }}</h1>
+    </div>
+  </div>
   <div class="bg-base-200 h-full overflow-y-auto">
     <div class="navbar bg-primary shadow-xl">
       <div class="navbar-start text-primary-content">
@@ -18,11 +23,8 @@
         </button>
       </div>
     </div>
-    <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
-      <h1 class="text-3xl font-bold uppercase">{{ error }}</h1>
-    </div>
     <div class="p-2 flex flex-col gap-2">
-      <div v-for="(mat, matIndex) in tournament.mats" class="bg-base-100">
+      <div v-for="(mat, matIndex) in tournament.mats" class="bg-base-100 border">
         <div class="flex justify-between mb-2 p-2">
           <h2 class="text-lg font-semibold">Mat {{ matIndex + 1 }}</h2>
           <div class="join">
@@ -114,10 +116,10 @@
       <GroupInput :group="groupToUpdate" />
     </Prompt>
     <Prompt name="add_match_modal" @submit="addMatch" :disabled="inAction" text="Add">
-      <MatchInput :match="newMatch" />
+      <MatchInput :match="newMatch" :athletes="athletes" />
     </Prompt>
     <Prompt name="edit_match_modal" @submit="updateMatch" :disabled="inAction" text="Update">
-      <MatchInput :match="matchToUpdate" />
+      <MatchInput :match="matchToUpdate" :athletes="athletes" />
     </Prompt>
   </div>
 </template>
@@ -128,7 +130,7 @@ import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon, ArrowPathIco
 import { getGroupName, handleServerError } from '~/src/utils';
 
 const DEFAULT_GROUP = { name: '', kata: '', numberOfJudges: 5, startTime: '' };
-const DEFAULT_MATCH = { tori: '', uke: '', kata: 'nnk', numberOfJudges: 5 };
+const DEFAULT_MATCH = { tori: '', uke: '' };
 
 const route = useRoute();
 const cookie = useCookie('jkj', { default: () => ({}) });
@@ -136,6 +138,7 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 const error = useState('error', () => '');
 const inAction = useState('in-action', () => false);
 const tournament = useState('tournament', () => ({}));
+const athletes = useState('athletes', () => []);
 const newGroup = useState('new-group', () => clone(DEFAULT_GROUP));
 const newMatch = useState('new-match', () => clone(DEFAULT_MATCH));
 const mat = useState('mat', () => undefined);
@@ -145,12 +148,6 @@ const groupToUpdate = useState('group-to-update', () => clone(DEFAULT_GROUP));
 const matchToUpdate = useState('match-to-update', () => clone(DEFAULT_MATCH));
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
-
-try {
-  tournament.value = await $fetch(`/api/tournaments/${route.params.tournament}`, { headers });
-} catch (err) {
-  error.value = handleServerError(err);
-}
 
 async function addMat() {
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m`, { method: 'POST', headers });
@@ -256,5 +253,23 @@ function _shuffle(array) {
   }
 
   return array;
+}
+
+let timeoutId;
+function _setError(errorString) {
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+  error.value = errorString;
+  timeoutId = setTimeout(() => {
+    error.value = '';
+  }, 3000);
+}
+
+try {
+  tournament.value = await $fetch(`/api/tournaments/${route.params.tournament}`, { headers });
+  athletes.value = await $fetch(`/api/athletes`, { headers });
+} catch (err) {
+  _setError(handleServerError(err));
 }
 </script>

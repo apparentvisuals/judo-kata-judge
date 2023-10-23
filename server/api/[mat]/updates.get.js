@@ -13,9 +13,6 @@ export default defineEventHandler(async (event) => {
   const matNumber = parseInt(getRouterParam(event, 'mat'));
 
   const tournament = await Tournament.get(token);
-  const mat = tournament.getMat(matNumber);
-  const { match, index } = tournament.getMatch(matNumber);
-
   const headers = {
     'Content-Type': 'text/event-stream',
     'Connection': 'keep-alive',

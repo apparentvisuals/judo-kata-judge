@@ -4,12 +4,12 @@
       <div class="navbar-start">
       </div>
       <div class="navbar-center text-primary-content">
-        <h1>{{ tournament.name }}</h1>
+        <h1>{{ tournament.name }} ({{ tournament.id }})</h1>
       </div>
       <div class="navbar-end">
         <button class="btn btn-sm btn-error" @click.prevent="logout">
-          <ArrowLeftOnRectangleIcon class="w-5 h-5" />
-          Logout
+          <ArrowPathIcon class="w-5 h-5" />
+          Change Tournament
         </button>
       </div>
     </div>
@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { ArrowLeftOnRectangleIcon } from '@heroicons/vue/24/outline';
+import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { handleServerError } from '~/src/utils';
 
 function logout() {

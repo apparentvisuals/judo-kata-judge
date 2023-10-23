@@ -17,8 +17,15 @@
     <label class="label" for="group-numberOfJudges">
       <span class="label-text">Number of Judges</span>
     </label>
-    <input id="group-numberOfJudges" type="number" min="1" max="5" class="input input-bordered"
+    <input id="group-numberOfJudges" type="range" min="1" max="5" step="1" class="range range-primary"
       v-model="group.numberOfJudges" />
+    <div class="w-full flex justify-between text-xs px-2">
+      <span>1</span>
+      <span>2</span>
+      <span>3</span>
+      <span>4</span>
+      <span>5</span>
+    </div>
   </div>
   <div class="form-control w-full">
     <label class="label" for="group-startTime">

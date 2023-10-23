@@ -1,7 +1,7 @@
 <template>
   <div class="h-full overflow-auto">
     <ClientOnly>
-      <ScheduleTable :tournament="tournament" :mat="$route.params.mat" />
+      <ScheduleTable :tournament="tournament" :mat="route.params.mat" />
     </ClientOnly>
   </div>
 </template>

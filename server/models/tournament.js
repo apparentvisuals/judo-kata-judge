@@ -121,11 +121,11 @@ export default class Tournament {
     if (!mat) {
       return;
     }
-    for (const group of mat.groups) {
+    for (const [groupIndex, group] of mat.groups.entries()) {
       for (const [index, match] of group.matches.entries()) {
         if (!match.completed) {
           const combinedMatch = { kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores };
-          return { match: combinedMatch, index };
+          return { match: combinedMatch, index, groupIndex };
         }
       }
     }
@@ -154,7 +154,7 @@ export default class Tournament {
     return match;
   }
 
-  async updateMatch(matNumber, groupNumber, matchNumber, { tori, uke }) {
+  async updateMatch(matNumber, groupNumber, matchNumber, { tori, uke, completed, scores, results }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -170,8 +170,21 @@ export default class Tournament {
     if (match.completed) {
       return;
     }
-    match.tori = tori;
-    match.uke = uke;
+    if (tori != null) {
+      match.tori = tori;
+    }
+    if (uke != null) {
+      match.uke = uke;
+    }
+    if (completed != null) {
+      match.completed = completed;
+    }
+    if (scores != null) {
+      match.scores = scores;
+    }
+    if (results != null) {
+      match.results = results;
+    }
   }
 
   async deleteMatch(matNumber, groupNumber, matchNumber) {
