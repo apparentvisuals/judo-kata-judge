@@ -124,7 +124,7 @@ export default class Tournament {
     for (const [groupIndex, group] of mat.groups.entries()) {
       for (const [index, match] of group.matches.entries()) {
         if (!match.completed) {
-          const combinedMatch = { kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores };
+          const combinedMatch = { kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores || Array(group.numberOfJudges).fill({}) };
           return { match: combinedMatch, index, groupIndex };
         }
       }
@@ -132,7 +132,7 @@ export default class Tournament {
     return {};
   }
 
-  async createMatch(matNumber, groupNumber, { kata, tori, uke, numberOfJudges, scores }) {
+  async createMatch(matNumber, groupNumber, { kata, tori, uke, numberOfJudges }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -147,7 +147,6 @@ export default class Tournament {
       tori,
       uke,
       numberOfJudges,
-      scores,
       completed: false,
     };
     matches.push(match);

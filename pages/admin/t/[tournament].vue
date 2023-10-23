@@ -211,11 +211,10 @@ async function showAddMatch(selectedMat, selectedGroup) {
 }
 
 async function addMatch() {
-  const body = { ...newMatch.value, scores: Array(newMatch.value.numberOfJudges).fill({}) };
+  const body = newMatch.value;
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}/match`, { method: 'POST', body, headers });
   tournament.value = response;
-  newMatch.value.tori = '';
-  newMatch.value.uke = '';
+  newMatch.value = clone(DEFAULT_MATCH);
 }
 
 async function showUpdateMatch(selectedMat, selectedGroup, selectedMatch, matchValue) {
