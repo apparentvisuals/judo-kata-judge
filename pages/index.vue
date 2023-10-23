@@ -20,6 +20,7 @@
             <th>Mat</th>
             <th class="w-6"></th>
             <th class="w-6"></th>
+            <th class="w-6"></th>
             <th style="width: 460px"></th>
           </tr>
         </thead>
@@ -28,6 +29,9 @@
             <td class="uppercase text-lg font-bold">{{ index + 1 }}</td>
             <td>
               <NuxtLink :to="`/schedule/${index}`" target="_blank" class="btn btn-sm btn-primary">schedule</NuxtLink>
+            </td>
+            <td>
+              <NuxtLink :to="`/announce/${index}`" target="_blank" class="btn btn-sm btn-primary">announce</NuxtLink>
             </td>
             <td>
               <NuxtLink :to="`/results/${index}`" target="_blank" class="btn btn-sm btn-primary">results</NuxtLink>
