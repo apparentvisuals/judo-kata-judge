@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import { pick } from 'lodash-es';
 
-import { isDev, numberOfTechniques } from '~/server/utils';
+import { isDev } from '~/server/utils';
 
 const key = isDev() ? 'tournament-dev' : 'tournament';
 
@@ -9,6 +9,7 @@ const key = isDev() ? 'tournament-dev' : 'tournament';
  * {
  *   id: string
  *   name: string
+ *   org: string
  *   numberOfMats: number
  *   showJudgeTotals: boolean
  *   mats: [{
@@ -44,7 +45,7 @@ export default class Tournament {
     const loadTournaments = tournamentsIds.map((id) => {
       return (async () => {
         const tournament = await Tournament.get(id);
-        return pick(tournament.data, ['id', 'name', 'showJudgeTotals']);
+        return pick(tournament.data, ['id', 'name', 'org', 'showJudgeTotals']);
       })();
     });
     const tournaments = await Promise.all(loadTournaments);
@@ -58,10 +59,11 @@ export default class Tournament {
     }
   }
 
-  static async create({ name = 'Tournament 1', showJudgeTotals = true }) {
+  static async create({ name = 'Tournament 1', org, showJudgeTotals = true }) {
     const id = nanoid(6);
     const tournamentData = {
       name,
+      org,
       showJudgeTotals,
       mats: [],
     };
@@ -213,28 +215,11 @@ export default class Tournament {
 
   replace(tournament) {
     this.#tournament.name = tournament.name;
+    this.#tournament.org = tournament.org;
     this.#tournament.showJudgeTotals = tournament.showJudgeTotals;
   }
 }
 
-function _getKataScoreSet(kata) {
-  return _createScoreSet(numberOfTechniques(kata));
-}
-
-function _createScoreSet(techniquesCount) {
-  return new Array(techniquesCount).fill().map(() => _defaultScore());
-}
-
 function _defaultScore() {
   return { value: 10, deductions: ':::::' };
-}
-
-function _createMatInfo(mat) {
-  return {
-    number: mat,
-    numberOfJudges: 5,
-    matches: [],
-    judges: Array(5).fill().map(() => ''),
-    judgeCodes: Array(5).fill().map(() => nanoid(4)),
-  }
 }

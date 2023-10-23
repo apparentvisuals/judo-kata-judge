@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="navbar-end print:hidden">
-      <button class="btn btn-sm btn-error" @click.prevent="changeJudge">
+      <button v-if="code" class="btn btn-sm btn-error" @click.prevent="changeJudge">
         <ArrowPathIcon class="w-5 h-5" />
         Change Judge
       </button>

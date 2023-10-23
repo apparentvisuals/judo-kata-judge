@@ -105,10 +105,11 @@ function showUpdate(tournament) {
 async function update() {
   try {
     const id = tournamentToUpdate.value.id;
-    const body = pick(tournamentToUpdate.value, ["name", "showJudgeTotals"]);
+    const body = pick(tournamentToUpdate.value, ["name", "org", "showJudgeTotals"]);
     const result = await $fetch(`/api/tournaments/${id}`, { method: 'POST', body, headers });
     const originalTournament = tournamentToUpdate.value.originalTournament;
     originalTournament.name = result.name;
+    originalTournament.org = result.org;
     originalTournament.showJudgeTotals = result.showJudgeTotals;
     tournamentToUpdate.value = clone(DEFAULT);
     error.value = '';
