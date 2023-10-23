@@ -1,24 +1,25 @@
 <template>
   <div class="navbar bg-primary text-primary-content">
     <div class="navbar-start">
-      <h1 class="text-center text-xl">Mat {{ parseInt(mat) + 1 }}</h1>
+      <h1 class="text-center text-xl">{{ tournament.name }} Mat {{ parseInt(mat) + 1 }}</h1>
     </div>
     <div class="navbar-end"></div>
   </div>
-  <table class="table w-full bg-base-100 mb-2 border" v-for="(group, groupIndex) in schedule">
+  <table class="table w-full bg-base-100 mt-2 border" v-for="(group, groupIndex) in schedule">
     <thead>
-      <tr>
-        <th colspan="3" class="text-center">{{ getGroupName(group, groupIndex) }}</th>
+      <tr class="border-none">
+        <th colspan="3" class="text-center text-lg">{{ getGroupName(group, groupIndex) }}</th>
       </tr>
-      <tr>
+      <tr class="border">
         <th class="w-8"></th>
         <th>Pair</th>
         <th class="w-10">Start</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(match, mIndex) in group.matches">
-        <td>{{ mIndex + 1 }}</td>
+      <tr v-for="(match, matchIndex) in group.matches"
+        :class="currentMatch === matchIndex && currentGroup === groupIndex ? 'bg-warning' : ''">
+        <td>{{ matchIndex + 1 }}</td>
         <td>{{ `${match.tori} / ${match.uke}` }}</td>
         <td>{{ match.startTime ? `${format(match.startTime, 'HH:mm')}` : '' }}</td>
       </tr>
@@ -29,11 +30,15 @@
 <script setup>
 import { addMinutes, format, parse } from 'date-fns';
 import { duration, getGroupName } from '~/src/utils';
+import { UpdateEvents } from '~/src/event-sources';
 
 const DEFAULT_BREAK = 10;
 
 const props = defineProps(['tournament', 'mat']);
-// const cookie = useCookie('jkj', { default: () => ({}) });
+const cookie = useCookie('jkj', { default: () => ({}) });
+const currentGroup = useState('current-group', () => -1);
+const currentMatch = useState('current-match', () => -1);
+
 const schedule = computed(() => {
   if (props.tournament && props.tournament.mats && props.tournament.mats.length > props.mat) {
     const mat = props.tournament.mats[props.mat];
@@ -61,36 +66,26 @@ const schedule = computed(() => {
   return [];
 });
 
-// onUnmounted(() => {
-//   if (events) {
-//     events.close();
-//   }
-// });
+/**
+ * @type UpdateEvents
+ */
+let event;
+onMounted(async () => {
+  event = new UpdateEvents(props.mat, cookie.value.tCode);
+  event.connect((data) => {
+    if (data.error) {
+      return;
+    }
+    currentMatch.value = data.index;
+    currentGroup.value = data.groupIndex;
+  });
+});
 
-// let events;
-// function _subscribe(matNumber) {
-//   if (events) {
-//     events.close();
-//   }
-//   events = new EventSource(`/api/${matNumber}/summary?token=${cookie.value.tCode}`);
-//   events.onmessage = (event) => {
-//     const data = JSON.parse(event.data);
-//     if (!data.error) {
-//       data.forEach((group) => {
-//         group.sort((a, b) => {
-//           const aTotal = a.total || 0;
-//           const bTotal = b.total || 0;
-//           return bTotal - aTotal;
-//         });
-//       });
-//       scores.value = data;
-//     } else {
-//       events.close();
-//     }
-//   };
-// }
-
-// _subscribe(props.mat);
+onUnmounted(() => {
+  if (event) {
+    event.close();
+  }
+});
 
 </script>
 

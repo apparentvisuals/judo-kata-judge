@@ -8,8 +8,8 @@
     </div>
     <div class="navbar-end print:hidden">
       <button class="btn btn-sm btn-error" @click.prevent="changeJudge">
-        <ArrowLeftOnRectangleIcon class="w-5 h-5" />
-        Logout
+        <ArrowPathIcon class="w-5 h-5" />
+        Change Judge
       </button>
     </div>
   </div>
@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { CheckIcon, PlusIcon, MinusIcon, ArrowLeftOnRectangleIcon } from '@heroicons/vue/24/outline';
+import { CheckIcon, PlusIcon, MinusIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { calculateMoveScore } from '~/server/utils';
 import { getKataName, handleServerError, moveList } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
