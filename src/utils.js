@@ -1,6 +1,26 @@
+export const ORG_MAP = {
+  'jc': 'Judo Canada',
+  'jo': 'Judo Ontario',
+  'jq': 'Judo Quebec',
+  'jb': 'Judo BC',
+  'js': 'Judo Saskatchewan',
+  'jm': 'Judo Manitoba'
+};
+
 export const PROVINCE_MAP = {
+  'ab': 'Alberta',
+  'bc': 'British Columbia',
+  'mb': 'Manitoba',
+  'nb': 'New Brunswick',
+  'ns': 'Nova Scotia',
+  'nl': 'Newfoundland and Labrador',
+  'nt': 'Northwest Territories',
+  'nu': 'Nunavut',
   'on': 'Ontario',
+  'pe': 'Prince Edward Island',
   'qc': 'Quebec',
+  'sk': 'Saskatchewan',
+  'yt': 'Yukon',
 };
 
 export const LEVEL_MAP = {
@@ -11,12 +31,26 @@ export const LEVEL_MAP = {
 }
 
 export const RANK_MAP = {
-  '2k': 'Nikyo',
-  '1k': 'Ikkyu',
-  '1d': 'Shodan',
-  '2d': 'Nidan',
-  '3d': 'Sandan',
-  '4d': 'Yondan',
+  '6k': 'White',
+  '6k+': 'White-Yellow',
+  '5k': 'Yellow',
+  '5k+': 'Yellow-Orange',
+  '4k': 'Orange',
+  '4k+': 'Orange-Green',
+  '3k': 'Green',
+  '3k+': 'Green-Blue',
+  '2k': 'Blue',
+  '2k+': 'Blue-Brown',
+  '1k': 'Brown',
+  '1d': 'Shodan (1st)',
+  '2d': 'Nidan (2nd)',
+  '3d': 'Sandan (3rd)',
+  '4d': 'Yondan (4th)',
+  '5d': 'Godan (5th)',
+  '6d': 'Rokudan (6th)',
+  '7d': 'Shichidan (7th)',
+  '8d': 'Hachidan (8th)',
+  '9d': 'Kudan (9th)',
 }
 
 export const KATA_MAP = {
@@ -40,6 +74,13 @@ const KINK_MOVE_LIST = ['Opening Ceremony', 'Ryote-dori', 'Tsukkake', 'Suri-age'
 const KO5_MOVE_LIST = ['Opening Ceremony', 'Ushiro-ukemi', 'Yoko-ukemi', 'Mae-mawari-ukemi', 'Kumi-kata & Ugoki-kata', 'Happo-no-kuzushi', 'De-ashi-harai', 'Uki-otoshi', 'Uki-goshi', 'Closing Ceremony'];
 const KO6_MOVE_LIST = ['Opening Ceremony', 'Ushiro-ukemi Sit x2', 'Ushiro-ukemi Grip x2', 'Yoko-ukemi 1/Side', 'Mae-mawari-ukemi', 'Mae-mawari-sabaki', 'Ushiro-mawari-sabaki', 'Ayumi-ashi', 'Tsugi-ashi Side', 'Tsugi-ashi Circle', 'Hiza-guruma', 'Tai-otoshi', 'Closing Ceremony'];
 const KO7_MOVE_LIST = ['Opening Ceremony', 'Ushiro-ukemi Back x2', 'Ushiro-ukemi Sit x2', 'Yoko-ukemi 1/Side', 'Outen-ukemi 1/Side', 'Ma-sabaki', 'Ushiro-sabaki', 'Ayumi-ashi', 'Tsugi-ashi', 'Mae-sabaki Throwing', 'Ushiro-sabaki Throwing', 'Closing Ceremony'];
+
+export function getOrganization(org) {
+  if (org) {
+    return ORG_MAP[org] || '';
+  }
+  return '';
+}
 
 export function moveList(kata) {
   switch (kata) {
