@@ -12,9 +12,9 @@ export default defineEventHandler(async (event) => {
   const tournamentId = getRouterParam(event, 'tournament');
   const matNumber = parseInt(getRouterParam(event, 'mat'));
   const groupNumber = parseInt(getRouterParam(event, 'group'));
-  const { kata, tori, uke, numberOfJudges, scores } = await readBody(event);
+  const { kata, tori, uke, numberOfJudges } = await readBody(event);
   const tournament = await Tournament.get(tournamentId);
-  await tournament.createMatch(matNumber, groupNumber, { kata, tori, uke, numberOfJudges, scores });
+  await tournament.createMatch(matNumber, groupNumber, { kata, tori, uke, numberOfJudges });
   await tournament.save();
   return tournament.data;
 });
