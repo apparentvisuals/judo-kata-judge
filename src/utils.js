@@ -7,6 +7,10 @@ export const ORG_MAP = {
   'jm': 'Judo Manitoba'
 };
 
+export const ORG_IMAGE_MAP = {
+  'jb': '/img/judo-bc.png'
+};
+
 export const PROVINCE_MAP = {
   'ab': 'Alberta',
   'bc': 'British Columbia',
@@ -78,6 +82,13 @@ const KO7_MOVE_LIST = ['Opening Ceremony', 'Ushiro-ukemi Back x2', 'Ushiro-ukemi
 export function getOrganization(org) {
   if (org) {
     return ORG_MAP[org] || '';
+  }
+  return '';
+}
+
+export function getOrganizationImage(org) {
+  if (org) {
+    return ORG_IMAGE_MAP[org] || '';
   }
   return '';
 }
