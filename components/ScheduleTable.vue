@@ -1,10 +1,4 @@
 <template>
-  <div class="navbar bg-primary text-primary-content">
-    <div class="navbar-start">
-      <h1 class="text-center text-xl">{{ tournament.name }} Mat {{ parseInt(mat) + 1 }}</h1>
-    </div>
-    <div class="navbar-end"></div>
-  </div>
   <table class="table w-full bg-base-100 mt-2 border" v-for="(group, groupIndex) in schedule">
     <thead>
       <tr class="border-none">

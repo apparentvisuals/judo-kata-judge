@@ -45,8 +45,8 @@
                 <div>
                   <span class="text-lg font-semibold">{{ getGroupName(group, groupIndex) }}</span>
                   <div class="flex gap-2">
-                    <div class="badge badge-info gap-2">Judges: {{ group.numberOfJudges }}</div>
-                    <div v-if="group.startTime" class="badge badge-info gap-2">Start Time: {{ group.startTime }}</div>
+                    <div class="badge badge-info">Judges: {{ group.numberOfJudges }}</div>
+                    <div v-if="group.startTime" class="badge badge-info">Start Time: {{ group.startTime }}</div>
                   </div>
                 </div>
                 <div class="join">

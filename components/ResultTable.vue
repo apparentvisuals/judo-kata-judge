@@ -16,11 +16,11 @@
               <th class="w-8 text-center"></th>
               <th>Tori</th>
               <th>Uke</th>
-              <th v-if="props.showSubTotal" class="w-16 text-center">1</th>
-              <th v-if="props.showSubTotal" class="w-16 text-center">2</th>
-              <th v-if="props.showSubTotal" class="w-16 text-center">3</th>
-              <th v-if="props.showSubTotal" class="w-16 text-center">4</th>
-              <th v-if="props.showSubTotal" class="w-16 text-center">5</th>
+              <th v-if="showSubTotal" class="w-16 text-center">1</th>
+              <th v-if="showSubTotal" class="w-16 text-center">2</th>
+              <th v-if="showSubTotal" class="w-16 text-center">3</th>
+              <th v-if="showSubTotal" class="w-16 text-center">4</th>
+              <th v-if="showSubTotal" class="w-16 text-center">5</th>
               <th class="w-24 text-center">Total</th>
             </tr>
           </thead>
@@ -29,11 +29,11 @@
               <td class="text-center">{{ matchIndex + 1 }}</td>
               <td>{{ match.tori }}</td>
               <td>{{ match.uke }}</td>
-              <td v-if="props.showSubTotal" class="text-center">{{ match.scores[0] }}</td>
-              <td v-if="props.showSubTotal" class="text-center">{{ match.scores[1] }}</td>
-              <td v-if="props.showSubTotal" class="text-center">{{ match.scores[2] }}</td>
-              <td v-if="props.showSubTotal" class="text-center">{{ match.scores[3] }}</td>
-              <td v-if="props.showSubTotal" class="text-center">{{ match.scores[4] }}</td>
+              <td v-if="showSubTotal" class="text-center">{{ match.scores[0] }}</td>
+              <td v-if="showSubTotal" class="text-center">{{ match.scores[1] }}</td>
+              <td v-if="showSubTotal" class="text-center">{{ match.scores[2] }}</td>
+              <td v-if="showSubTotal" class="text-center">{{ match.scores[3] }}</td>
+              <td v-if="showSubTotal" class="text-center">{{ match.scores[4] }}</td>
               <td class="w-24 text-center">{{ match.total }}</td>
             </tr>
           </tbody>
@@ -47,11 +47,18 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { getGroupName } from '~/src/utils';
 
-const props = defineProps(['tournament', 'mat', 'show-sub-total']);
+const props = defineProps(['tournament', 'mat']);
 const cookie = useCookie('jkj', { default: () => ({}) });
 const scores = useState('scores', () => ({}));
+const showSubTotal = computed(() => {
+  if (props.tournament.showJudgeTotals != null) {
+    return props.tournament.showJudgeTotals;
+  }
+  return true;
+});
 
 onUnmounted(() => {
   if (events) {

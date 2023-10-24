@@ -1,9 +1,8 @@
 <template>
   <div class="bg-base-200 h-full overflow-y-auto">
     <div class="navbar bg-primary shadow-xl">
-      <div class="navbar-start">
-      </div>
-      <div class="navbar-center text-primary-content">
+      <div class="navbar-start flex gap-2 text-primary-content text-xl">
+        <img :src="getOrganizationImage(tournament.org)" class="h-10" />
         <h1>{{ tournament.name }} ({{ tournament.id }})</h1>
       </div>
       <div class="navbar-end">
@@ -54,7 +53,7 @@
 
 <script setup>
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
-import { handleServerError } from '~/src/utils';
+import { getOrganizationImage, handleServerError } from '~/src/utils';
 
 function logout() {
   cookie.value.tCode = '';
