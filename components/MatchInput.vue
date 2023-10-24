@@ -9,8 +9,8 @@
     <label class="label" for="suggestedTori">
       <span class="label-text">Athlete</span>
     </label>
-    <select id="suggestedUke" class="select select-bordered" v-model="foundTori">
-      <option v-for="tori of matchedTori" :value="tori">{{ tori }}</option>
+    <select id="suggestedTori" class="select select-bordered" v-model="foundTori">
+      <option v-for="tori of matchedTori" :value="tori">{{ tori.name }} ({{ getProvinceName(tori.region) }})</option>
     </select>
   </div>
   <div class="form-control w-full ">
@@ -24,41 +24,66 @@
       <span class="label-text">Athlete</span>
     </label>
     <select id="suggestedUke" class="select select-bordered" v-model="foundUke">
-      <option v-for="uke of matchedUke" :value="uke">{{ uke }}</option>
+      <option v-for="uke of matchedUke" :value="uke">{{ uke.name }} ({{ getProvinceName(uke.region) }})</option>
     </select>
   </div>
 </template>
 
 <script setup>
-const props = defineProps(['match', 'athletes']);
-const matchedTori = useState('matched-tori', () => []);
-const matchedUke = useState('matched-uke', () => []);
-const foundTori = useState('found-tori', () => undefined);
-const foundUke = useState('found-uke', () => undefined);
+import { ref } from 'vue';
+import { getProvinceName } from '~/src/utils';
 
-let lastTori = undefined;
-let lastUke = undefined;
+const props = defineProps(['match', 'athletes']);
+const matchedTori = ref([]);
+const matchedUke = ref([]);
+const foundTori = ref(undefined);
+const foundUke = ref(undefined);
+
 watch(props.match, async (newMatch) => {
-  console.log(newMatch);
+  console.log('watch match');
   if (newMatch.tori) {
+    let matched = [];
     if (newMatch.tori.length > 4) {
-      lastTori = newMatch.tori;
-      matchedTori.value = props.athletes.filter((athlete) => athlete.name.search(lastTori) != -1);
-    } else {
-      lastTori = undefined;
-      matchedTori.value = [];
+      matched = props.athletes.filter((athlete) => athlete.name.toLowerCase().search(newMatch.tori.toLowerCase()) != -1);
+    }
+    matchedTori.value = matched;
+    if (matched.length === 0) {
+      foundTori.value = undefined;
+    }
+    if (newMatch.toriId) {
+      foundTori.value = matched.find((athlete) => athlete.id === newMatch.toriId);
     }
   }
   if (newMatch.uke) {
+    let matched = [];
     if (newMatch.uke.length > 4) {
-      lastUke = newMatch.uke;
-      matchedUke.value = props.athletes.filter((athlete) => athlete.name.search(lastUke) != -1);
-    } else {
-      lastUke = undefined;
-      matchedUke.value = [];
+      matched = props.athletes.filter((athlete) => athlete.name.toLowerCase().search(newMatch.uke.toLowerCase()) != -1);
+    }
+    matchedUke.value = matched;
+    if (matched.length === 0) {
+      foundUke.value = undefined;
+    }
+    if (newMatch.ukeId) {
+      foundUke.value = matched.find((athlete) => athlete.id === newMatch.ukeId);
     }
   }
 });
 
+watch(foundTori, (newValue) => {
+  if (newValue && newValue.name) {
+    props.match.tori = newValue.name;
+    props.match.toriId = newValue.id;
+  } else {
+    props.match.toriId = undefined;
+  }
+});
 
+watch(foundUke, (newValue) => {
+  if (newValue && newValue.name) {
+    props.match.uke = newValue.name;
+    props.match.ukeId = newValue.id;
+  } else {
+    props.match.ukeId = undefined;
+  }
+})
 </script>

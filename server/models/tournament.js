@@ -134,7 +134,7 @@ export default class Tournament {
     return {};
   }
 
-  async createMatch(matNumber, groupNumber, { kata, tori, uke, numberOfJudges }) {
+  async createMatch(matNumber, groupNumber, { tori, toriId, uke, ukeId }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -145,17 +145,17 @@ export default class Tournament {
     }
     const matches = group.matches;
     const match = {
-      kata,
       tori,
+      toriId,
       uke,
-      numberOfJudges,
+      ukeId,
       completed: false,
     };
     matches.push(match);
     return match;
   }
 
-  async updateMatch(matNumber, groupNumber, matchNumber, { tori, uke, completed, scores, results }) {
+  async updateMatch(matNumber, groupNumber, matchNumber, { tori, toriId, uke, ukeId, completed, scores, results }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -174,9 +174,11 @@ export default class Tournament {
     if (tori != null) {
       match.tori = tori;
     }
+    match.toriId = toriId;
     if (uke != null) {
       match.uke = uke;
     }
+    match.ukeId = ukeId;
     if (completed != null) {
       match.completed = completed;
     }

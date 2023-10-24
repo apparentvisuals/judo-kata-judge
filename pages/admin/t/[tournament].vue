@@ -221,12 +221,15 @@ async function showUpdateMatch(selectedMat, selectedGroup, selectedMatch, matchV
   mat.value = selectedMat;
   group.value = selectedGroup;
   match.value = selectedMatch;
-  matchToUpdate.value = clone(matchValue);
+  matchToUpdate.value.tori = matchValue.tori;
+  matchToUpdate.value.uke = matchValue.uke;
+  matchToUpdate.value.toriId = matchValue.toriId;
+  matchToUpdate.value.ukeId = matchValue.ukeId;
   edit_match_modal.showModal();
 }
 
 async function updateMatch() {
-  const body = pick(matchToUpdate.value, ["kata", "uke", 'tori', "numberOfJudges"]);
+  const body = pick(matchToUpdate.value, ['uke', 'ukeId', 'tori', 'toriId']);
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}/match/${match.value}`, { method: 'POST', body, headers });
   tournament.value = response;
 }

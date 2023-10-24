@@ -66,7 +66,7 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 const error = useState('error', () => '');
 const athletes = useState('athletes', () => ({}));
 const inAction = useState('in-action', () => false);
-const newAthlete = useState('new-athlete', () => (DEFAULT));
+const newAthlete = useState('new-athlete', () => clone(DEFAULT));
 const athleteToDelete = useState('athlete-to-delete', () => undefined);
 const athleteToUpdate = useState('athlete-to-update', () => clone(DEFAULT));
 
@@ -92,7 +92,7 @@ async function add() {
     const body = newAthlete.value;
     const result = await $fetch(`/api/athletes`, { method: 'POST', body, headers });
     athletes.value.push(result);
-    newAthlete.value = DEFAULT;
+    newAthlete.value = clone(DEFAULT);
     error.value = '';
   } catch (err) {
     error.value = handleServerError(err);
