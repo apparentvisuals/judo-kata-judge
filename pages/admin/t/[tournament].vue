@@ -214,7 +214,8 @@ async function addMatch() {
   const body = newMatch.value;
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}/match`, { method: 'POST', body, headers });
   tournament.value = response;
-  newMatch.value = clone(DEFAULT_MATCH);
+  newMatch.value.tori = '';
+  newMatch.value.uke = '';
 }
 
 async function showUpdateMatch(selectedMat, selectedGroup, selectedMatch, matchValue) {

@@ -40,7 +40,6 @@ const foundTori = ref(undefined);
 const foundUke = ref(undefined);
 
 watch(props.match, async (newMatch) => {
-  console.log('watch match');
   if (newMatch.tori) {
     let matched = [];
     if (newMatch.tori.length > 4) {
