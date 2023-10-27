@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
       console.log(`${mat}:${id} summary connection closed`);
       clients.summary.remove(id);
     });
-    res.write(createSummaryMessage(matInfo));
+    res.write(createSummaryMessage(tournament.data));
 
     event._handled = true;
   } else {
