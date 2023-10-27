@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
   // notifyAllClients(clients.report.list, createReportMessage(match.results));
   if (match.completed) {
     const mat = tournament.getMat(matNumber);
-    notifyAllClients(clients.summary.list, createSummaryMessage(mat));
+    notifyAllClients(clients.summary.list, createSummaryMessage(tournament.data));
   }
   return match.scores[judgeNumber];
 });

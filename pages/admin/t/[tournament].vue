@@ -72,8 +72,8 @@
               <table class="table w-full border">
                 <thead>
                   <tr>
-                    <th>Tori</th>
-                    <th class="hidden sm:table-cell">Uke</th>
+                    <th class="sm:w-1/2">Tori</th>
+                    <th class="hidden sm:table-cell sm:w-1/2">Uke</th>
                     <th class="w-8"></th>
                   </tr>
                 </thead>

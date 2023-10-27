@@ -13,11 +13,13 @@
       </div>
     </div>
     <div class="m-4 py-4" v-if="tournament.mats">
+      <div class="pb-4">
+        <NuxtLink to="/results" target="_blank" class="btn btn-sm btn-primary">results</NuxtLink>
+      </div>
       <table class="table" v-if="tournament.mats.length > 0">
         <thead>
           <tr>
             <th>Mat</th>
-            <th class="w-6"></th>
             <th class="w-6"></th>
             <th class="w-6"></th>
             <th style="width: 460px"></th>
@@ -31,9 +33,6 @@
             </td>
             <td>
               <NuxtLink :to="`/announce/${index}`" target="_blank" class="btn btn-sm btn-primary">announce</NuxtLink>
-            </td>
-            <td>
-              <NuxtLink :to="`/results/${index}`" target="_blank" class="btn btn-sm btn-primary">results</NuxtLink>
             </td>
             <td>
               <div class="btn-group">

@@ -7,7 +7,7 @@ body,
 
 @media screen {
   #__nuxt {
-    @apply bg bg-base-100;
+    @apply bg-base-100;
   }
 }
 

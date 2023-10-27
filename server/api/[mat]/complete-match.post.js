@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
       notifyAllClients(clients.report.list, `data: ${JSON.stringify({ error: 'no more matches' })}\n\n`);
     }
 
-    notifyAllClients(clients.summary.list, createSummaryMessage(matInfo));
+    notifyAllClients(clients.summary.list, createSummaryMessage(tournament.data));
   }
 
   return {};

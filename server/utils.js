@@ -53,27 +53,31 @@ export function createReportMessage(report) {
   return `data: ${JSON.stringify(report)}\n\n`;
 }
 
-export function createSummaryMessage(mat) {
-  const groups = mat.groups;
-  const groupsSummary = groups.map((group) => {
-    const matches = group.matches;
-    const summary = matches.map((match) => {
-      const matchSummary = {
-        number: match.number,
-        kata: group.kata,
-        tori: match.tori,
-        uke: match.uke,
-        scores: [],
-      }
-      if (match.completed) {
-        matchSummary.scores = match.results.summary.values;
-        matchSummary.total = match.results.summary.total;
-      }
-      return matchSummary;
+export function createSummaryMessage(tournament) {
+  const summary = { name: tournament.name, org: tournament.org, showJudgeTotals: tournament.showJudgeTotals, results: [] };
+  for (const mat of tournament.mats) {
+    const groups = mat.groups;
+    const groupsSummary = groups.map((group) => {
+      const matches = group.matches;
+      const summary = matches.map((match) => {
+        const matchSummary = {
+          number: match.number,
+          kata: group.kata,
+          tori: match.tori,
+          uke: match.uke,
+          scores: [],
+        }
+        if (match.completed) {
+          matchSummary.scores = match.results.summary.values;
+          matchSummary.total = match.results.summary.total;
+        }
+        return matchSummary;
+      });
+      return { name: group.name, kata: group.kata, matches: summary };
     });
-    return summary;
-  });
-  return `data: ${JSON.stringify(groupsSummary)}\n\n`;
+    summary.results.push(...groupsSummary);
+  }
+  return `data: ${JSON.stringify(summary)}\n\n`;
 }
 
 export function notifyAllClients(clients, message) {
