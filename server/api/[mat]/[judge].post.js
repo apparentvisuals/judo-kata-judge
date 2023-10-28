@@ -18,23 +18,22 @@ export default defineEventHandler(async (event) => {
   const judgeScores = await readBody(event);
 
   const tournament = await Tournament.get(token);
-  const { match, index, groupIndex } = tournament.getMatch(matNumber);
+  const { match, index, groupIndex } = tournament.getNextMatch(matNumber);
   if (!match) {
     return createError({ statusCode: 404, statusMessage: 'no more matches' })
   }
 
   match.scores[judgeNumber] = judgeScores;
-  tournament.updateMatch(matNumber, groupIndex, index, { scores: match.scores, results: createReport(match), completed: _IsMatchComplete(match.scores) });
+  const updatedMatch = tournament.updateMatch(matNumber, groupIndex, index, { scores: match.scores, results: createReport(match), completed: _IsMatchComplete(match.scores) });
   await tournament.save();
 
   const clients = db.clients(`${token}-${matNumber}`);
   notifyAllClients(clients.match.list, createUpdateMessage(tournament, matNumber));
-  // notifyAllClients(clients.report.list, createReportMessage(match.results));
-  if (match.completed) {
-    const mat = tournament.getMat(matNumber);
-    notifyAllClients(clients.summary.list, createSummaryMessage(tournament.data));
+  if (updatedMatch.completed) {
+    const summaryClients = db.clients(`${token}--1`);
+    notifyAllClients(summaryClients.summary.list, createSummaryMessage(tournament.data));
   }
-  return match.scores[judgeNumber];
+  return updatedMatch.scores[judgeNumber];
 });
 
 function _IsMatchComplete(scores) {

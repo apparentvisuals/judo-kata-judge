@@ -11,9 +11,9 @@ export default defineEventHandler(async (event) => {
   }
   const tournamentId = getRouterParam(event, 'tournament');
   const matNumber = getRouterParam(event, 'mat');
-  const { numberOfJudges, name, kata, startTime } = await readBody(event);
+  const { numberOfJudges, name, kata, startTime, disableDivideByHalf, disableForgotten, disableMajor } = await readBody(event);
   const tournament = await Tournament.get(tournamentId);
-  await tournament.createGroup(matNumber, { name, kata, numberOfJudges, startTime });
+  tournament.createGroup(matNumber, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor });
   await tournament.save();
   return tournament.data;
 });

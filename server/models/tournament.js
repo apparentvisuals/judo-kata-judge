@@ -81,25 +81,37 @@ export default class Tournament {
     return mat;
   }
 
-  async createMat() {
+  createMat() {
     this.#tournament.mats.push({ groups: [] });
   }
 
-  async deleteMat(index) {
+  deleteMat(index) {
     this.#tournament.mats.splice(index, 1);
   }
 
-  async createGroup(mat, { name, kata, numberOfJudges, startTime }) {
-    this.#tournament.mats[mat].groups.push({
+  createGroup(mat, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
+    const group = {
       name,
       kata,
       numberOfJudges,
-      startTime,
       matches: []
-    });
+    }
+    if (startTime) {
+      group.startTime = startTime;
+    }
+    if (disableDivideByHalf != null) {
+      group.disableDivideByHalf = disableDivideByHalf;
+    }
+    if (disableForgotten != null) {
+      group.disableForgotten = disableForgotten;
+    }
+    if (disableMajor != null) {
+      group.disableMajor = disableMajor;
+    }
+    this.#tournament.mats[mat].groups.push(group);
   }
 
-  async updateGroup(matNumber, groupNumber, { name, kata, numberOfJudges, startTime }) {
+  updateGroup(matNumber, groupNumber, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -112,13 +124,35 @@ export default class Tournament {
     group.kata = kata;
     group.numberOfJudges = numberOfJudges;
     group.startTime = startTime;
+    if (disableDivideByHalf != null) {
+      group.disableDivideByHalf = disableDivideByHalf;
+    }
+    if (disableForgotten != null) {
+      group.disableForgotten = disableForgotten;
+    }
+    if (disableMajor != null) {
+      group.disableMajor = disableMajor;
+    }
   }
 
-  async deleteGroup(mat, group) {
+  deleteGroup(mat, group) {
     this.#tournament.mats[mat].groups.splice(group, 1);
   }
 
-  getMatch(matNumber) {
+  getMatch(matNumber, groupNumber, matchNumber) {
+    const mat = this.#tournament.mats[matNumber];
+    if (!mat) {
+      return;
+    }
+    const group = mat.groups[groupNumber];
+    if (!group) {
+      return;
+    }
+    const match = group.matches[matchNumber];
+    return { kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores, results: match.results };
+  }
+
+  getNextMatch(matNumber) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -134,7 +168,7 @@ export default class Tournament {
     return {};
   }
 
-  async createMatch(matNumber, groupNumber, { tori, toriId, uke, ukeId }) {
+  createMatch(matNumber, groupNumber, { tori, toriId, uke, ukeId }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -155,7 +189,7 @@ export default class Tournament {
     return match;
   }
 
-  async updateMatch(matNumber, groupNumber, matchNumber, { tori, toriId, uke, ukeId, completed, scores, results }) {
+  updateMatch(matNumber, groupNumber, matchNumber, { tori, toriId, uke, ukeId, completed, scores, results }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -188,9 +222,10 @@ export default class Tournament {
     if (results != null) {
       match.results = results;
     }
+    return match;
   }
 
-  async deleteMatch(matNumber, groupNumber, matchNumber) {
+  deleteMatch(matNumber, groupNumber, matchNumber) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;

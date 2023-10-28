@@ -1,7 +1,7 @@
 <template>
   <ClientOnly>
     <div class="navbar bg-primary text-primary-content flex gap-2 text-xl">
-      <img :src="getOrganizationImage(scores.org)" class="h-10" />
+      <img :src="getOrganizationImage(scores.org)" class="h-12" />
       <h1>{{ scores.name }}</h1>
     </div>
     <div class="navbar bg-primary text-primary-content">

@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   }
   const tournamentId = getRouterParam(event, 'tournament');
   const tournament = await Tournament.get(tournamentId);
-  await tournament.createMat();
+  tournament.createMat();
   await tournament.save();
   return tournament.data;
 });

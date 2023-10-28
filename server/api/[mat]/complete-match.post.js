@@ -12,12 +12,12 @@ export default defineEventHandler(async (event) => {
   const mat = parseInt(event.context.params.mat - 1);
   const tournament = await Tournament.get(token);
   const matInfo = tournament.getMat(mat);
-  const matchInfo = tournament.getMatch(mat);
+  const matchInfo = tournament.getNextMatch(mat);
 
   if (matchInfo) {
     matchInfo.completed = true;
     await tournament.save();
-    const nextMatch = tournament.getMatch(mat);
+    const nextMatch = tournament.getNextMatch(mat);
     const clients = db.clients(`${token}-${mat}`);
     if (nextMatch) {
       notifyAllClients(clients.report.list, createReportMessage(nextMatch.results));

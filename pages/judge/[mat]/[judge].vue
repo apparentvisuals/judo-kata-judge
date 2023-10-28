@@ -1,10 +1,11 @@
 <template>
   <div class="navbar bg-primary fixed text-primary-content">
-    <div class="navbar-start">
-      <div>
-        <div class="text-xl">{{ tournament }}</div>
-        <div class="text-md">{{ match ? getKataName(match.kata) : '' }}</div>
-      </div>
+    <div class="navbar-start gap-2">
+      <img :src="getOrganizationImage(org)" class="h-12" />
+      <div class="text-xl">{{ tournament }}</div>
+    </div>
+    <div class="navbar-center">
+      <div class="text-xl" v-if="judge">{{ judge.name }}</div>
     </div>
     <div class="navbar-end print:hidden">
       <button v-if="code" class="btn btn-sm btn-error" @click.prevent="changeJudge">
@@ -39,12 +40,10 @@
     <div v-else-if="match" class="w-full overflow-auto mt-16">
       <div class="navbar bg-primary text-primary-content">
         <div class="navbar-start">
-          <div>
-            <div>{{ judge.name }}</div>
-            <div>{{ `${match.tori} / ${match.uke}` }}</div>
-          </div>
+          <div class="text-xl">{{ `${match.tori} / ${match.uke}` }}</div>
         </div>
         <div class="navbar-center">
+          <div class="text-xl">{{ match ? getKataName(match.kata) : '' }}</div>
         </div>
         <div class="navbar-end print:hidden">
           <button class="btn btn-sm btn-success" @click.prevent="showSubmitScore">submit</button>
@@ -64,8 +63,7 @@
           </tr>
         </thead>
         <tbody class="bg-base-100">
-          <tr v-for="(score, index) in scores"
-            :class="score.deductions && score.deductions[4] === '1' ? 'bg-warning' : ''">
+          <tr v-for="(score, index) in scores" :class="techniqueColour(score)">
             <td>{{ moves[index] }}</td>
             <td v-for="(deduction, dIndex) in score.deductions || Array(6).fill(0)" class="score"
               @click.prevent="toggleScore(score, dIndex)">
@@ -78,13 +76,7 @@
             <td class="text-center">{{ score.value }}</td>
           </tr>
           <tr>
-            <td>Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td colspan="7">Total</td>
             <td class="text-center">{{ total }}</td>
           </tr>
         </tbody>
@@ -97,9 +89,10 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { CheckIcon, PlusIcon, MinusIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { calculateMoveScore } from '~/server/utils';
-import { getKataName, handleServerError, moveList } from '~/src/utils';
+import { getKataName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
@@ -110,8 +103,8 @@ const judgeNumber = computed(() => route.params.judge);
 
 const error = useState('error', () => '');
 const code = useState('code', () => '');
-const tournament = useState('tournament', () => '');
-const matchIndex = useState('match-index', () => -1);
+const tournament = ref('');
+const org = ref('');
 const match = useState('match', () => undefined);
 const judge = useState('judge', () => undefined);
 const scores = useState('scores', () => []);
@@ -184,10 +177,27 @@ async function submitScore() {
   scores.value = _payloadToScore(judgeValues);
 }
 
+function techniqueColour(score) {
+  if (score) {
+    if (!score.deductions) {
+      return 'bg-yellow-50';
+    }
+    if (score.deductions && score.deductions[4] === '1') {
+      return 'bg-warning';
+    }
+    if (score.value === 10) {
+      return 'bg-yellow-50';
+    }
+    return '';
+  }
+
+}
+
 /**
  * @type UpdateEvents
  */
 let event;
+let matchIndex = -1;
 onMounted(async () => {
   event = new UpdateEvents(matNumber.value, cookie.value.tCode);
   event.connect((data) => {
@@ -198,11 +208,12 @@ onMounted(async () => {
     }
     wait.value = '';
     tournament.value = data.tournament;
+    org.value = data.org;
     if (data.index === -1) {
       wait.value = 'no more matches';
     } else {
-      if (data.index !== matchIndex.value) {
-        matchIndex.value = data.index;
+      if (data.index !== matchIndex) {
+        matchIndex = data.index;
         match.value = data.match;
       }
       if (!data.completed && data.state[judgeNumber.value - 1]) {

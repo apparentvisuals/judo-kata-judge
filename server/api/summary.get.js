@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   clients.summary.add(id, res);
 
   req.on('close', () => {
-    console.log(`${mat}:${id} summary connection closed`);
+    console.log(`${id} summary connection closed`);
     clients.summary.remove(id);
   });
   res.write(createSummaryMessage(tournament.data));

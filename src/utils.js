@@ -120,9 +120,9 @@ export function moveList(kata) {
 export function duration(kata) {
   switch (kata) {
     case 'nnk3':
-      return 4;
+      return 5;
     case 'nnk':
-      return 7;
+      return 8;
     case 'knk':
       return 10;
     case 'jnk':
