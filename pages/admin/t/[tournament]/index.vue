@@ -7,9 +7,9 @@
   <div class="bg-base-200 h-full overflow-y-auto">
     <div class="navbar bg-primary shadow-xl">
       <div class="navbar-start text-primary-content">
-        <button class="btn btn-square btn-ghost" @click.prevent="navigateTo('/admin')">
+        <NuxtLink class="btn btn-square btn-ghost" to="/admin">
           <ArrowLeftIcon class="w-6 h-6" />
-        </button>
+        </NuxtLink>
       </div>
       <div class="navbar-center text-primary-content">
         <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
@@ -87,9 +87,10 @@
                       <td class="hidden sm:table-cell">{{ match.uke }}</td>
                       <td>
                         <div class="join">
-                          <button class="btn btn-primary btn-square btn-sm join-item" :disabled="!match.completed">
+                          <NuxtLink class="btn btn-primary btn-square btn-sm join-item" :disabled="!match.completed"
+                            :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank">
                             <CheckIcon class="w-5 h-5" />
-                          </button>
+                          </NuxtLink>
                           <button class="btn btn-primary btn-square btn-sm join-item"
                             @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
                             :disabled="match.completed || inAction">

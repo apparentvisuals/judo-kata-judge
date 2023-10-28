@@ -21,7 +21,9 @@
         <tbody class="bg-base-100">
           <tr v-for="t in tournaments">
             <td>{{ t.id }}</td>
-            <td><a class="link" href="#" @click.prevent="navigateTo(`/admin/t/${t.id}`)">{{ t.name }}</a></td>
+            <td>
+              <NuxtLink class="link" :to="`/admin/t/${t.id}`">{{ t.name }}</NuxtLink>
+            </td>
             <td>
               <div class="join">
                 <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(t)"

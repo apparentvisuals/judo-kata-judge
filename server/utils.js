@@ -31,9 +31,10 @@ export function createNoMatchMessage() {
 export function createUpdateMessage(tournament, mat) {
   const update = {
     tournament: tournament.data.name,
+    org: tournament.data.org,
     mat,
   };
-  const { match, index, groupIndex } = tournament.getMatch(mat);
+  const { match, index, groupIndex } = tournament.getNextMatch(mat);
   if (match) {
     const scores = match.scores;
     const completed = scores.every((judgeScore) => judgeScore.name);

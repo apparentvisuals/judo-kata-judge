@@ -2,7 +2,7 @@
   <div class="bg-base-200 h-full overflow-y-auto">
     <div class="navbar bg-primary shadow-xl">
       <div class="navbar-start flex gap-2 text-primary-content text-xl">
-        <img :src="getOrganizationImage(tournament.org)" class="h-10" />
+        <img :src="getOrganizationImage(tournament.org)" class="h-12" />
         <h1>{{ tournament.name }} ({{ tournament.id }})</h1>
       </div>
       <div class="navbar-end">

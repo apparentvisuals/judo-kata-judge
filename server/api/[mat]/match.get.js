@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const mat = parseInt(getRouterParam(event, 'mat'));
 
   const tournament = await Tournament.get(token);
-  const { match, index } = tournament.getMatch(mat);
+  const { match, index } = tournament.getNextMatch(mat);
   if (!match) {
     return createError({ statusCode: 404, statusMessage: 'no more matches' })
   }

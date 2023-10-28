@@ -7,14 +7,14 @@
       <tr class="border">
         <th class="w-8"></th>
         <th>Pair</th>
-        <th class="w-10">Start</th>
+        <th class="w-10 text-right">Start</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(match, matchIndex) in group.matches"
-        :class="currentMatch === matchIndex && currentGroup === groupIndex ? 'bg-warning' : ''">
+      <tr v-for="(match, matchIndex) in group.matches">
+        <!-- :class="currentMatch === matchIndex && currentGroup === groupIndex ? 'bg-warning' : ''" -->
         <td>{{ matchIndex + 1 }}</td>
-        <td>{{ `${match.tori} / ${match.uke}` }}</td>
+        <td>{{ match.tori }} / {{ match.uke }}</td>
         <td>{{ match.startTime ? `${format(match.startTime, 'HH:mm')}` : '' }}</td>
       </tr>
     </tbody>

@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const mat = parseInt(event.context.params.mat - 1);
   const tournament = await Tournament.get(token);
-  const { numberOfJudges, clients } = tournament.getMatch(mat);
+  const { numberOfJudges, clients } = tournament.getNextMatch(mat);
 
   return { numberOfJudges, numberOfClients: clients.count };
 });
