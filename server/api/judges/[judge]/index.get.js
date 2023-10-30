@@ -10,20 +10,20 @@ export default defineEventHandler(async (event) => {
 
   const tournament = await Tournament.get(token);
   if (!tournament) {
-    return createError({ statusCode: 403, statusMessage: 'forbidden' });
+    return createError({ statusCode: 403, message: 'forbidden' });
   }
 
   try {
     const judgeId = getRouterParam(event, 'judge');
     if (!judgeId) {
-      return createError({ statusCode: 404, statusMessage: 'Judge not found' });
+      return createError({ statusCode: 404, message: 'Judge not found' });
     }
     const judge = await Judge.get(judgeId.toUpperCase());
     if (!judge) {
-      return createError({ statusCode: 404, statusMessage: 'Judge not found' });
+      return createError({ statusCode: 404, message: 'Judge not found' });
     }
     return judge;
   } catch (err) {
-    return createError({ statusCode: 400, statusMessage: err.message });
+    return createError({ statusCode: 400, message: err.message });
   }
 });

@@ -5,7 +5,8 @@ import { moveList } from '~/src/utils';
 export const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 
 export function isDev() {
-  return process.env.NODE_ENV !== 'production';
+  // return process.env.NODE_ENV !== 'production';
+  return false;
 }
 
 export function getToken(event) {
@@ -68,9 +69,10 @@ export function createSummaryMessage(tournament) {
           uke: match.uke,
           scores: [],
         }
+        const results = createReport(group, match);
         if (match.completed) {
-          matchSummary.scores = match.results.summary.values;
-          matchSummary.total = match.results.summary.total;
+          matchSummary.scores = results.summary.values;
+          matchSummary.total = results.summary.total;
         }
         return matchSummary;
       });
@@ -89,6 +91,14 @@ export function notifyAllClients(clients, message) {
 
 export function numberOfTechniques(kata) {
   return moveList(kata).length;
+}
+
+export function calculateHasMajor(scores) {
+  let hasMajor = scores.some((score) => {
+    const deductions = score.deductions.split(':');
+    return deductions[4] === '1';
+  });
+  return hasMajor;
 }
 
 export function calculateMoveScore(deductions) {
@@ -116,32 +126,26 @@ export function calculateMoveScore(deductions) {
   return Math.min(Math.max(0, total), 10);
 }
 
-export function createReport(match) {
+export function createReport(group, match) {
   const scores = match.scores;
-  const kata = match.kata;
-  const numberOfJudges = match.numberOfJudges;
+  const kata = group.kata;
+  const numberOfJudges = match.scores.length;
   const techniquesCount = numberOfTechniques(kata);
-  const report = _defaultTechniqueScore(match);
+  const report = _defaultTechniqueScore(group, match);
   const summary = {
     total: 0,
     values: new Array(numberOfJudges),
   }
   for (let ii = 0; ii < numberOfJudges; ii++) {
     const judgeScores = scores[ii];
-    let hasMajor = false;
-    let total = 0;
     if (judgeScores.scores) {
+      let total = 0;
+      const hasMajor = calculateHasMajor(judgeScores.scores);
       for (let jj = 0; jj < techniquesCount; jj++) {
         const deductions = judgeScores.scores[jj].deductions.split(':');
         let value = calculateMoveScore(deductions);
-        report[jj].values[ii] = value;
+        report[jj].values[ii] = hasMajor ? value / 2 : value;
         total += value;
-        if (deductions[4] === '1') {
-          hasMajor = true;
-        }
-      }
-      if (hasMajor) {
-        total = total / 2;
       }
       summary.values[ii] = total;
     }
@@ -158,10 +162,10 @@ export function createReport(match) {
       min = Math.min(min, value);
       max = Math.max(max, value);
     }
-    if (match.numberOfJudges > 3) {
+    if (numberOfJudges > 3) {
       subTotal -= min;
     }
-    if (match.numberOfJudges > 4) {
+    if (numberOfJudges > 4) {
       subTotal -= max;
     }
     technique.total = subTotal;
@@ -172,11 +176,10 @@ export function createReport(match) {
   return { report, summary };
 }
 
-function _defaultTechniqueScore(match) {
-  const kata = match.kata;
-  const numberOfJudges = match.numberOfJudges;
+function _defaultTechniqueScore(group, match) {
+  const kata = group.kata;
+  const numberOfJudges = match.scores.length;
   const techniquesCount = numberOfTechniques(kata);
-  const list = moveList(kata);
   const report = new Array(techniquesCount).fill().map((_el) => {
     return { values: new Array(numberOfJudges).fill().map(() => 10) };
   });
