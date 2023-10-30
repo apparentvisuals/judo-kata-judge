@@ -18,7 +18,7 @@
       <span class="label-text">Number of Judges</span>
     </label>
     <input id="group-numberOfJudges" type="range" min="1" max="5" step="1" class="range range-primary"
-      v-model="group.numberOfJudges" />
+      v-model.number="group.numberOfJudges" />
     <div class="w-full flex justify-between text-xs px-2">
       <span>1</span>
       <span>2</span>

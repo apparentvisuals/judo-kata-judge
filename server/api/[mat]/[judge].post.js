@@ -20,11 +20,11 @@ export default defineEventHandler(async (event) => {
   const tournament = await Tournament.get(token);
   const { match, index, groupIndex } = tournament.getNextMatch(matNumber);
   if (!match) {
-    return createError({ statusCode: 404, statusMessage: 'no more matches' })
+    return createError({ statusCode: 404, message: 'no more matches' })
   }
 
   match.scores[judgeNumber] = judgeScores;
-  const updatedMatch = tournament.updateMatch(matNumber, groupIndex, index, { scores: match.scores, results: createReport(match), completed: _IsMatchComplete(match.scores) });
+  const updatedMatch = tournament.updateMatch(matNumber, groupIndex, index, { scores: match.scores, completed: _IsMatchComplete(match.scores) });
   await tournament.save();
 
   const clients = db.clients(`${token}-${matNumber}`);

@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import { pick } from 'lodash-es';
 
-import { isDev } from '~/server/utils';
+import { createReport, isDev } from '~/server/utils';
 
 const key = isDev() ? 'tournament-dev' : 'tournament';
 
@@ -26,7 +26,6 @@ const key = isDev() ? 'tournament-dev' : 'tournament';
  *           id: string
  *           scores: []
  *         }]
- *         results: []
  *       }]
  *     }]
  *   }]
@@ -122,7 +121,9 @@ export default class Tournament {
     }
     group.name = name;
     group.kata = kata;
-    group.numberOfJudges = numberOfJudges;
+    if (group.numberOfJudges) {
+      group.numberOfJudges = parseInt(numberOfJudges);
+    }
     group.startTime = startTime;
     if (disableDivideByHalf != null) {
       group.disableDivideByHalf = disableDivideByHalf;
@@ -149,7 +150,7 @@ export default class Tournament {
       return;
     }
     const match = group.matches[matchNumber];
-    return { kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores, results: match.results };
+    return { kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores, results: createReport(group, match) };
   }
 
   getNextMatch(matNumber) {
@@ -189,7 +190,7 @@ export default class Tournament {
     return match;
   }
 
-  updateMatch(matNumber, groupNumber, matchNumber, { tori, toriId, uke, ukeId, completed, scores, results }) {
+  updateMatch(matNumber, groupNumber, matchNumber, { tori, toriId, uke, ukeId, completed, scores }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -218,9 +219,6 @@ export default class Tournament {
     }
     if (scores != null) {
       match.scores = scores;
-    }
-    if (results != null) {
-      match.results = results;
     }
     return match;
   }

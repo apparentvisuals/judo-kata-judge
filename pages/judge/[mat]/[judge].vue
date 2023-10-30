@@ -174,7 +174,7 @@ function showSubmitScore() {
 async function submitScore() {
   const body = _scoreToPayload();
   const judgeValues = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers });
-  scores.value = _payloadToScore(judgeValues);
+  // scores.value = _payloadToScore(judgeValues);
 }
 
 function techniqueColour(score) {
