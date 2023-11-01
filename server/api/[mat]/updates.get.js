@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import db from '../../db';
-import { createNoMatchMessage, createUpdateMessage } from '~/server/utils';
+import { createUpdateMessage } from '~/server/utils';
 import Tournament from '~/server/models/tournament';
 
 export default defineEventHandler(async (event) => {
@@ -11,8 +11,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const matNumber = parseInt(getRouterParam(event, 'mat'));
-
   const tournament = await Tournament.get(token);
+
   const headers = {
     'Content-Type': 'text/event-stream',
     'Connection': 'keep-alive',

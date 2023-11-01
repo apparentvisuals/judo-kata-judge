@@ -1,42 +1,35 @@
 <template>
+  <div v-if="error" class="toast toast-top z-50">
+    <div class="alert alert-error">
+      <h1 class="text-xl font-bold uppercase">{{ error }}</h1>
+    </div>
+  </div>
   <div class="navbar bg-primary fixed text-primary-content">
     <div class="navbar-start gap-2">
-      <img :src="getOrganizationImage(org)" class="h-12" />
-      <div class="text-xl">{{ tournament }}</div>
+      <img :src="getOrganizationImage(tournament.org)" class="h-12" />
+      <div class="text-xl">{{ tournament.name }}</div>
     </div>
     <div class="navbar-center">
-      <div class="text-xl" v-if="judge">{{ judge.name }}</div>
+      <div class="text-xl" v-if="judge">{{ judge.name }} ({{ judgeNumber }})</div>
     </div>
     <div class="navbar-end print:hidden">
-      <button v-if="code" class="btn btn-sm btn-error" @click.prevent="changeJudge">
+      <button v-if="judgeCode" class="btn btn-sm btn-error" @click.prevent="changeJudge">
         <ArrowPathIcon class="w-5 h-5" />
         Change Judge
       </button>
     </div>
   </div>
   <div class="h-full flex">
-    <div v-if="wait" class="m-auto max-h-96 text-center">
+    <div v-if="status" class="m-auto max-h-96 text-center">
       <div>
-        <span class="text-3xl font-bold">{{ wait }}</span>
+        <span class="text-3xl font-bold">{{ status }}</span>
       </div>
       <div class="p-4">
         <span class="loading loading-ring loading-lg"></span>
       </div>
     </div>
-    <div v-else-if="match && !judge" class="m-auto w-full p-1 xs:w-80 xs:p-0 max-h-96">
-      <form valid="isValid" @submit.prevent="submitCode">
-        <div class="form-control w-full">
-          <label class="label" for="code">
-            <span class="label-text">Judge Code</span>
-          </label>
-          <input id="code" name="code" type="text" class="input input-bordered" v-model="code" />
-          <label class="label">
-            <span for="code" class="label-text-alt text-error" v-if="error">{{ error }}</span>
-          </label>
-        </div>
-        <button type="submit" class="btn btn-primary mt-4">Submit</button>
-      </form>
-    </div>
+    <CodeForm v-else-if="match && !judge" v-model="judgeCode" title="Judge Code" @submit="submitCode"
+      :error="codeError" />
     <div v-else-if="match" class="w-full overflow-auto mt-16">
       <div class="navbar bg-primary text-primary-content">
         <div class="navbar-start">
@@ -63,7 +56,7 @@
           </tr>
         </thead>
         <tbody class="bg-base-100">
-          <tr v-for="(score, index) in scores" :class="techniqueColour(score)">
+          <tr v-for="(score, index) in scores.points" :class="techniqueColour(score)">
             <td>{{ moves[index] }}</td>
             <td v-for="(deduction, dIndex) in score.deductions || Array(6).fill(0)" class="score"
               @click.prevent="toggleScore(score, dIndex)">
@@ -90,6 +83,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useLocalStorage } from '@vueuse/core';
 import { CheckIcon, PlusIcon, MinusIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { calculateMoveScore } from '~/server/utils';
 import { getKataName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
@@ -101,22 +95,51 @@ const route = useRoute();
 const matNumber = computed(() => route.params.mat);
 const judgeNumber = computed(() => route.params.judge);
 
-const error = useState('error', () => '');
-const code = useState('code', () => '');
-const tournament = ref('');
-const org = ref('');
-const match = useState('match', () => undefined);
-const judge = useState('judge', () => undefined);
-const scores = useState('scores', () => []);
-const inAction = useState('in-action', () => false);
-const wait = useState('wait', () => '');
+const error = ref('');
+const judgeCode = computed({
+  get() {
+    return cookie.value.jCode;
+  },
+  set(value) {
+    cookie.value.jCode = value;
+  }
+});
+const codeError = ref('');
+const loading = ref(true);
+const tournament = ref({});
+const matchIndex = ref(-1);
+const groupIndex = ref(-1);
+const match = ref(undefined);
+const judge = ref(undefined);
+const inAction = ref(false);
+const submitted = ref(false);
+const scores = useLocalStorage(`scores-${matNumber.value}-${judgeNumber.value}`, { id: '', points: [] });
+
 
 const headers = { authorization: `Bearer ${cookie.value.tCode}` };
 
+const status = computed(() => {
+  if (loading.value) {
+    return 'Loading...';
+  }
+  if (matchIndex.value === -1) {
+    return 'No more matches';
+  }
+  if (judgeNumber.value > match.value.numberOfJudges) {
+    return 'Invalid Judge Position';
+  }
+  if (!match.value.completed && match.value.judgeState[judgeNumber.value - 1]) {
+    return 'Please wait until all judges have submitted their score...';
+  }
+  if (submitted.value) {
+    return 'Scores have been submitted. This page should auto refresh but if not please manually refresh';
+  }
+  return '';
+});
 const moves = computed(() => moveList(match.value.kata));
-const hasMajor = computed(() => scores.value.find((score) => score.deductions && score.deductions[4] === '1'));
+const hasMajor = computed(() => scores.value.points.find((score) => score.deductions && score.deductions[4] === '1'));
 const total = computed(() => {
-  const total = scores.value.reduce((acc, score) => {
+  const total = scores.value.points.reduce((acc, score) => {
     if (score.value != null) {
       return acc += score.value;
     } else {
@@ -132,10 +155,14 @@ const total = computed(() => {
 async function submitCode() {
   try {
     inAction.value = true;
-    error.value = '';
-    judge.value = await $fetch(`/api/judges/${code.value}`, { headers });
+    _setError('');
+    const judgeData = await $fetch(`/api/judges/${judgeCode.value}`, { headers });
+    judge.value = judgeData;
+    if (judgeData.id !== scores.value.id) {
+      scores.value = { id: judgeData.id, points: Array(moves.value.length).fill().map(() => ({})) };
+    }
   } catch (err) {
-    error.value = handleServerError(err);
+    codeError.value = handleServerError(err);
   } finally {
     inAction.value = false;
   }
@@ -143,7 +170,8 @@ async function submitCode() {
 
 async function changeJudge() {
   judge.value = undefined;
-  code.value = '';
+  judgeCode.value = '';
+  scores.value = { points: [] };
 }
 
 async function toggleScore(score, index) {
@@ -173,8 +201,8 @@ function showSubmitScore() {
 
 async function submitScore() {
   const body = _scoreToPayload();
-  const judgeValues = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers });
-  // scores.value = _payloadToScore(judgeValues);
+  await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers });
+  submitted.value = true;
 }
 
 function techniqueColour(score) {
@@ -197,28 +225,26 @@ function techniqueColour(score) {
  * @type UpdateEvents
  */
 let event;
-let matchIndex = -1;
 onMounted(async () => {
   event = new UpdateEvents(matNumber.value, cookie.value.tCode);
   event.connect((data) => {
+    loading.value = false;
     if (data.error) {
-      wait.value = data.error;
+      _setError(data.error);
       event.close();
       return;
     }
-    wait.value = '';
-    tournament.value = data.tournament;
-    org.value = data.org;
-    if (data.index === -1) {
-      wait.value = 'no more matches';
-    } else {
-      if (data.index !== matchIndex) {
-        matchIndex = data.index;
-        match.value = data.match;
+    tournament.value.name = data.tournament;
+    tournament.value.org = data.org;
+    if (data.index !== matchIndex || data.groupIndex !== groupIndex) {
+      matchIndex.value = data.index;
+      groupIndex.value = data.groupIndex;
+      match.value = { ...data.match, completed: data.completed, judgeState: data.state };
+      const newScores = { points: Array(moves.value.length).fill().map(() => ({})) };
+      if (judge.value) {
+        newScores.id = judge.value.id;
       }
-      if (!data.completed && data.state[judgeNumber.value - 1]) {
-        wait.value = 'Please wait until all judges have submitted their score...';
-      }
+      scores.value = newScores;
     }
   });
 });
@@ -229,39 +255,23 @@ onUnmounted(() => {
   }
 });
 
-watch(match, async () => {
-  if (match) {
-    if (judgeNumber.value > match.value.numberOfJudges) {
-      wait.value = 'Invalid Judge Position';
-    } else {
-      const judgeValue = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { headers });
-      const newScores = _payloadToScore(judgeValue);
-      scores.value = newScores;
-    }
-  }
-});
-
-function _payloadToScore(judgeValue) {
-  const count = moves.value.length;
-  const newScores = Array(count).fill().map(() => ({}));
-  for (let ii = 0; ii < count; ii++) {
-    const judgeScores = judgeValue.scores || [];
-    if (ii < judgeScores.length) {
-      const score = judgeValue.scores[ii];
-      const deductions = score.deductions.split(':');
-      const total = calculateMoveScore(deductions);
-      newScores[ii] = { deductions, value: total };
-    }
-  }
-  return newScores;
-}
-
 function _scoreToPayload() {
   const payload = { id: judge.value.id, name: judge.value.name, scores: [] };
-  for (const score of scores.value) {
+  for (const score of scores.value.points) {
     payload.scores.push({ deductions: (score.deductions || Array(6).fill('')).join(':') });
   }
   return payload;
+}
+
+let timeoutId;
+function _setError(errorString) {
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+  error.value = errorString;
+  timeoutId = setTimeout(() => {
+    error.value = '';
+  }, 3000);
 }
 
 </script>
