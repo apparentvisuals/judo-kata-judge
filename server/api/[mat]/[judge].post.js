@@ -33,7 +33,8 @@ export default defineEventHandler(async (event) => {
     const summaryClients = db.clients(`${token}--1`);
     notifyAllClients(summaryClients.summary.list, createSummaryMessage(tournament.data));
   }
-  return updatedMatch.scores[judgeNumber];
+  return;
+  // return updatedMatch.scores[judgeNumber];
 });
 
 function _IsMatchComplete(scores) {

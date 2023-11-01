@@ -27,5 +27,11 @@
     "uuid": "^9.0.1",
     "vue": "^3.2.47",
     "vuedraggable": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vueuse/core": "^10.5.0",
+    "@vueuse/nuxt": "^10.5.0",
+    "i": "^0.3.7",
+    "npm": "^10.2.1"
   }
 }
