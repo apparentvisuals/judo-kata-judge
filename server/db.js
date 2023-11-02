@@ -1,8 +1,10 @@
 
 
 import Clients from './clients';
+import Notify from './notify';
 
 const clients = new Map();
+const notifications = new Map();
 
 class DB {
   /**
@@ -18,6 +20,18 @@ class DB {
       });
     }
     return clients.get(key);
+  }
+
+  /**
+   * 
+   * @param {string} key 
+   * @returns {Notify}
+   */
+  notifications(key) {
+    if (!notifications.has(key)) {
+      notifications.set(key, new Notify());
+    }
+    return notifications.get(key);
   }
 }
 
