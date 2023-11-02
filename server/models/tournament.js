@@ -65,6 +65,7 @@ export default class Tournament {
       org,
       showJudgeTotals,
       mats: [],
+      invites: {},
     };
     const tournament = new Tournament(id, tournamentData);
     await tournament.save();
@@ -88,29 +89,24 @@ export default class Tournament {
     this.#tournament.mats.splice(index, 1);
   }
 
-  createGroup(mat, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
-    const group = {
-      name,
-      kata,
-      numberOfJudges,
-      matches: []
+  addInvite(invite, data = {}) {
+    if (!this.#tournament.invites) {
+      this.#tournament.invites = {};
     }
-    if (startTime) {
-      group.startTime = startTime;
-    }
-    if (disableDivideByHalf != null) {
-      group.disableDivideByHalf = disableDivideByHalf;
-    }
-    if (disableForgotten != null) {
-      group.disableForgotten = disableForgotten;
-    }
-    if (disableMajor != null) {
-      group.disableMajor = disableMajor;
-    }
+    this.#tournament.invites[invite] = data;
+  }
+
+  deleteInvite(invite) {
+    delete this.#tournament.invites[invite];
+  }
+
+  createGroup(mat, data) {
+    const group = { matches: [] };
+    this.#assignGroupValues(group, data);
     this.#tournament.mats[mat].groups.push(group);
   }
 
-  updateGroup(matNumber, groupNumber, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
+  getGroup(matNumber, groupNumber) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -119,21 +115,12 @@ export default class Tournament {
     if (!group) {
       return;
     }
-    group.name = name;
-    group.kata = kata;
-    if (group.numberOfJudges) {
-      group.numberOfJudges = parseInt(numberOfJudges);
-    }
-    group.startTime = startTime;
-    if (disableDivideByHalf != null) {
-      group.disableDivideByHalf = disableDivideByHalf;
-    }
-    if (disableForgotten != null) {
-      group.disableForgotten = disableForgotten;
-    }
-    if (disableMajor != null) {
-      group.disableMajor = disableMajor;
-    }
+    return group;
+  }
+
+  updateGroup(matNumber, groupNumber, data) {
+    const group = this.getGroup(matNumber, groupNumber);
+    this.#assignGroupValues(group, data);
   }
 
   deleteGroup(mat, group) {
@@ -252,6 +239,30 @@ export default class Tournament {
     this.#tournament.name = tournament.name;
     this.#tournament.org = tournament.org;
     this.#tournament.showJudgeTotals = tournament.showJudgeTotals;
+  }
+
+  #assignGroupValues(group, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
+    if (name) {
+      group.name = name;
+    }
+    if (kata) {
+      group.kata = kata;
+    }
+    if (numberOfJudges) {
+      group.numberOfJudges = parseInt(numberOfJudges);
+    }
+    if (startTime) {
+      group.startTime = startTime;
+    }
+    if (disableDivideByHalf != null) {
+      group.disableDivideByHalf = disableDivideByHalf;
+    }
+    if (disableForgotten != null) {
+      group.disableForgotten = disableForgotten;
+    }
+    if (disableMajor != null) {
+      group.disableMajor = disableMajor;
+    }
   }
 }
 

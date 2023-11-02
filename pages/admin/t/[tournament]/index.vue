@@ -14,11 +14,15 @@
       <div class="navbar-center text-primary-content">
         <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
       </div>
-      <div class="navbar-end text-primary-content">
-        <button class="btn btn-square btn-ghost btn-sm" @click.prevent="addMat" aria-label="add mat">
-          <PlusIcon class="w-6 h-6" />
+      <div class="navbar-end join">
+        <button class="btn btn-square btn-success btn-sm join-item" @click.prevent="addMat" aria-label="add mat">
+          <PlusIcon class="w-5 h-5" />
         </button>
-        <button class="btn btn-ghost btn-sm" @click.prevent="save">
+        <button class="btn btn-square btn-success btn-sm join-item" @click.prevent="createInvite"
+          aria-label="create invite">
+          <EnvelopeIcon class="w-5 h-5" />
+        </button>
+        <button class="btn btn-success btn-sm join-item" @click.prevent="save">
           Save
         </button>
       </div>
@@ -87,7 +91,8 @@
                       <td class="hidden sm:table-cell">{{ match.uke }}</td>
                       <td>
                         <div class="join">
-                          <NuxtLink class="btn btn-primary btn-square btn-sm join-item" :disabled="!match.completed"
+                          <NuxtLink class="btn btn-primary btn-square btn-sm join-item"
+                            :class="match.completed ? '' : 'btn-disabled'"
                             :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank">
                             <CheckIcon class="w-5 h-5" />
                           </NuxtLink>
@@ -122,13 +127,20 @@
     <Prompt name="edit_match_modal" @submit="updateMatch" :disabled="inAction" text="Update">
       <MatchInput :match="matchToUpdate" :athletes="athletes" />
     </Prompt>
+    <Prompt name="view_invite_modal" text="Close">
+      <div class="flex flex-col items-center">
+        <img :src="qrCode" alt="invite link QR code" class="w-48" />
+        <div>Invite Link: <a class="btn-link" :href="inviteLink" target="_blank">{{ inviteLink }}</a></div>
+      </div>
+    </Prompt>
   </div>
 </template>
 
 <script setup>
 import { clone, pick } from 'lodash-es';
-import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
-import { getGroupName, handleServerError } from '~/src/utils';
+import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon, ArrowPathIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
+import { getGroupName, handleServerError, shuffle } from '~/src/utils';
+import { useQRCode } from '@vueuse/integrations/useQRCode'
 
 const DEFAULT_GROUP = { name: '', kata: '', numberOfJudges: 5, startTime: '' };
 const DEFAULT_MATCH = { tori: '', uke: '' };
@@ -147,12 +159,25 @@ const group = useState('group', () => undefined);
 const match = useState('match', () => undefined);
 const groupToUpdate = useState('group-to-update', () => clone(DEFAULT_GROUP));
 const matchToUpdate = useState('match-to-update', () => clone(DEFAULT_MATCH));
+const invite = ref('');
+const inviteLink = computed(() => {
+  return `http://localhost:3000/${invite.value}`;
+})
+const qrCode = useQRCode(inviteLink)
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
 async function addMat() {
   const response = await $fetch(`/api/tournaments/${route.params.tournament}/m`, { method: 'POST', headers });
   tournament.value = response;
+}
+
+async function createInvite() {
+  if (!invite.value) {
+    const response = await $fetch(`/api/tournaments/${route.params.tournament}/invite`, { headers });
+    invite.value = response;
+  }
+  view_invite_modal.showModal();
 }
 
 async function deleteMat(mat) {
@@ -184,7 +209,7 @@ function canRandomize(matIndex, groupIndex) {
 
 function randomizeGroup(matIndex, groupIndex) {
   const matches = tournament.value.mats[matIndex].groups[groupIndex].matches;
-  _shuffle(matches);
+  shuffle(matches);
 }
 
 async function showUpdateGroup(matIndex, groupIndex, groupValue) {
@@ -241,24 +266,6 @@ async function deleteMatch(mat, group, matchId) {
   tournament.value = response;
 }
 
-function _shuffle(array) {
-  let currentIndex = array.length, randomIndex;
-
-  // While there remain elements to shuffle.
-  while (currentIndex > 0) {
-
-    // Pick a remaining element.
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
-  }
-
-  return array;
-}
-
 let timeoutId;
 function _setError(errorString) {
   if (timeoutId) {
@@ -273,6 +280,9 @@ function _setError(errorString) {
 try {
   tournament.value = await $fetch(`/api/tournaments/${route.params.tournament}`, { headers });
   athletes.value = await $fetch(`/api/athletes`, { headers });
+  if (tournament.value.invites && Object.keys(tournament.value.invites).length > 0) {
+    invite.value = Object.keys(tournament.value.invites)[0];
+  }
 } catch (err) {
   _setError(handleServerError(err));
 }
