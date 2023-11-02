@@ -1,6 +1,6 @@
 import Tournament from '~/server/models/tournament';
 import db from '../../db';
-import { notifyAllClients, createUpdateMessage, createReportMessage, createReport, createSummaryMessage } from '~/server/utils';
+import { notifyAllClients, createUpdateMessage, createSummaryMessage } from '~/server/utils';
 
 export default defineEventHandler(async (event) => {
   const authorization = getHeader(event, 'authorization');
@@ -27,14 +27,21 @@ export default defineEventHandler(async (event) => {
   const updatedMatch = tournament.updateMatch(matNumber, groupIndex, index, { scores: match.scores, completed: _IsMatchComplete(match.scores) });
   await tournament.save();
 
-  const clients = db.clients(`${token}-${matNumber}`);
-  notifyAllClients(clients.match.list, createUpdateMessage(tournament, matNumber));
-  if (updatedMatch.completed) {
-    const summaryClients = db.clients(`${token}--1`);
-    notifyAllClients(summaryClients.summary.list, createSummaryMessage(tournament.data));
-  }
+  const updates = db.notifications('updates');
+  updates.notify(() => {
+    const clients = db.clients(`${token}-${matNumber}`);
+    notifyAllClients(clients.match.list, createUpdateMessage(tournament, matNumber));
+  });
+
+  const summary = db.notifications('summary');
+  summary.notify(() => {
+    if (updatedMatch.completed) {
+      const summaryClients = db.clients(`${token}--1`);
+      notifyAllClients(summaryClients.summary.list, createSummaryMessage(tournament.data));
+    }
+  });
+
   return;
-  // return updatedMatch.scores[judgeNumber];
 });
 
 function _IsMatchComplete(scores) {

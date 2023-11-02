@@ -247,6 +247,9 @@ onMounted(async () => {
       scores.value = newScores;
     }
   });
+  if (judgeCode.value) {
+    await submitCode();
+  }
 });
 
 onUnmounted(() => {

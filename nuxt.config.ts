@@ -49,6 +49,17 @@ export default defineNuxtConfig({
         driver: 'fs',
         base: './data/athletes'
       },
+      'invite': {
+        driver: 'azureCosmos',
+        endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
+        accountKey: process.env.COSMOS_KEY,
+        containerName: 'invites',
+        databaseName: 'judo-kata-judge'
+      },
+      'invite-dev': {
+        driver: 'fs',
+        base: './data/invites'
+      },
       'archive': {
         driver: 'fs',
         base: './data/archive'
