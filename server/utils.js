@@ -126,9 +126,9 @@ export function calculateMoveScore(deductions) {
 }
 
 export function createReport(group, match) {
-  const scores = match.scores;
   const kata = group.kata;
-  const numberOfJudges = match.scores.length;
+  const numberOfJudges = (match.score && match.scores.length) || group.numberOfJudges;
+  const scores = match.scores || Array(numberOfJudges).fill({});
   const techniquesCount = numberOfTechniques(kata);
   const report = _defaultTechniqueScore(group, match);
   const summary = {
@@ -177,7 +177,7 @@ export function createReport(group, match) {
 
 function _defaultTechniqueScore(group, match) {
   const kata = group.kata;
-  const numberOfJudges = match.scores.length;
+  const numberOfJudges = (match.score && match.scores.length) || group.numberOfJudges;
   const techniquesCount = numberOfTechniques(kata);
   const report = new Array(techniquesCount).fill().map((_el) => {
     return { values: new Array(numberOfJudges).fill().map(() => 10) };

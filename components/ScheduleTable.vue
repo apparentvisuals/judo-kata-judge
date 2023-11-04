@@ -15,7 +15,7 @@
         <!-- :class="currentMatch === matchIndex && currentGroup === groupIndex ? 'bg-warning' : ''" -->
         <td>{{ matchIndex + 1 }}</td>
         <td>{{ match.tori }} / {{ match.uke }}</td>
-        <td>{{ match.startTime ? `${format(match.startTime, 'HH:mm')}` : '' }}</td>
+        <td>{{ match.startTime ? match.startTime : '' }}</td>
       </tr>
     </tbody>
   </table>
@@ -42,7 +42,7 @@ const schedule = computed(() => {
       const groupSchedule = { kata: group.kata, matches: [] };
       if (group.startTime) {
         lastTime = parse(group.startTime, 'HH:mm', new Date());
-      } else {
+      } else if (lastTime) {
         lastTime = addMinutes(lastTime, DEFAULT_BREAK);
       }
       for (const match of group.matches) {
