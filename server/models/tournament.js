@@ -239,6 +239,7 @@ export default class Tournament {
     this.#tournament.name = tournament.name;
     this.#tournament.org = tournament.org;
     this.#tournament.showJudgeTotals = tournament.showJudgeTotals;
+    this.#tournament.mats = tournament.mats;
   }
 
   #assignGroupValues(group, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {

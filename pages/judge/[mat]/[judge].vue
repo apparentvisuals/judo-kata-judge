@@ -237,6 +237,7 @@ onMounted(async () => {
     tournament.value.name = data.tournament;
     tournament.value.org = data.org;
     if (data.index !== matchIndex || data.groupIndex !== groupIndex) {
+      submitted.value = false;
       matchIndex.value = data.index;
       groupIndex.value = data.groupIndex;
       match.value = { ...data.match, completed: data.completed, judgeState: data.state };
