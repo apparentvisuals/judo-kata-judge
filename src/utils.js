@@ -2,11 +2,11 @@
 export const ORG_MAP = {
   'jc': 'Judo Canada',
   'ja': 'Judo Alberta',
-  'jo': 'Judo Ontario',
-  'jq': 'Judo Quebec',
   'jb': 'Judo BC',
   'js': 'Judo Saskatchewan',
   'jm': 'Judo Manitoba',
+  'jo': 'Judo Ontario',
+  'jq': 'Judo Quebec',
   'jb': 'Judo New Brunswick',
   'jt': 'Judo Nova Scotia',
   'jp': 'Judo PEI',
@@ -17,23 +17,35 @@ export const ORG_MAP = {
 };
 
 export const ORG_IMAGE_MAP = {
-  'jb': '/img/judo-bc.png'
+  'ja': '/img/judo-alberta.png',
+  'jb': '/img/judo-bc.png',
+  'js': '/img/judo-sask.png',
+  'jm': '/img/judo-manitoba.png',
+  'jo': '/img/judo-ontario.png',
+  'jq': '/img/judo-quebec.png',
+  'jb': '/img/judo-nb.png',
+  'jt': '/img/judo-ns.png',
+  'jp': '/img/judo-pei.png',
+  'jf': '/img/judo-newfoundland.png',
+  'jy': '/img/judo-yukon.png',
+  'jn': '/img/judo-nwt.png',
+  'jv': '/img/judo-nunavut.png',
 };
 
 export const PROVINCE_MAP = {
   'ab': 'Alberta',
   'bc': 'British Columbia',
-  'mb': 'Manitoba',
-  'nb': 'New Brunswick',
-  'ns': 'Nova Scotia',
-  'nl': 'Newfoundland and Labrador',
-  'nt': 'Northwest Territories',
-  'nu': 'Nunavut',
-  'on': 'Ontario',
-  'pe': 'Prince Edward Island',
-  'qc': 'Quebec',
   'sk': 'Saskatchewan',
+  'mb': 'Manitoba',
+  'on': 'Ontario',
+  'qc': 'Quebec',
+  'nb': 'New Brunswick',
+  'nt': 'Nova Scotia',
+  'pe': 'Prince Edward Island',
+  'nl': 'Newfoundland and Labrador',
   'yt': 'Yukon',
+  'nt': 'Northwest Territories',
+  'nu': 'Nunavut'
 };
 
 export const LEVEL_MAP = {
