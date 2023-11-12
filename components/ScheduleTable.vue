@@ -12,10 +12,9 @@
     </thead>
     <tbody>
       <tr v-for="(match, matchIndex) in group.matches">
-        <!-- :class="currentMatch === matchIndex && currentGroup === groupIndex ? 'bg-warning' : ''" -->
         <td>{{ matchIndex + 1 }}</td>
         <td>{{ match.tori }} / {{ match.uke }}</td>
-        <td>{{ match.startTime ? match.startTime : '' }}</td>
+        <td>{{ match.startTime ? `${format(match.startTime, 'HH:mm')}` : '' }}</td>
       </tr>
     </tbody>
   </table>
@@ -29,7 +28,6 @@ import { UpdateEvents } from '~/src/event-sources';
 const DEFAULT_BREAK = 10;
 
 const props = defineProps(['tournament', 'mat']);
-const cookie = useCookie('jkj', { default: () => ({}) });
 const currentGroup = useState('current-group', () => -1);
 const currentMatch = useState('current-match', () => -1);
 
@@ -65,7 +63,7 @@ const schedule = computed(() => {
  */
 let event;
 onMounted(async () => {
-  event = new UpdateEvents(props.mat, cookie.value.tCode);
+  event = new UpdateEvents(props.mat, props.tournament.id);
   event.connect((data) => {
     if (data.error) {
       return;

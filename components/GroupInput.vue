@@ -9,7 +9,7 @@
     <label class="label" for="group-kata">
       <span class="label-text">Kata</span>
     </label>
-    <select id="group-kata" class="select select-bordered" v-model="group.kata">
+    <select id="group-kata" class="select select-bordered" v-model="group.kata" required>
       <option v-for="kata of Object.keys(KATA_MAP)" :value="kata">{{ getKataName(kata) }}</option>
     </select>
   </div>

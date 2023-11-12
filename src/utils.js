@@ -1,51 +1,30 @@
-
 export const ORG_MAP = {
   'jc': 'Judo Canada',
-  'ja': 'Judo Alberta',
-  'jb': 'Judo BC',
-  'js': 'Judo Saskatchewan',
-  'jm': 'Judo Manitoba',
   'jo': 'Judo Ontario',
   'jq': 'Judo Quebec',
-  'jb': 'Judo New Brunswick',
-  'jt': 'Judo Nova Scotia',
-  'jp': 'Judo PEI',
-  'jf': 'Newfoundland and Labrador Judo Association',
-  'jy': 'Judo Yukon',
-  'jn': 'NWT Judo Association',
-  'jv': 'Judo Nunavut',
+  'jb': 'Judo BC',
+  'js': 'Judo Saskatchewan',
+  'jm': 'Judo Manitoba'
 };
 
 export const ORG_IMAGE_MAP = {
-  'ja': '/img/judo-alberta.png',
-  'jb': '/img/judo-bc.png',
-  'js': '/img/judo-sask.png',
-  'jm': '/img/judo-manitoba.png',
-  'jo': '/img/judo-ontario.png',
-  'jq': '/img/judo-quebec.png',
-  'jb': '/img/judo-nb.png',
-  'jt': '/img/judo-ns.png',
-  'jp': '/img/judo-pei.png',
-  'jf': '/img/judo-newfoundland.png',
-  'jy': '/img/judo-yukon.png',
-  'jn': '/img/judo-nwt.png',
-  'jv': '/img/judo-nunavut.png',
+  'jb': '/img/judo-bc.png'
 };
 
 export const PROVINCE_MAP = {
   'ab': 'Alberta',
   'bc': 'British Columbia',
-  'sk': 'Saskatchewan',
   'mb': 'Manitoba',
-  'on': 'Ontario',
-  'qc': 'Quebec',
   'nb': 'New Brunswick',
-  'nt': 'Nova Scotia',
-  'pe': 'Prince Edward Island',
+  'ns': 'Nova Scotia',
   'nl': 'Newfoundland and Labrador',
-  'yt': 'Yukon',
   'nt': 'Northwest Territories',
   'nu': 'Nunavut',
+  'on': 'Ontario',
+  'pe': 'Prince Edward Island',
+  'qc': 'Quebec',
+  'sk': 'Saskatchewan',
+  'yt': 'Yukon',
 };
 
 export const LEVEL_MAP = {
@@ -85,10 +64,6 @@ export const KATA_MAP = {
   'jnk': 'Ju-no-kata',
   'kgj': 'Kodokan-goshin-jutsu',
   'kink': 'Kime-no-kata',
-  'ko1': 'Kodomo-no-kata 1',
-  'ko2': 'Kodomo-no-kata 2',
-  'ko3': 'Kodomo-no-kata 3',
-  'ko4': 'Kodomo-no-kata 4',
   'ko5': 'Kodomo-no-kata 5',
   'ko6': 'Kodomo-no-kata 6',
   'ko7': 'Kodomo-no-kata 7',
@@ -100,104 +75,9 @@ const KNK_MOVE_LIST = ['Opening Ceremony', 'Kesa-gatame', 'Kata-gatame', 'Kami-s
 const JNK_MOVE_LIST = ['Opening Ceremony', 'Tsuki-dashi', 'Kata-oshi', 'Ryote-dori', 'Kata-mawashi', 'Ago-oshi', 'Kiri-oroshi', 'Ryokata-oshi', 'Nanami-uchi', 'Katate-dori', 'Katate-age', 'Obi-tori', 'Mune-oshi', 'Tsuki-age', 'Uchi-oroshi', 'Ryogan-tsuki', 'Closing Ceremony'];
 const KGJ_MOVE_LIST = ['Opening Ceremony', 'Ryote-dori', 'Hidari-eri-dori', 'Migi-eri-dori', 'Kataude-dori', 'Ushiro-eri-dori', 'Ushiro-jime', 'Kakae-dori', 'Naname-uchi', 'Ago-tsuki', 'Ganmen-tsuki', 'Mae-geri', 'Yoko-geri', 'Tsukkake', 'Choku-tsuki', 'Naname-tsuki', 'Furi-age', 'Furi-oroshi', 'Morote-tsuki', 'Shomen-zuke', 'Koshi-gamae', 'Haimen-zuke', 'Closing Ceremony'];
 const KINK_MOVE_LIST = ['Opening Ceremony', 'Ryote-dori', 'Tsukkake', 'Suri-age', ' Yoko-uchi', 'Ushiro-dori', 'Tsukkomi', 'Kiri-komi', 'Yoko-tsuki', 'Ryote-dori', 'Sode-tori', 'Tsukkake', 'Tsuki-age', 'Suri-age', ' Yoko-uchi', 'Ke-age', 'Ushiro-dori', 'Tsukkomi', 'Kiri-komi', 'Nuki-gake', 'Kiri-oroshi', 'Closing Ceremony'];
-
-// KODOMO NO KATA lists
-// Optional Numeric prefixing used to Group List Items.
-// A simple regex check can be done to rip out prefix before displaying item.
-// GUI can detect changes between prefix to determine/indicate new group.
-const KO1_MOVE_LIST = [
-  '1-Opening Ceremony', 
-  '2-Mae-mawari-ukemi Horse To Feet', 
-  '3-Uchi-mata Fixed', 
-  '3-Uchi-mata Dynamic', 
-  '4-Harai-goshi Fixed', 
-  '4-Harai-goshi Dynamic', 
-  '5-Ko-uchi gari to Ippon-seoinage Transition', 
-  '6-Ippon-seoinage to Keta-gatame Transition', 
-  '6-Ushiro-kesa-gatame Transition', 
-  '6-Yoko-shiho-gatame Transition', 
-  '6-Kami-shiho-gatame Transition', 
-  '7-Closing Ceremony',
-];
-const KO2_MOVE_LIST =  [
-  '1-Opening Ceremony', 
-  '2-Mae-ukemi Stand', 
-  '2-Mae-mawari-ukemi Walk To Feet', 
-  '3-O-uchi-gari Fixed & Dynamic', 
-  '4-Ko-uchi-gari Fixed & Dynamic', 
-  '5-O-soto-gari Resistance',
-  '5-O-soto-gari Direct',
-  '6-O-uchi to Ko-uchi Combination', 
-  '7-O-soto-gari to Yoko-shiho-gatame Transition', 
-  '7-Tate-shiho-gatame Transition', 
-  '7-Kata-gatame Transition', 
-  '8-Closing Ceremony',
-];
-const KO3_MOVE_LIST = [
-  '1-Opening Ceremony', 
-  '2-Mae-ukemi Knees to Feet', 
-  '2-Mae-mawari-ukemi Walk To Feet',  
-  '3-Mae-mawari-sabaki & Ushiro-mawari-sabaki', 
-  '4-Tai-sabaki Kuzushi', 
-  '5-Sasae-tsurikomi-ashi Circular', 
-  '6-Ippon-seionage Lift/Step-Over', 
-  '7-Tsuri-komi-goshi Lift/Step-Over', 
-  '8-Sasae-tsurikomi-ashi to Kesa Transition', 
-  '9-Closing Ceremony',
-];
-const KO4_MOVE_LIST =  [
-  '1-Opening Ceremony', 
-  '2-Ushiro-ukemi Walking', 
-  '2-Yoko-ukemi Sliding', 
-  '2-Mae-mawari-ukemi Stand to Flat', 
-  '3-Mae-sabaki & Ushiro-sabaki', 
-  '3-Mae-mawari-sabaki & Ushiro-mawari-sabaki', 
-  '4-Happo-no-kuzushi Moving',
-  '5-Hiza-guruma Stand', 
-  '6-Tai-otoshi Step-Over', 
-  '7-O-goshi Lift/Step-Over', 
-  '8-Closing Ceremony',
-];
-const KO5_MOVE_LIST = [
-  '1-Opening Ceremony', 
-  '2-Ushiro-ukemi Stand to Feet',
-  '2-Yoko-ukemi Stand to Feet', 
-  '2-Mae-mawari-ukemi Knees to Flat', 
-  '3-Kumi-kata & Ugoki-kata', 
-  '4-Happo-no-kuzushi Fixed', 
-  '5-De-ashi-harai Stand', 
-  '6-Uki-otoshi Side-Roll', 
-  '7-Uki-goshi Step-Over', 
-  '8-Closing Ceremony',
-];
-const KO6_MOVE_LIST = [
-  '1-Opening Ceremony', 
-  '2-Ushiro-ukemi Sit to Sit', 
-  '2-Ushiro-ukemi Grip to Squat', 
-  '2-Yoko-ukemi Squat', 
-  '2-Mae-mawari-ukemi Horse to Flat', 
-  '3-Mae-mawari-sabaki', 
-  '3-Ushiro-mawari-sabaki', 
-  '4-Ayumi-ashi', 
-  '4-Tsugi-ashi Side & Circle', 
-  '5-Hiza-guruma Knee', 
-  '6-Tai-otoshi Knee', 
-  '7-Closing Ceremony',
-];
-const KO7_MOVE_LIST = [
-  '1-Opening Ceremony', 
-  '2-Ushiro-ukemi Flat', 
-  '2-Ushiro-ukemi Sit to Sit', 
-  '2-Yoko-ukemi Side to Flat', 
-  '2-Outen-ukemi Fours to Flat', 
-  '3-Mae-sabaki', 
-  '3-Ushiro-sabaki', 
-  '4-Ayumi-ashi', 
-  '4-Tsugi-ashi Side', 
-  '5-Mae-sabaki Knees Throwing', 
-  '6-Ushiro-sabaki Knee Throwing', 
-  '7-Closing Ceremony',
-];
+const KO5_MOVE_LIST = ['Opening Ceremony', 'Ushiro-ukemi', 'Yoko-ukemi', 'Mae-mawari-ukemi', 'Kumi-kata & Ugoki-kata', 'Happo-no-kuzushi', 'De-ashi-harai', 'Uki-otoshi', 'Uki-goshi', 'Closing Ceremony'];
+const KO6_MOVE_LIST = ['Opening Ceremony', 'Ushiro-ukemi Sit x2', 'Ushiro-ukemi Grip x2', 'Yoko-ukemi 1/Side', 'Mae-mawari-ukemi', 'Mae-mawari-sabaki', 'Ushiro-mawari-sabaki', 'Ayumi-ashi', 'Tsugi-ashi Side', 'Tsugi-ashi Circle', 'Hiza-guruma', 'Tai-otoshi', 'Closing Ceremony'];
+const KO7_MOVE_LIST = ['Opening Ceremony', 'Ushiro-ukemi Back x2', 'Ushiro-ukemi Sit x2', 'Yoko-ukemi 1/Side', 'Outen-ukemi 1/Side', 'Ma-sabaki', 'Ushiro-sabaki', 'Ayumi-ashi', 'Tsugi-ashi', 'Mae-sabaki Throwing', 'Ushiro-sabaki Throwing', 'Closing Ceremony'];
 
 export function getOrganization(org) {
   if (org) {
@@ -227,14 +107,6 @@ export function moveList(kata) {
       return KGJ_MOVE_LIST;
     case 'kink':
       return KINK_MOVE_LIST;
-    case 'ko1':
-      return KO1_MOVE_LIST;
-    case 'ko2':
-      return KO2_MOVE_LIST;
-    case 'ko3':
-      return KO3_MOVE_LIST;
-    case 'ko4':
-      return KO4_MOVE_LIST;
     case 'ko5':
       return KO5_MOVE_LIST;
     case 'ko6':
@@ -259,10 +131,6 @@ export function duration(kata) {
       return 8;
     case 'kink':
       return 11;
-    case 'ko1':
-    case 'ko2':
-    case 'ko3':
-    case 'ko4':
     case 'ko5':
     case 'ko6':
     case 'ko7':
