@@ -113,7 +113,7 @@ const KO1_MOVE_LIST = [
   '4-Harai-goshi Fixed', 
   '4-Harai-goshi Dynamic', 
   '5-Ko-uchi gari to Ippon-seoinage Transition', 
-  '6-Ippon-seoinage to Keta-gatame Transition', 
+  '6-Ippon-seoinage to Kesa-gatame Transition', 
   '6-Ushiro-kesa-gatame Transition', 
   '6-Yoko-shiho-gatame Transition', 
   '6-Kami-shiho-gatame Transition', 
