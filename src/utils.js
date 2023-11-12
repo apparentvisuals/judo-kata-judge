@@ -1,10 +1,19 @@
+
 export const ORG_MAP = {
   'jc': 'Judo Canada',
+  'ja': 'Judo Alberta',
   'jo': 'Judo Ontario',
   'jq': 'Judo Quebec',
   'jb': 'Judo BC',
   'js': 'Judo Saskatchewan',
-  'jm': 'Judo Manitoba'
+  'jm': 'Judo Manitoba',
+  'jb': 'Judo New Brunswick',
+  'jt': 'Judo Nova Scotia',
+  'jp': 'Judo PEI',
+  'jf': 'Newfoundland and Labrador Judo Association',
+  'jy': 'Judo Yukon',
+  'jn': 'NWT Judo Association',
+  'jv': 'Judo Nunavut'
 };
 
 export const ORG_IMAGE_MAP = {
