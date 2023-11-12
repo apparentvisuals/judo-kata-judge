@@ -1,7 +1,7 @@
 export default defineNuxtRouteMiddleware((to, from) => {
   const cookie = useCookie('jkj', { default: () => ({}) });
 
-  if (to.path.startsWith('/invite')) {
+  if (to.path.startsWith('/i')) {
     return;
   } else if (to.path.startsWith('/admin')) {
     if (to.path === '/admin/code') {

@@ -4,7 +4,7 @@ import { isDev } from "~/server/utils";
 
 const EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 
-const key = isDev() ? 'invites-dev' : 'invites';
+const key = isDev() ? 'invite-dev' : 'invite';
 export default class Invite {
   static async create(data) {
     const id = nanoid(6);
@@ -14,13 +14,15 @@ export default class Invite {
     return { id, data };
   }
 
+  static async get(id) {
+    const data = await useStorage(key).getItem(id);
+    return { id, data };
+  }
+
   static async getAll() {
     const inviteIds = await useStorage(key).getKeys();
     const loadInvites = inviteIds.map((id) => {
-      return (async () => {
-        const invite = await useStorage(key).getItem(id);
-        return { id, data };
-      })();
+      return Invite.get(id);
     });
     const invites = await Promise.all(loadInvites);
     return invites;

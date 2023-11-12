@@ -11,18 +11,18 @@
   },
   "dependencies": {
     "@azure/cosmos": "^3.17.3",
-    "@azure/identity": "^3.3.0",
+    "@azure/identity": "^3.3.2",
     "@heroicons/vue": "^2.0.18",
     "@nuxtjs/color-mode": "^3.3.0",
-    "@nuxtjs/tailwindcss": "^6.8.0",
+    "@nuxtjs/tailwindcss": "^6.9.4",
     "@tailwindcss/typography": "^0.5.10",
-    "autoprefixer": "^10.4.15",
-    "daisyui": "^3.7.6",
+    "autoprefixer": "^10.4.16",
+    "daisyui": "^3.9.4",
     "date-fns": "^2.30.0",
     "lodash-es": "^4.17.21",
     "nanoid": "^4.0.2",
-    "nuxt": "^3.7.3",
-    "postcss": "^8.4.30",
+    "nuxt": "^3.8.1",
+    "postcss": "^8.4.31",
     "unstorage": "github:apparentvisuals/unstorage#dist",
     "uuid": "^9.0.1",
     "vue": "^3.2.47",
@@ -30,8 +30,8 @@
   },
   "devDependencies": {
     "@vueuse/core": "^10.5.0",
-    "@vueuse/integrations": "^10.5.0",
-    "@vueuse/nuxt": "^10.5.0",
+    "@vueuse/integrations": "^10.6.0",
+    "@vueuse/nuxt": "^10.6.0",
     "qrcode": "^1.5.3"
   }
 }
