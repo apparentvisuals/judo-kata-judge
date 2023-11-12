@@ -40,11 +40,11 @@ export const PROVINCE_MAP = {
   'on': 'Ontario',
   'qc': 'Quebec',
   'nb': 'New Brunswick',
-  'nt': 'Nova Scotia',
+  'ns': 'Nova Scotia',
   'pe': 'Prince Edward Island',
   'nl': 'Newfoundland and Labrador',
   'yt': 'Yukon',
-  'nt': 'Northwest Territories',
+  'nw': 'Northwest Territories',
   'nu': 'Nunavut',
 };
 
