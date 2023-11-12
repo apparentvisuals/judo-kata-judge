@@ -127,7 +127,7 @@ export function calculateMoveScore(deductions) {
 
 export function createReport(group, match) {
   const kata = group.kata;
-  const numberOfJudges = (match.score && match.scores.length) || group.numberOfJudges;
+  const numberOfJudges = (match.scores && match.scores.length) || group.numberOfJudges;
   const scores = match.scores || Array(numberOfJudges).fill({});
   const techniquesCount = numberOfTechniques(kata);
   const report = _defaultTechniqueScore(group, match);

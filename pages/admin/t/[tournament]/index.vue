@@ -127,67 +127,81 @@
     <Prompt name="edit_match_modal" @submit="updateMatch" :disabled="inAction" text="Update">
       <MatchInput :match="matchToUpdate" :athletes="athletes" />
     </Prompt>
-    <Prompt name="view_invite_modal" text="Close">
-      <div class="flex flex-col items-center">
-        <img :src="qrCode" alt="invite link QR code" class="w-48" />
-        <div>Invite Link: <a class="btn-link" :href="inviteLink" target="_blank">{{ inviteLink }}</a></div>
-      </div>
-    </Prompt>
+    <ClientOnly>
+      <Prompt v-if="inviteLink" name="view_invite_modal" text="Close">
+        <div class="flex flex-col items-center">
+          <img :src="qrCode" alt="invite link QR code" class="w-48" />
+          <NuxtLink class="btn-link" :to="inviteLink" target="_blank">{{ invite }}</NuxtLink>
+        </div>
+      </Prompt>
+    </ClientOnly>
   </div>
 </template>
 
 <script setup>
 import { clone, pick } from 'lodash-es';
 import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon, ArrowPathIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
-import { getGroupName, handleServerError, shuffle } from '~/src/utils';
 import { useQRCode } from '@vueuse/integrations/useQRCode'
+import { getGroupName, handleServerError, shuffle } from '~/src/utils';
 
 const DEFAULT_GROUP = { name: '', kata: '', numberOfJudges: 5, startTime: '' };
 const DEFAULT_MATCH = { tori: '', uke: '' };
 
 const route = useRoute();
+const tournamentId = computed(() => route.params.tournament);
+
 const cookie = useCookie('jkj', { default: () => ({}) });
+const headers = computed(() => ({ authorization: `Bearer ${cookie.value.adminCode}` }));
 
-const error = useState('error', () => '');
-const inAction = useState('in-action', () => false);
-const tournament = useState('tournament', () => ({}));
-const athletes = useState('athletes', () => []);
-const newGroup = useState('new-group', () => clone(DEFAULT_GROUP));
-const newMatch = useState('new-match', () => clone(DEFAULT_MATCH));
-const mat = useState('mat', () => undefined);
-const group = useState('group', () => undefined);
-const match = useState('match', () => undefined);
-const groupToUpdate = useState('group-to-update', () => clone(DEFAULT_GROUP));
-const matchToUpdate = useState('match-to-update', () => clone(DEFAULT_MATCH));
-const invite = ref('');
+const error = ref('');
+const inAction = ref(false);
+const tournament = ref({});
+const athletes = ref([]);
+const newGroup = ref(clone(DEFAULT_GROUP));
+const newMatch = ref(clone(DEFAULT_MATCH));
+const mat = ref();
+const group = ref();
+const match = ref();
+const groupToUpdate = ref(clone(DEFAULT_GROUP));
+const matchToUpdate = ref(clone(DEFAULT_MATCH));
+const invite = computed(() => {
+  if (tournament.value.invites) {
+    const inviteCodes = Object.keys(tournament.value.invites);
+    if (inviteCodes.length > 0) {
+      return inviteCodes[0];
+    }
+  }
+});
 const inviteLink = computed(() => {
-  return `http://localhost:3000/${invite.value}`;
-})
-const qrCode = useQRCode(inviteLink)
-
-const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
+  if (invite.value) {
+    return `/i/${invite.value}`;
+  }
+});
+const qrCode = useQRCode(inviteLink);
 
 async function addMat() {
-  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m`, { method: 'POST', headers });
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m`, { method: 'POST', headers: headers.value });
   tournament.value = response;
 }
 
 async function createInvite() {
   if (!invite.value) {
-    const response = await $fetch(`/api/tournaments/${route.params.tournament}/invite`, { headers });
-    invite.value = response;
+    const response = await $fetch(`/api/tournaments/${tournamentId.value}/invite`, { headers: headers.value });
+    const newInviteCode = {};
+    newInviteCode[response.id] = {};
+    tournament.value.invites = Object.assign({}, tournament.value.invites, newInviteCode);
   }
   view_invite_modal.showModal();
 }
 
 async function deleteMat(mat) {
-  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}`, { method: 'DELETE', headers });
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}`, { method: 'DELETE', headers: headers.value });
   tournament.value = response;
 }
 
 async function save() {
   const body = tournament.value;
-  await $fetch(`/api/tournaments/${route.params.tournament}`, { method: 'POST', body, headers });
+  await $fetch(`/api/tournaments/${tournamentId.value}`, { method: 'POST', body, headers: headers.value });
 }
 
 async function showAddGroup(matIndex) {
@@ -197,7 +211,7 @@ async function showAddGroup(matIndex) {
 
 async function addGroup() {
   const body = newGroup.value;
-  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g`, { method: 'POST', body, headers });
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat.value}/g`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
   newGroup.value.name = '';
 }
@@ -221,12 +235,12 @@ async function showUpdateGroup(matIndex, groupIndex, groupValue) {
 
 async function updateGroup() {
   const body = pick(groupToUpdate.value, ["name", "kata", "numberOfJudges", "startTime"]);
-  const result = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}`, { method: 'POST', body, headers });
+  const result = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat.value}/g/${group.value}`, { method: 'POST', body, headers: headers.value });
   tournament.value = result;
 }
 
 async function deleteGroup(mat, group) {
-  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}`, { method: 'DELETE', headers });
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}`, { method: 'DELETE', headers: headers.value });
   tournament.value = response;
 }
 
@@ -238,7 +252,7 @@ async function showAddMatch(selectedMat, selectedGroup) {
 
 async function addMatch() {
   const body = newMatch.value;
-  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}/match`, { method: 'POST', body, headers });
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat.value}/g/${group.value}/match`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
   newMatch.value.tori = '';
   newMatch.value.uke = '';
@@ -257,12 +271,12 @@ async function showUpdateMatch(selectedMat, selectedGroup, selectedMatch, matchV
 
 async function updateMatch() {
   const body = pick(matchToUpdate.value, ['uke', 'ukeId', 'tori', 'toriId']);
-  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat.value}/g/${group.value}/match/${match.value}`, { method: 'POST', body, headers });
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat.value}/g/${group.value}/match/${match.value}`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
 }
 
 async function deleteMatch(mat, group, matchId) {
-  const response = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}/match/${matchId}`, { method: 'DELETE', headers });
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}/match/${matchId}`, { method: 'DELETE', headers: headers.value });
   tournament.value = response;
 }
 
@@ -278,12 +292,10 @@ function _setError(errorString) {
 }
 
 try {
-  tournament.value = await $fetch(`/api/tournaments/${route.params.tournament}`, { headers });
-  athletes.value = await $fetch(`/api/athletes`, { headers });
-  if (tournament.value.invites && Object.keys(tournament.value.invites).length > 0) {
-    invite.value = Object.keys(tournament.value.invites)[0];
-  }
+  tournament.value = await $fetch(`/api/tournaments/${tournamentId.value}`, { headers: headers.value });
+  athletes.value = await $fetch(`/api/athletes`, { headers: headers.value });
 } catch (err) {
   _setError(handleServerError(err));
 }
+
 </script>
