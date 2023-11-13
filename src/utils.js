@@ -125,9 +125,20 @@ export function getOrganizationImage(org) {
 }
 
 export function moveList(kata) {
+  return legacyMoveList(kata).map((move) => {
+    const parts = move.split(':');
+    if (parts.length > 1) {
+      return parts[1];
+    } else {
+      return parts[0];
+    }
+  });
+}
+
+function legacyMoveList(kata) {
   switch (kata) {
     case 'nnk3':
-      return nnk3.moves;
+      return nnk3.moves.map((move) => move);
     case 'nnk':
       return nnk.moves;
     case 'knk':
