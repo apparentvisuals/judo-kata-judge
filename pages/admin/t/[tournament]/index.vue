@@ -55,20 +55,20 @@
                 </div>
                 <div class="join">
                   <button class="btn btn-square btn-sm btn-success join-item"
-                    @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match">
+                    @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match" title="add match">
                     <PlusIcon class="w-5 h-5" />
                   </button>
                   <button class="btn btn-square btn-sm btn-success join-item"
                     :disabled="!canRandomize(matIndex, groupIndex)" @click.prevent="randomizeGroup(matIndex, groupIndex)"
-                    aria-label="randomize matches in group">
+                    aria-label="randomize matches in group" title="randomize">
                     <ArrowPathIcon class="w-5 h-5" />
                   </button>
                   <button class="btn btn-primary btn-square btn-sm join-item"
-                    @click.prvent="showUpdateGroup(matIndex, groupIndex, group)">
+                    @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" title="edit group">
                     <PencilIcon class="w-4 h-4" />
                   </button>
                   <button class="btn btn-square btn-sm btn-error join-item"
-                    @click.prevent="deleteGroup(matIndex, groupIndex)" aria-label="delete group">
+                    @click.prevent="deleteGroup(matIndex, groupIndex)" aria-label="delete group" title="delete group">
                     <XMarkIcon class="w-5 h-5" />
                   </button>
                 </div>
