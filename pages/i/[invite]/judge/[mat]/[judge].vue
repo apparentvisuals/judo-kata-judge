@@ -156,7 +156,7 @@ async function submitCode() {
   try {
     inAction.value = true;
     _setError('');
-    const judgeData = await $fetch(`/api/judges/${judgeCode.value}`, { headers });
+    const judgeData = await $fetch(`/api/judges/${judgeCode.value}`, { headers: headers.value });
     judge.value = judgeData;
     if (judgeData.id !== scores.value.id) {
       scores.value = { id: judgeData.id, points: Array(moves.value.length).fill().map(() => ({})) };
@@ -201,7 +201,7 @@ function showSubmitScore() {
 
 async function submitScore() {
   const body = _scoreToPayload();
-  await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers });
+  await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers: headers.value });
   submitted.value = true;
 }
 
