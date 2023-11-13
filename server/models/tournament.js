@@ -82,6 +82,9 @@ export default class Tournament {
   }
 
   createMat() {
+    if (!this.#tournament.mats) {
+      this.#tournament.mats = [];
+    }
     this.#tournament.mats.push({ groups: [] });
   }
 
@@ -235,11 +238,13 @@ export default class Tournament {
     await useStorage(key).setItem(this.#id, this.#tournament);
   }
 
-  replace(tournament) {
+  update(tournament) {
     this.#tournament.name = tournament.name;
     this.#tournament.org = tournament.org;
     this.#tournament.showJudgeTotals = tournament.showJudgeTotals;
-    this.#tournament.mats = tournament.mats;
+    if (tournament.mats) {
+      this.#tournament.mats = tournament.mats;
+    }
   }
 
   #assignGroupValues(group, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
