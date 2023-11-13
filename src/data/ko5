@@ -1,6 +1,7 @@
 {
   "name": "Kodomo no Kata: Set 5",
   "code": "KO5",
+  "duration": 3,
   "groups": {
     "etiquette": "Etiquette",
     "ukemi": "Ukemi (Breakfalls)",

@@ -1,6 +1,7 @@
 {
   "name": "Katame-no-kata",
   "code": "KNK",
+  "duration": 10,
   "groups": {
     "etiquette": "Etiquette",
     "osaekomi-waza": "Osaekomi Waza (Holding Techniques)",

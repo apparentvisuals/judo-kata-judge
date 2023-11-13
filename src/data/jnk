@@ -1,6 +1,7 @@
 {
   "name": "Ju-no-kata",
   "code": "JNK",
+  "duration": 9,
   "groups": {
     "etiquette": "Etiquette",
     "ikkyo": "Ikkyo (First Set)",

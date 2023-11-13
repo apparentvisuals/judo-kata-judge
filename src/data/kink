@@ -1,6 +1,7 @@
 {
-  "name": "Katame-no-kata",
-  "code": "KNK",
+  "name": "Kime-no-kata",
+  "code": "KINK",
+  "duration": 11,
   "groups": {
     "etiquette": "Etiquette",
     "idori-waza-unarmed": "Osaekomi Waza (Kneeling Unarmed Techniques)",

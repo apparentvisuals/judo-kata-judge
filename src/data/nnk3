@@ -1,6 +1,7 @@
 {
   "name": "Nage-no-kata: 3-Set",
   "code": "NNK3",
+  "duration": 5,
   "groups": {
     "etiquette": "Etiquette",
     "te-waza": "Te Waza (Hand Techniques)",

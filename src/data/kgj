@@ -1,6 +1,7 @@
 {
   "name": "Kodokan-goshin-jutsu",
   "code": "KGJ",
+  "duration": 8,
   "groups": {
     "etiquette": "Etiquette",
     "unarmed-held": "Unarmed Held Techniques",

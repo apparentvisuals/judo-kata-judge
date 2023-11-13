@@ -15,6 +15,7 @@ const knk = { moves: ["etiquette:Opening Ceremony", "etiquette:Closing Ceremony"
 const kink = { moves: ["etiquette:Opening Ceremony", "etiquette:Closing Ceremony"]};
 const jnk = { moves: ["etiquette:Opening Ceremony", "etiquette:Closing Ceremony"]};
 
+// DEPRECATE: These values can come from our Organizations JSON file. 
 export const ORG_MAP = {
   'jc': 'Judo Canada',
   'ab': 'Judo Alberta',
@@ -32,6 +33,7 @@ export const ORG_MAP = {
   'nu': 'Judo Nunavut',
 };
 
+// DEPRECATE: These values can come from our Organizations JSON file. 
 export const ORG_IMAGE_MAP = {
   'ab': '/img/judo-alberta.png',
   'bc': '/img/judo-bc.png',
@@ -48,6 +50,7 @@ export const ORG_IMAGE_MAP = {
   'nu': '/img/judo-nunavut.png',
 };
 
+// DEPRECATE: These values can come from our Organizations JSON file. 
 export const PROVINCE_MAP = {
   'ab': 'Alberta',
   'bc': 'British Columbia',
@@ -64,6 +67,7 @@ export const PROVINCE_MAP = {
   'nu': 'Nunavut',
 };
 
+// DEPRECATE: These values can come from our Judging JSON file. 
 export const LEVEL_MAP = {
   'p': 'Provincial',
   'n': 'National',
@@ -71,6 +75,7 @@ export const LEVEL_MAP = {
   'ijf': 'IJF',
 }
 
+// DEPRECATE: These values can come from our Athletes JSON file. 
 export const RANK_MAP = {
   '6k': 'White',
   '6k+': 'White-Yellow',
@@ -94,6 +99,7 @@ export const RANK_MAP = {
   '9d': 'Kudan (9th)',
 }
 
+// DEPRECATE: These values can come from our JSON files now. 
 export const KATA_MAP = {
   'nnk3': 'Nage-no-kata 3-Set',
   'nnk': 'Nage-no-kata',
@@ -167,6 +173,7 @@ function legacyMoveList(kata) {
   }
 }
 
+// DEPRECATE: These values can come from our JSON files now. 
 export function duration(kata) {
   switch (kata) {
     case 'nnk3':
@@ -204,6 +211,8 @@ export function getGroupName(group, index) {
   return `Group ${index + 1}`;
 }
 
+// NOTE: These GET helper methods can now be modified to leverage our 
+// JSON files to gather this metadata from each individual Kata file.
 export function getKataName(kata) {
   return KATA_MAP[kata] || '';
 };
