@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   if (!tournament) {
     return createError({ statusCode: 404, message: 'Tournament not found' });
   }
-  tournament.replace(body);
+  tournament.update(body);
   await tournament.save();
   return tournament.data;
 });
