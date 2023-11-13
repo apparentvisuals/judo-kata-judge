@@ -1,0 +1,29 @@
+{
+  "name": "Ju-no-kata",
+  "code": "JNK",
+  "groups": {
+    "etiquette": "Etiquette",
+    "ikkyo": "Ikkyo (First Set)",
+    "nikyo": "Nikyo (Second Set)",
+    "sankyo": "Sankyo (Third Set)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "ikkyo:Tsuki-dashi", 
+    "ikkyo:Kata-oshi", 
+    "ikkyo:Ryote-dori", 
+    "ikkyo:Kata-mawashi", 
+    "ikkyo:Ago-oshi", 
+    "nikyo:Kiri-oroshi", 
+    "nikyo:Ryokata-oshi", 
+    "nikyo:Nanami-uchi", 
+    "nikyo:Katate-dori", 
+    "nikyo:Katate-age", 
+    "sankyo:Obi-tori", 
+    "sankyo:Mune-oshi", 
+    "sankyo:Tsuki-age", 
+    "sankyo:Uchi-oroshi", 
+    "sankyo:Ryogan-tsuki", 
+    "etiquette:Closing Ceremony"
+  ]
+}

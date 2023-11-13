@@ -1,0 +1,48 @@
+{
+  "organizations": {
+    "jc": "Judo Canada",
+    "ab": "Judo Alberta",
+    "bc": "Judo BC",
+    "sk": "Judo Saskatchewan",
+    "mb": "Judo Manitoba",
+    "on": "Judo Ontario",
+    "qc": "Judo Quebec",
+    "nb": "Judo New Brunswick",
+    "ns": "Judo Nova Scotia",
+    "pe": "Judo PEI",
+    "nl": "Newfoundland and Labrador Judo Association",
+    "yt": "Judo Yukon",
+    "nt": "NWT Judo Association",
+    "nu": "Judo Nunavut"
+  },
+  "provinces": {
+    "ab": "Alberta",
+    "bc": "British Columbia",
+    "sk": "Saskatchewan",
+    "mb": "Manitoba",
+    "on": "Ontario",
+    "qc": "Quebec",
+    "nb": "New Brunswick",
+    "ns": "Nova Scotia",
+    "pe": "Prince Edward Island",
+    "nl": "Newfoundland and Labrador",
+    "yt": "Yukon",
+    "nt": "Northwest Territories",
+    "nu": "Nunavut"
+  },
+  "images": {
+    "ab": "/img/judo-alberta.png",
+    "bc": "/img/judo-bc.png",
+    "sk": "/img/judo-sask.png",
+    "mb": "/img/judo-manitoba.png",
+    "on": "/img/judo-ontario.png",
+    "qc": "/img/judo-quebec.png",
+    "nb": "/img/judo-nb.png",
+    "ns": "/img/judo-ns.png",
+    "pe": "/img/judo-pei.png",
+    "nl": "/img/judo-newfoundland.png",
+    "yt": "/img/judo-yukon.png",
+    "nt": "/img/judo-nwt.png",
+    "nu": "/img/judo-nunavut.png"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "Kodomo no Kata: Set 5",
+  "code": "KO5",
+  "groups": {
+    "etiquette": "Etiquette",
+    "ukemi": "Ukemi (Breakfalls)",
+    "tai-sabaki": "Tai Sabaki (Body Control & Movements)",
+    "ashi-waza": "Ashi Waza (Foot Techniques)",
+    "te-waza": "Te Waza (Hand Techniques)",
+    "koshi-waza": "Koshi Waza (Hip Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "ukemi:Ushiro-ukemi Stand to Feet",
+    "ukemi:Yoko-ukemi Stand to Feet", 
+    "ukemi:Mae-mawari-ukemi Knees to Flat", 
+    "tai-sabaki:Kumi-kata & Ugoki-kata", 
+    "tai-sabaki:Happo-no-kuzushi Fixed", 
+    "ashi-waza:De-ashi-harai Stand", 
+    "te-waza:Uki-otoshi Side-Roll", 
+    "koshi-waza:Uki-goshi Step-Over", 
+    "etiquette:Closing Ceremony"
+  ]
+}

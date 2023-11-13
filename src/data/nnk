@@ -1,0 +1,31 @@
+{
+  "name": "Nage-no-kata: 5-Set",
+  "code": "NNK",
+  "groups": {
+    "etiquette": "Etiquette",
+    "te-waza": "Te Waza (Hand Techniques)",
+    "koshi-waza": "Koshi Waza (Hip Techniques)",
+    "ashi-waza": "Ashi Waza (Foot Techniques)",
+    "ma-sutemi-waza": "Ma Sutemi Waza (Sacrafice Techniques)",
+    "yoko-sutemi-waza": "Yoko Sutemi Waza (Side Sacrafice Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "te-waza:Uki-otoshi", 
+    "te-waza:Seoi-nage", 
+    "te-waza:Kata-guruma", 
+    "koshi-waza:Uki-goshi", 
+    "koshi-waza:Harai-goshi", 
+    "koshi-waza:Tsurikomi-goshi", 
+    "ashi-waza:Okuri-ashi-harai", 
+    "ashi-waza:Sasae-tsurikomi-ashi", 
+    "ashi-waza:Uchi-mata", 
+    "ma-sutemi-waza:Tomoe-nage", 
+    "ma-sutemi-waza:Ura-nage", 
+    "ma-sutemi-waza:Sumi-gaeshi", 
+    "yoko-sutemi-waza:Yoko-gake", 
+    "yoko-sutemi-waza:Yoko-guruma", 
+    "yoko-sutemi-waza:Uki-waza", 
+    "etiquette:Closing Ceremony"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "Kodomo no Kata: Set 6",
+  "code": "KO6",
+  "groups": {
+    "etiquette": "Etiquette",
+    "ukemi": "Ukemi (Breakfalls)",
+    "tai-sabaki": "Tai Sabaki (Body Control & Movements)",
+    "shintai-dosa": "Shintai Dosa (Footwork)",
+    "ashi-waza": "Ashi Waza (Foot Techniques)",
+    "te-waza": "Te Waza (Hand Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "ukemi:Ushiro-ukemi Sit to Sit", 
+    "ukemi:Ushiro-ukemi Grip to Squat", 
+    "ukemi:Yoko-ukemi Squat", 
+    "ukemi:Mae-mawari-ukemi Horse to Flat", 
+    "tai-sabaki:Mae-mawari-sabaki", 
+    "tai-sabaki:Ushiro-mawari-sabaki", 
+    "shintai-dosa:Ayumi-ashi", 
+    "shintai-dosa:Tsugi-ashi Side & Circle", 
+    "ashi-waza:Hiza-guruma Knee", 
+    "te-waza:Tai-otoshi Knee", 
+    "etiquette:Closing Ceremony"
+  ]
+}

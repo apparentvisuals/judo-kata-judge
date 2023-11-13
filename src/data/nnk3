@@ -1,0 +1,23 @@
+{
+  "name": "Nage-no-kata: 3-Set",
+  "code": "NNK3",
+  "groups": {
+    "etiquette": "Etiquette",
+    "te-waza": "Te Waza (Hand Techniques)",
+    "koshi-waza": "Koshi Waza (Hip Techniques)",
+    "ashi-waza": "Ashi Waza (Foot Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony",
+    "te-waza:Uki-otoshi", 
+    "te-waza:Seoi-nage", 
+    "te-waza:Kata-guruma", 
+    "koshi-waza:Uki-goshi", 
+    "koshi-waza:Harai-goshi", 
+    "koshi-waza:Tsurikomi-goshi", 
+    "ashi-waza:Okuri-ashi-harai", 
+    "ashi-waza:Sasae-tsurikomi-ashi", 
+    "ashi-waza:Uchi-mata", 
+    "etiquette:Closing Ceremony"
+  ]
+}

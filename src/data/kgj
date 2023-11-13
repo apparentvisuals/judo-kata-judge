@@ -1,0 +1,37 @@
+{
+  "name": "Kodokan-goshin-jutsu",
+  "code": "KGJ",
+  "groups": {
+    "etiquette": "Etiquette",
+    "unarmed-held": "Unarmed Held Techniques",
+    "unarmed-distance": "Unarmed Distance Techniques",
+    "armed-dagger": "Armed Dagger Techniques",
+    "armed-stick": "Armed Stick Techniques",
+    "armed-pistol": "Armed Pistol Techniques"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "unarmed-held:Ryote-dori", 
+    "unarmed-held:Hidari-eri-dori",
+    "unarmed-held:Migi-eri-dori", 
+    "unarmed-held:Kataude-dori", 
+    "unarmed-held:Ushiro-eri-dori", 
+    "unarmed-held:Ushiro-jime", 
+    "unarmed-held:Kakae-dori", 
+    "unarmed-distance:Naname-uchi", 
+    "unarmed-distance:Ago-tsuki", 
+    "unarmed-distance:Ganmen-tsuki", 
+    "unarmed-distance:Mae-geri", 
+    "unarmed-distance:Yoko-geri", 
+    "armed-dagger:Tsukkake", 
+    "armed-dagger:Choku-tsuki", 
+    "armed-dagger:Naname-tsuki", 
+    "armed-stick:Furi-age", 
+    "armed-stick:Furi-oroshi", 
+    "armed-stick:Morote-tsuki",
+    "armed-pistol:Shomen-zuke", 
+    "armed-pistol:Koshi-gamae", 
+    "armed-pistol:Haimen-zuke", 
+    "etiquette:Closing Ceremony"
+  ]
+}

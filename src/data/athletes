@@ -1,0 +1,24 @@
+{
+  "ranks": {
+    "6k": "White",
+    "6k+": "White-Yellow",
+    "5k": "Yellow",
+    "5k+": "Yellow-Orange",
+    "4k": "Orange",
+    "4k+": "Orange-Green",
+    "3k": "Green",
+    "3k+": "Green-Blue",
+    "2k": "Blue",
+    "2k+": "Blue-Brown",
+    "1k": "Brown",
+    "1d": "Shodan (1st)",
+    "2d": "Nidan (2nd)",
+    "3d": "Sandan (3rd)",
+    "4d": "Yondan (4th)",
+    "5d": "Godan (5th)",
+    "6d": "Rokudan (6th)",
+    "7d": "Shichidan (7th)",
+    "8d": "Hachidan (8th)",
+    "9d": "Kudan (9th)"
+  }
+}

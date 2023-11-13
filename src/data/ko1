@@ -1,0 +1,26 @@
+{
+  "name": "Kodomo no Kata: Set 1",
+  "code": "KO1",
+  "groups": {
+    "etiquette": "Etiquette",
+    "ukemi": "Ukemi (Breakfalls)",
+    "ashi-waza": "Ashi Waza (Foot Techniques)",
+    "koshi-waza": "Koshi Waza (Hip Techniques)",
+    "te-waza": "Te Waza (Hand Techniques)",
+    "osaekomi-waza": "Osaekomi Waza (Holding Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "ukemi:Mae-mawari-ukemi Horse To Feet", 
+    "ashi-waza:Uchi-mata Fixed", 
+    "ashi-waza:Uchi-mata Dynamic", 
+    "koshi-waza:Harai-goshi Fixed", 
+    "koshi-waza:Harai-goshi Dynamic", 
+    "te-waza:Ko-uchi gari to Ippon-seoinage Transition", 
+    "osaekomi-waza:Ippon-seoinage to Kesa-gatame Transition", 
+    "osaekomi-waza:Ushiro-kesa-gatame Transition", 
+    "osaekomi-waza:Yoko-shiho-gatame Transition", 
+    "osaekomi-waza:Kami-shiho-gatame Transition", 
+    "etiquette:Closing Ceremony"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Kodomo no Kata: Set 3",
+  "code": "KO3",
+  "groups": {
+    "etiquette": "Etiquette",
+    "ukemi": "Ukemi (Breakfalls)",
+    "tai-sabaki": "Tai Sabaki (Body Control & Movements)",
+    "ashi-waza": "Ashi Waza (Foot Techniques)",
+    "te-waza": "Te Waza (Hand Techniques)",
+    "koshi-waza": "Koshi Waza (Hip Techniques)",
+    "osaekomi-waza": "Osaekomi Waza (Holding Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "ukemi:Mae-ukemi Knees to Feet", 
+    "ukemi:Mae-mawari-ukemi Walk To Feet",  
+    "tai-sabaki:Mae-mawari-sabaki & Ushiro-mawari-sabaki", 
+    "tai-sabaki:Tai-sabaki Kuzushi", 
+    "ashi-waza:Sasae-tsurikomi-ashi Circular", 
+    "te-waza:Ippon-seionage Lift/Step-Over", 
+    "koshi-waza:Tsuri-komi-goshi Lift/Step-Over", 
+    "osaekomi-waza:Sasae-tsurikomi-ashi to Kesa Transition", 
+    "etiquette:Closing Ceremony"
+  ]
+}

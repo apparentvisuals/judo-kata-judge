@@ -1,0 +1,35 @@
+{
+  "name": "Katame-no-kata",
+  "code": "KNK",
+  "groups": {
+    "etiquette": "Etiquette",
+    "idori-waza-unarmed": "Osaekomi Waza (Kneeling Unarmed Techniques)",
+    "idori-waza-armed": "Shime Waza (Kneeling Armed Techniques)",
+    "tachi-waza-unarmed": "Kansetsu Waza (Standing Kneeling Unarmed)",
+    "tachi-waza-armed": "Kansetsu Waza (Standing Armed Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "idori-waza-unarmed:Ryote-dori",
+    "idori-waza-unarmed:Tsukkake", 
+    "idori-waza-unarmed:Suri-age", 
+    "idori-waza-unarmed:Yoko-uchi", 
+    "idori-waza-unarmed:Ushiro-dori", 
+    "idori-waza-armed:Tsukkomi", 
+    "idori-waza-armed:Kiri-komi", 
+    "idori-waza-armed:Yoko-tsuki", 
+    "tachi-waza-unarmed:Ryote-dori",
+    "tachi-waza-unarmed:Sode-tori", 
+    "tachi-waza-unarmed:Tsukkake", 
+    "tachi-waza-unarmed:Tsuki-age", 
+    "tachi-waza-unarmed:Suri-age", 
+    "tachi-waza-unarmed:Yoko-uchi", 
+    "tachi-waza-unarmed:Ke-age",
+    "tachi-waza-unarmed:Ushiro-dori", 
+    "tachi-waza-armed:Tsukkomi", 
+    "tachi-waza-armed:Kiri-komi", 
+    "tachi-waza-armed:Nuki-gake",
+    "tachi-waza-armed:Kiri-oroshi", 
+    "etiquette:Closing Ceremony"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "levels": {
+    "l": "Local",
+    "p": "Provincial",
+    "n": "National",
+    "pjc": "PJC",
+    "ijf": "IJF"
+  }
+}

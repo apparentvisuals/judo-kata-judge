@@ -1,0 +1,25 @@
+{
+  "name": "Kodomo no Kata: Set 7",
+  "code": "KO7",
+  "groups": {
+    "etiquette": "Etiquette",
+    "ukemi": "Ukemi (Breakfalls)",
+    "tai-sabaki": "Tai Sabaki (Body Control & Movements)",
+    "shintai-dosa": "Shintai Dosa (Footwork)",
+    "te-waza": "Te Waza (Hand Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "ukemi:Ushiro-ukemi Flat", 
+    "ukemi:Ushiro-ukemi Sit to Sit", 
+    "ukemi:Yoko-ukemi Side to Flat", 
+    "ukemi:Outen-ukemi Fours to Flat", 
+    "tai-sabaki:Mae-sabaki", 
+    "tai-sabaki:Ushiro-sabaki", 
+    "shintai-dosa:Ayumi-ashi", 
+    "shintai-dosa:Tsugi-ashi Side", 
+    "te-waza:Mae-sabaki Knees Throwing", 
+    "te-waza:Ushiro-sabaki Knee Throwing", 
+    "etiquette:Closing Ceremony"
+  ]
+}

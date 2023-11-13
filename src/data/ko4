@@ -1,0 +1,26 @@
+{
+  "name": "Kodomo no Kata: Set 4",
+  "code": "KO4",
+  "groups": {
+    "etiquette": "Etiquette",
+    "ukemi": "Ukemi (Breakfalls)",
+    "tai-sabaki": "Tai Sabaki (Body Control & Movements)",
+    "kuzushi": "Kuzushi (Balance Breaking)",
+    "ashi-waza": "Ashi Waza (Foot Techniques)",
+    "te-waza": "Te Waza (Hand Techniques)",
+    "koshi-waza": "Koshi Waza (Hip Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "ukemi:Ushiro-ukemi Walking", 
+    "ukemi:Yoko-ukemi Sliding", 
+    "ukemi:Mae-mawari-ukemi Stand to Flat", 
+    "tai-sabaki:Mae-sabaki & Ushiro-sabaki", 
+    "tai-sabaki:Mae-mawari-sabaki & Ushiro-mawari-sabaki", 
+    "kuzushi:Happo-no-kuzushi Moving",
+    "ashi-waza:Hiza-guruma Stand", 
+    "te-waza:Tai-otoshi Step-Over", 
+    "koshi-waza:O-goshi Lift/Step-Over", 
+    "etiquette:Closing Ceremony"
+  ]
+}

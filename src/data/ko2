@@ -1,0 +1,24 @@
+{
+  "name": "Kodomo no Kata: Set 2",
+  "code": "KO2",
+  "groups": {
+    "etiquette": "Etiquette",
+    "ukemi": "Ukemi (Breakfalls)",
+    "ashi-waza": "Ashi Waza (Foot Techniques)",
+    "osaekomi-waza": "Osaekomi Waza (Holding Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "ukemi:Mae-ukemi Stand", 
+    "ukemi:Mae-mawari-ukemi Walk To Feet", 
+    "ashi-waza:O-uchi-gari Fixed & Dynamic", 
+    "ashi-waza:Ko-uchi-gari Fixed & Dynamic", 
+    "ashi-waza:O-soto-gari Resistance",
+    "ashi-waza:O-soto-gari Direct",
+    "ashi-waza:O-uchi to Ko-uchi Combination", 
+    "osaekomi-waza:O-soto-gari to Yoko-shiho-gatame Transition", 
+    "osaekomi-waza:Tate-shiho-gatame Transition", 
+    "osaekomi-waza:Kata-gatame Transition", 
+    "etiquette:Closing Ceremony"
+  ]
+}

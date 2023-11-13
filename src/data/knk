@@ -1,0 +1,29 @@
+{
+  "name": "Katame-no-kata",
+  "code": "KNK",
+  "groups": {
+    "etiquette": "Etiquette",
+    "osaekomi-waza": "Osaekomi Waza (Holding Techniques)",
+    "shime-waza": "Shime Waza (Strangulation Techniques)",
+    "kansetsu-waza": "Kansetsu Waza (Joint Locking Techniques)"
+  },
+  "moves": [
+    "etiquette:Opening Ceremony", 
+    "osaekomi-waza:Kesa-gatame", 
+    "osaekomi-waza:Kata-gatame", 
+    "osaekomi-waza:Kami-shiho-gatame", 
+    "osaekomi-waza:Yoko-shiho-gatame", 
+    "osaekomi-waza:Kuzure-kami-shiho-gatame", 
+    "shime-waza:Kata-juji-jime", 
+    "shime-waza:Hadaka-jime", 
+    "shime-waza:Okuri-eri-jime", 
+    "shime-waza:Kataha-jime", 
+    "shime-waza:Gyaku-juji-jime", 
+    "kansetsu-waza:Ude-garami", 
+    "kansetsu-waza:Ude-hishigi-juji-gatame",
+    "kansetsu-waza:Ude-hishigi-ude-gatame", 
+    "kansetsu-waza:Ude-hishigi-hiza-hatame", 
+    "kansetsu-waza:Ashi-garami", 
+    "etiquette:Closing Ceremony"
+  ]
+}
