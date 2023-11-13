@@ -92,8 +92,8 @@ function _queueChange() {
 
 onMounted(async () => {
   tournament.value = await $fetch(`/api/invites/${inviteCode.value}`);
-  _subscribe();
   // For automatic cycling of results
+  _subscribe();
   _queueChange();
 });
 </script>
