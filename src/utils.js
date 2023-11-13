@@ -44,7 +44,7 @@ export const PROVINCE_MAP = {
   'pe': 'Prince Edward Island',
   'nl': 'Newfoundland and Labrador',
   'yt': 'Yukon',
-  'nw': 'Northwest Territories',
+  'nt': 'Northwest Territories',
   'nu': 'Nunavut',
 };
 
