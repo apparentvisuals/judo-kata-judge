@@ -16,7 +16,7 @@
       <h1>{{ props.name }}</h1>
     </div>
     <div class="navbar-end">
-      <button class="btn btn-sm btn-error" @click.prevent="logout">
+      <button class="btn btn-sm btn-error" @click.prevent="logout" title="Logout">
         <ArrowLeftOnRectangleIcon class="w-5 h-5" />
         Logout
       </button>
