@@ -6,7 +6,7 @@
     </div>
     <div class="m-4 py-4">
       <div class="pb-4">
-        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd">
+        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" title="Create Tournament">
           <span>Create Tournament</span>
         </button>
       </div>
@@ -27,10 +27,10 @@
             <td>
               <div class="join">
                 <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(t)"
-                  :disabled="inAction">
+                  :disabled="inAction" title="Edit Tournament">
                   <PencilIcon class="w-4 h-4" />
                 </button>
-                <button class="btn btn-error btn-square btn-sm" @click.prevent="showRemove(t.id)" :disabled="inAction">
+                <button class="btn btn-error btn-square btn-sm" @click.prevent="showRemove(t.id)" :disabled="inAction" title="Delete Tournament">
                   <XMarkIcon class="w-4 h-4" />
                 </button>
               </div>

@@ -15,14 +15,14 @@
         <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
       </div>
       <div class="navbar-end join">
-        <button class="btn btn-square btn-success btn-sm join-item" @click.prevent="addMat" aria-label="add mat">
+        <button class="btn btn-square btn-success btn-sm join-item" @click.prevent="addMat" aria-label="add mat" title="Add Mat">
           <PlusIcon class="w-5 h-5" />
         </button>
         <button class="btn btn-square btn-success btn-sm join-item" @click.prevent="createInvite"
-          aria-label="create invite">
+          aria-label="create invite" title="Create Invite">
           <EnvelopeIcon class="w-5 h-5" />
         </button>
-        <button class="btn btn-success btn-sm join-item" @click.prevent="save">
+        <button class="btn btn-success btn-sm join-item" @click.prevent="save" title="Save">
           Save
         </button>
       </div>
@@ -33,11 +33,11 @@
           <h2 class="text-lg font-semibold">Mat {{ matIndex + 1 }}</h2>
           <div class="join">
             <button class="btn btn-square btn-sm btn-primary join-item" @click.prevent="showAddGroup(matIndex)"
-              aria-label="add group">
+              aria-label="add group" title="Add Group">
               <PlusIcon class="w-6 h-6" />
             </button>
             <button class="btn btn-square btn-sm btn-error join-item" @click.prevent="deleteMat(matIndex)"
-              aria-label="delete mat">
+              aria-label="delete mat" title="Delete Mat">
               <XMarkIcon class="w-6 h-6" />
             </button>
           </div>
@@ -55,20 +55,20 @@
                 </div>
                 <div class="join">
                   <button class="btn btn-square btn-sm btn-success join-item"
-                    @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match">
+                    @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match" title="Add Match">
                     <PlusIcon class="w-5 h-5" />
                   </button>
                   <button class="btn btn-square btn-sm btn-success join-item"
                     :disabled="!canRandomize(matIndex, groupIndex)" @click.prevent="randomizeGroup(matIndex, groupIndex)"
-                    aria-label="randomize matches in group">
+                    aria-label="randomize matches in group" title="Randomize Matches">
                     <ArrowPathIcon class="w-5 h-5" />
                   </button>
                   <button class="btn btn-primary btn-square btn-sm join-item"
-                    @click.prvent="showUpdateGroup(matIndex, groupIndex, group)">
+                    @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" title="Edit Group">
                     <PencilIcon class="w-4 h-4" />
                   </button>
                   <button class="btn btn-square btn-sm btn-error join-item"
-                    @click.prevent="deleteGroup(matIndex, groupIndex)" aria-label="delete group">
+                    @click.prevent="deleteGroup(matIndex, groupIndex)" aria-label="delete group" title="Delete Group">
                     <XMarkIcon class="w-5 h-5" />
                   </button>
                 </div>
@@ -98,10 +98,10 @@
                           </NuxtLink>
                           <button class="btn btn-primary btn-square btn-sm join-item"
                             @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
-                            :disabled="match.completed || inAction">
+                            :disabled="match.completed || inAction" title="Edit Match">
                             <PencilIcon class="w-4 h-4" />
                           </button>
-                          <button class="btn btn-square btn-sm btn-error join-item" alt="delete match">
+                          <button class="btn btn-square btn-sm btn-error join-item" alt="delete match" title="Delete Match">
                             <XMarkIcon class="w-5 h-5" @click.prevent="deleteMatch(matIndex, groupIndex, index)" />
                           </button>
                         </div>
