@@ -94,15 +94,131 @@ export const KATA_MAP = {
   'ko7': 'Kodomo-no-kata 7',
 }
 
-const NNK3_MOVE_LIST = ['Opening Ceremony', 'Uki-otoshi', 'Seoi-nage', 'Kata-guruma', 'Uki-goshi', 'Harai-goshi', 'Tsurikomi-goshi', 'Okuri-ashi-harai', 'Sasae-tsurikomi-ashi', 'Uchi-mata', 'Closing Ceremony'];
-const NNK_MOVE_LIST = ['Opening Ceremony', 'Uki-otoshi', 'Seoi-nage', 'Kata-guruma', 'Uki-goshi', 'Harai-goshi', 'Tsurikomi-goshi', 'Okuri-ashi-harai', 'Sasae-tsurikomi-ashi', 'Uchi-mata', 'Tomoe-nage', 'Ura-nage', 'Sumi-gaeshi', 'Yoko-gake', 'Yoko-guruma', 'Uki-waza', 'Closing Ceremony'];
-const KNK_MOVE_LIST = ['Opening Ceremony', 'Kesa-gatame', 'Kata-gatame', 'Kami-shiho-gatame', 'Yoko-shiho-gatame', 'Kuzure-kami-shiho-gatame', 'Kata-juji-jime', 'Hadaka-jime', 'Okuri-eri-jime', 'Kataha-jime', 'Gyaku-juji-jime', 'Ude-garami', 'Ude-hishigi-juji-gatame', 'Ude-hishigi-ude-gatame', 'Ude-hishigi-hiza-hatame', 'Ashi-garami', 'Closing Ceremony'];
-const JNK_MOVE_LIST = ['Opening Ceremony', 'Tsuki-dashi', 'Kata-oshi', 'Ryote-dori', 'Kata-mawashi', 'Ago-oshi', 'Kiri-oroshi', 'Ryokata-oshi', 'Nanami-uchi', 'Katate-dori', 'Katate-age', 'Obi-tori', 'Mune-oshi', 'Tsuki-age', 'Uchi-oroshi', 'Ryogan-tsuki', 'Closing Ceremony'];
-const KGJ_MOVE_LIST = ['Opening Ceremony', 'Ryote-dori', 'Hidari-eri-dori', 'Migi-eri-dori', 'Kataude-dori', 'Ushiro-eri-dori', 'Ushiro-jime', 'Kakae-dori', 'Naname-uchi', 'Ago-tsuki', 'Ganmen-tsuki', 'Mae-geri', 'Yoko-geri', 'Tsukkake', 'Choku-tsuki', 'Naname-tsuki', 'Furi-age', 'Furi-oroshi', 'Morote-tsuki', 'Shomen-zuke', 'Koshi-gamae', 'Haimen-zuke', 'Closing Ceremony'];
-const KINK_MOVE_LIST = ['Opening Ceremony', 'Ryote-dori', 'Tsukkake', 'Suri-age', ' Yoko-uchi', 'Ushiro-dori', 'Tsukkomi', 'Kiri-komi', 'Yoko-tsuki', 'Ryote-dori', 'Sode-tori', 'Tsukkake', 'Tsuki-age', 'Suri-age', ' Yoko-uchi', 'Ke-age', 'Ushiro-dori', 'Tsukkomi', 'Kiri-komi', 'Nuki-gake', 'Kiri-oroshi', 'Closing Ceremony'];
+const NNK3_MOVE_LIST = [
+  'ceremony:Opening Ceremony',
+  'te-waza:Uki-otoshi', 
+  'te-waza:Seoi-nage', 
+  'te-waza:Kata-guruma', 
+  'koshi-waza:Uki-goshi', 
+  'koshi-waza:Harai-goshi', 
+  'koshi-waza:Tsurikomi-goshi', 
+  'ashi-waza:Okuri-ashi-harai', 
+  'ashi-waza:Sasae-tsurikomi-ashi', 
+  'ashi-waza:Uchi-mata', 
+  'ceremony:Closing Ceremony'
+];
 
-// KODOMO NO KATA lists
-// We are using grouping in the following format: group-name:move-name
+const NNK_MOVE_LIST = [
+  'ceremony:Opening Ceremony', 
+  'te-waza:Uki-otoshi', 
+  'te-waza:Seoi-nage', 
+  'te-waza:Kata-guruma', 
+  'koshi-waza:Uki-goshi', 
+  'koshi-waza:Harai-goshi', 
+  'koshi-waza:Tsurikomi-goshi', 
+  'ashi-waza:Okuri-ashi-harai', 
+  'ashi-waza:Sasae-tsurikomi-ashi', 
+  'ashi-waza:Uchi-mata', 
+  'ma-sutemi-waza:Tomoe-nage', 
+  'ma-sutemi-waza:Ura-nage', 
+  'ma-sutemi-waza:Sumi-gaeshi', 
+  'yoko-sutemi-waza:Yoko-gake', 
+  'yoko-sutemi-waza:Yoko-guruma', 
+  'yoko-sutemi-waza:Uki-waza', 
+  'ceremony:Closing Ceremony'
+];
+
+const KNK_MOVE_LIST = [
+  'ceremony:Opening Ceremony', 
+  'osaekomi-waza:Kesa-gatame', 
+  'osaekomi-waza:Kata-gatame', 
+  'osaekomi-waza:Kami-shiho-gatame', 
+  'osaekomi-waza:Yoko-shiho-gatame', 
+  'osaekomi-waza:Kuzure-kami-shiho-gatame', 
+  'shime-waza:Kata-juji-jime', 
+  'shime-waza:Hadaka-jime', 
+  'shime-waza:Okuri-eri-jime', 
+  'shime-waza:Kataha-jime', 
+  'shime-waza:Gyaku-juji-jime', 
+  'kansetsu-waza:Ude-garami', 
+  'kansetsu-waza:Ude-hishigi-juji-gatame',
+  'kansetsu-waza:Ude-hishigi-ude-gatame', 
+  'kansetsu-waza:Ude-hishigi-hiza-hatame', 
+  'kansetsu-waza:Ashi-garami', 
+  'ceremony:Closing Ceremony'
+];
+
+const JNK_MOVE_LIST = [
+  'ceremony:Opening Ceremony', 
+  'ikkyo:Tsuki-dashi', 
+  'ikkyo:Kata-oshi', 
+  'ikkyo:Ryote-dori', 
+  'ikkyo:Kata-mawashi', 
+  'ikkyo:Ago-oshi', 
+  'nikyo:Kiri-oroshi', 
+  'nikyo:Ryokata-oshi', 
+  'nikyo:Nanami-uchi', 
+  'nikyo:Katate-dori', 
+  'nikyo:Katate-age', 
+  'sankyo:Obi-tori', 
+  'sankyo:Mune-oshi', 
+  'sankyo:Tsuki-age', 
+  'sankyo:Uchi-oroshi', 
+  'sankyo:Ryogan-tsuki', 
+  'ceremony:Closing Ceremony'
+];
+
+const KGJ_MOVE_LIST = [
+  'ceremony:Opening Ceremony',
+  'unarmed-held:Ryote-dori', 
+  'unarmed-held:Hidari-eri-dori',
+  'unarmed-held:Migi-eri-dori', 
+  'unarmed-held:Kataude-dori', 
+  'unarmed-held:Ushiro-eri-dori', 
+  'unarmed-held:Ushiro-jime', 
+  'unarmed-held:Kakae-dori', 
+  'unarmed-distance:Naname-uchi', 
+  'unarmed-distance:Ago-tsuki', 
+  'unarmed-distance:Ganmen-tsuki', 
+  'unarmed-distance:Mae-geri', 
+  'unarmed-distance:Yoko-geri', 
+  'armed-dagger:Tsukkake', 
+  'armed-dagger:Choku-tsuki', 
+  'armed-dagger:Naname-tsuki', 
+  'armed-stick:Furi-age', 
+  'armed-stick:Furi-oroshi', 
+  'armed-stick:Morote-tsuki',
+  'armed-pistol:Shomen-zuke', 
+  'armed-pistol:Koshi-gamae', 
+  'armed-pistol:Haimen-zuke', 
+  'ceremony:Closing Ceremony'
+];
+
+const KINK_MOVE_LIST = [
+  'ceremony:Opening Ceremony', 
+  'idori-waza-unarmed:Ryote-dori',
+  'idori-waza-unarmed:Tsukkake', 
+  'idori-waza-unarmed:Suri-age', 
+  'idori-waza-unarmed:Yoko-uchi', 
+  'idori-waza-unarmed:Ushiro-dori', 
+  'idori-waza-armed:Tsukkomi', 
+  'idori-waza-armed:Kiri-komi', 
+  'idori-waza-armed:Yoko-tsuki', 
+  'tachi-waza-unarmed:Ryote-dori',
+  'tachi-waza-unarmed:Sode-tori', 
+  'tachi-waza-unarmed:Tsukkake', 
+  'tachi-waza-unarmed:Tsuki-age', 
+  'tachi-waza-unarmed:Suri-age', 
+  'tachi-waza-unarmed:Yoko-uchi', 
+  'tachi-waza-unarmed:Ke-age',
+  'tachi-waza-unarmed:Ushiro-dori', 
+  'tachi-waza-armed:Tsukkomi', 
+  'tachi-waza-armed:Kiri-komi', 
+  'tachi-waza-armed:Nuki-gake',
+  'tachi-waza-armed:Kiri-oroshi', 
+  'ceremony:Closing Ceremony'
+];
+
 const KO1_MOVE_LIST = [
   'ceremony:Opening Ceremony', 
   'ukemi:Mae-mawari-ukemi Horse To Feet', 
