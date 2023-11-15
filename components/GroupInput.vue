@@ -34,6 +34,24 @@
     <input id="group-startTime" type="text" class="input input-bordered join-item" placeholder="09:00"
       v-model="group.startTime" />
   </div>
+  <div class="form-control">
+    <label class="label" for="disableDivideByHalf">
+      <span class="label-text">Don't divide total by half on forgotten techniques?</span>
+      <input id="disableDivideByHalf" type="checkbox" v-model="group.disableDivideByHalf" />
+    </label>
+  </div>
+  <div class="form-control">
+    <label class="label" for="disableForgotten">
+      <span class="label-text">Don't allow forgotten techniques?</span>
+      <input id="disableForgotten" type="checkbox" v-model="group.disableForgotten" />
+    </label>
+  </div>
+  <div class="form-control">
+    <label class="label" for="disableMajor">
+      <span class="label-text">Don't allow major/big mistakes?</span>
+      <input id="disableMajor" type="checkbox" v-model="group.disableMajor" />
+    </label>
+  </div>
 </template>
 
 <script setup>

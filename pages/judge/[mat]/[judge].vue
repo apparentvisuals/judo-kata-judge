@@ -49,8 +49,8 @@
             <th class="score">S(1)</th>
             <th class="score">S(1)</th>
             <th class="score">M(3)</th>
-            <th class="score">B(5)</th>
-            <th class="score">F(0)</th>
+            <th class="score" v-show="!match.disableMajor">B(5)</th>
+            <th class="score" v-show="!match.disableForgotten">F(0)</th>
             <th class="score">C</th>
             <th class="w-16 text-center">Score</th>
           </tr>
@@ -59,7 +59,7 @@
           <tr v-for="(score, index) in scores.points" :class="techniqueColour(score)">
             <td>{{ moves[index] }}</td>
             <td v-for="(deduction, dIndex) in score.deductions || Array(6).fill(0)" class="score"
-              @click.prevent="toggleScore(score, dIndex)">
+              @click.prevent="toggleScore(score, dIndex)" v-show="!disabledScore(dIndex)">
               <div class="h-6 px-1">
                 <CheckIcon class="h-6 w-6" v-if="deduction === '1'" />
                 <PlusIcon class="h-6 w-6" v-if="dIndex === 5 && deduction === '+'" />
@@ -69,7 +69,7 @@
             <td class="text-center">{{ score.value }}</td>
           </tr>
           <tr>
-            <td colspan="7">Total</td>
+            <td :colspan="totalSpan">Total</td>
             <td class="text-center">{{ total }}</td>
           </tr>
         </tbody>
@@ -85,8 +85,7 @@
 import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 import { CheckIcon, PlusIcon, MinusIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
-import { calculateMoveScore } from '~/server/utils';
-import { getKataName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
+import { calculateHasMajor, calculateMoveScore, getKataName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
@@ -137,7 +136,7 @@ const status = computed(() => {
   return '';
 });
 const moves = computed(() => moveList(match.value.kata));
-const hasMajor = computed(() => scores.value.points.find((score) => score.deductions && score.deductions[4] === '1'));
+const hasMajor = computed(() => calculateHasMajor(scores.value.points));
 const total = computed(() => {
   const total = scores.value.points.reduce((acc, score) => {
     if (score.value != null) {
@@ -146,11 +145,25 @@ const total = computed(() => {
       return acc += 10;
     }
   }, 0);
-  if (hasMajor.value) {
+  if (hasMajor.value && !match.value.disableDivideByHalf) {
     return total / 2;
   }
   return total;
 });
+const totalSpan = computed(() => {
+  let span = 7;
+  if (match.value.disableMajor) {
+    span -= 1;
+  }
+  if (match.value.disableForgotten) {
+    span -= 1;
+  }
+  return span;
+});
+
+function disabledScore(index) {
+  return (index === 3 && match.disableMajor) || (index === 4 && match.disableForgotten);
+}
 
 async function submitCode() {
   try {
