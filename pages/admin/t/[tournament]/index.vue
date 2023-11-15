@@ -37,7 +37,7 @@
               aria-label="add group" title="Add Group">
               <PlusIcon class="w-6 h-6" />
             </button>
-            <button class="btn btn-square btn-sm btn-error join-item" @click.prevent="deleteMat(matIndex)"
+            <button class="btn btn-square btn-sm btn-error join-item" @click.prevent="showDeleteMat(matIndex)"
               aria-label="delete mat" title="Delete Mat">
               <XMarkIcon class="w-6 h-6" />
             </button>
@@ -69,7 +69,7 @@
                     <PencilIcon class="w-4 h-4" />
                   </button>
                   <button class="btn btn-square btn-sm btn-error join-item"
-                    @click.prevent="deleteGroup(matIndex, groupIndex)" aria-label="delete group" title="Delete Group">
+                    @click.prevent="showDeleteGroup(matIndex, groupIndex)" aria-label="delete group" title="Delete Group">
                     <XMarkIcon class="w-5 h-5" />
                   </button>
                 </div>
@@ -104,7 +104,7 @@
                           </button>
                           <button class="btn btn-square btn-sm btn-error join-item" alt="delete match"
                             title="Delete Match">
-                            <XMarkIcon class="w-5 h-5" @click.prevent="deleteMatch(matIndex, groupIndex, index)" />
+                            <XMarkIcon class="w-5 h-5" @click.prevent="showDeleteMatch(matIndex, groupIndex, index)" />
                           </button>
                         </div>
                       </td>
@@ -117,17 +117,26 @@
         </draggable>
       </div>
     </div>
+    <Prompt name="delete_mat_modal" @submit="deleteMat" text="Yes">
+      <span>Delete this mat?</span>
+    </Prompt>
     <Prompt name="add_group_modal" @submit="addGroup" :disabled="inAction" text="Add">
       <GroupInput :group="newGroup" />
     </Prompt>
     <Prompt name="edit_group_modal" @submit="updateGroup" :disabled="inAction" text="update">
       <GroupInput :group="groupToUpdate" />
     </Prompt>
+    <Prompt name="delete_group_modal" @submit="deleteGroup" text="Yes">
+      <span>Delete this group?</span>
+    </Prompt>
     <Prompt name="add_match_modal" @submit="addMatch" :disabled="inAction" text="Add">
       <MatchInput :match="newMatch" :athletes="athletes" />
     </Prompt>
     <Prompt name="edit_match_modal" @submit="updateMatch" :disabled="inAction" text="Update">
       <MatchInput :match="matchToUpdate" :athletes="athletes" />
+    </Prompt>
+    <Prompt name="delete_match_modal" @submit="deleteMatch" text="Yes">
+      <span>Delete this match?</span>
     </Prompt>
     <ClientOnly>
       <Prompt v-if="inviteLink" name="view_invite_modal" text="Close">
@@ -161,9 +170,9 @@ const tournament = ref({});
 const athletes = ref([]);
 const newGroup = ref(clone(DEFAULT_GROUP));
 const newMatch = ref(clone(DEFAULT_MATCH));
-const mat = ref();
-const group = ref();
-const match = ref();
+const matToEdit = ref();
+const groupToEdit = ref();
+const matchToEdit = ref();
 const groupToUpdate = ref(clone(DEFAULT_GROUP));
 const matchToUpdate = ref(clone(DEFAULT_MATCH));
 const invite = computed(() => {
@@ -196,7 +205,13 @@ async function createInvite() {
   view_invite_modal.showModal();
 }
 
-async function deleteMat(mat) {
+async function showDeleteMat(matIndex) {
+  matToEdit.value = matIndex;
+  delete_mat_modal.showModal();
+}
+
+async function deleteMat() {
+  const mat = matToEdit.value;
   const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}`, { method: 'DELETE', headers: headers.value });
   tournament.value = response;
 }
@@ -207,7 +222,7 @@ async function save() {
 }
 
 async function showAddGroup(matIndex) {
-  mat.value = matIndex;
+  matToEdit.value = matIndex;
   add_group_modal.showModal();
 }
 
@@ -216,6 +231,34 @@ async function addGroup() {
   const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat.value}/g`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
   newGroup.value.name = '';
+}
+
+async function showUpdateGroup(matIndex, groupIndex, groupValue) {
+  matToEdit.value = matIndex;
+  groupToEdit.value = groupIndex;
+  groupToUpdate.value = clone(groupValue);
+  edit_group_modal.showModal();
+}
+
+async function updateGroup() {
+  const mat = matToEdit.value;
+  const group = groupToEdit.value;
+  const body = omit(groupToUpdate.value, "matches");
+  const result = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}`, { method: 'POST', body, headers: headers.value });
+  tournament.value = result;
+}
+
+async function showDeleteGroup(matIndex, groupIndex) {
+  matToEdit.value = matIndex;
+  groupToEdit.value = groupIndex;
+  delete_group_modal.showModal();
+}
+
+async function deleteGroup() {
+  const mat = matToEdit.value;
+  const group = groupToEdit.value;
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}`, { method: 'DELETE', headers: headers.value });
+  tournament.value = response;
 }
 
 function canRandomize(matIndex, groupIndex) {
@@ -228,42 +271,26 @@ function randomizeGroup(matIndex, groupIndex) {
   shuffle(matches);
 }
 
-async function showUpdateGroup(matIndex, groupIndex, groupValue) {
-  mat.value = matIndex;
-  group.value = groupIndex;
-  groupToUpdate.value = clone(groupValue);
-  edit_group_modal.showModal();
-}
-
-async function updateGroup() {
-  const body = omit(groupToUpdate.value, "matches");
-  const result = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat.value}/g/${group.value}`, { method: 'POST', body, headers: headers.value });
-  tournament.value = result;
-}
-
-async function deleteGroup(mat, group) {
-  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}`, { method: 'DELETE', headers: headers.value });
-  tournament.value = response;
-}
-
-async function showAddMatch(selectedMat, selectedGroup) {
-  mat.value = selectedMat;
-  group.value = selectedGroup;
+async function showAddMatch(matIndex, groupIndex) {
+  matToEdit.value = matIndex;
+  groupToEdit.value = groupIndex;
   add_match_modal.showModal();
 }
 
 async function addMatch() {
+  const mat = matToEdit.value;
+  const group = groupToEdit.value;
   const body = newMatch.value;
-  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat.value}/g/${group.value}/match`, { method: 'POST', body, headers: headers.value });
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}/match`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
   newMatch.value.tori = '';
   newMatch.value.uke = '';
 }
 
 async function showUpdateMatch(selectedMat, selectedGroup, selectedMatch, matchValue) {
-  mat.value = selectedMat;
-  group.value = selectedGroup;
-  match.value = selectedMatch;
+  matToEdit.value = selectedMat;
+  groupToEdit.value = selectedGroup;
+  matchToEdit.value = selectedMatch;
   matchToUpdate.value.tori = matchValue.tori;
   matchToUpdate.value.uke = matchValue.uke;
   matchToUpdate.value.toriId = matchValue.toriId;
@@ -272,13 +299,26 @@ async function showUpdateMatch(selectedMat, selectedGroup, selectedMatch, matchV
 }
 
 async function updateMatch() {
+  const mat = matToEdit.value;
+  const group = groupToEdit.value;
+  const match = matchToEdit.value;
   const body = pick(matchToUpdate.value, ['uke', 'ukeId', 'tori', 'toriId']);
-  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat.value}/g/${group.value}/match/${match.value}`, { method: 'POST', body, headers: headers.value });
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}/match/${match}`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
 }
 
-async function deleteMatch(mat, group, matchId) {
-  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}/match/${matchId}`, { method: 'DELETE', headers: headers.value });
+async function showDeleteMatch(selectedMat, selectedGroup, selectedMatch) {
+  matToEdit.value = selectedMat;
+  groupToEdit.value = selectedGroup;
+  matchToEdit.value = selectedMatch;
+  delete_match_modal.showModal();
+}
+
+async function deleteMatch() {
+  const mat = matToEdit.value;
+  const group = groupToEdit.value;
+  const match = matchToEdit.value;
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}/match/${match}`, { method: 'DELETE', headers: headers.value });
   tournament.value = response;
 }
 

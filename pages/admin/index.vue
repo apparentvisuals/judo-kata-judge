@@ -30,7 +30,8 @@
                   :disabled="inAction" title="Edit Tournament">
                   <PencilIcon class="w-4 h-4" />
                 </button>
-                <button class="btn btn-error btn-square btn-sm" @click.prevent="showRemove(t.id)" :disabled="inAction" title="Delete Tournament">
+                <button class="btn btn-error btn-square btn-sm" @click.prevent="showRemove(t.id)" :disabled="inAction"
+                  title="Delete Tournament">
                   <XMarkIcon class="w-4 h-4" />
                 </button>
               </div>
@@ -60,12 +61,12 @@ const DEFAULT = { name: '', showJudgeTotals: true };
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 
-const error = useState('error', () => '');
-const tournaments = useState('tournaments', () => ({}));
-const inAction = useState('in-action', () => false);
-const newTournament = useState('new-tournament', () => Object.assign(DEFAULT));
-const tournamentToDelete = useState('tournament-to-delete', () => undefined);
-const tournamentToUpdate = useState('tournament-to-update', () => Object.assign(DEFAULT));
+const error = ref('');
+const tournaments = ref({});
+const inAction = ref(false);
+const newTournament = ref(Object.assign(DEFAULT));
+const tournamentToDelete = ref();
+const tournamentToUpdate = ref(Object.assign(DEFAULT));
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
