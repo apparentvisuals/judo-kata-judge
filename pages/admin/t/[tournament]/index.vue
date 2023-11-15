@@ -15,7 +15,8 @@
         <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
       </div>
       <div class="navbar-end join">
-        <button class="btn btn-square btn-success btn-sm join-item" @click.prevent="addMat" aria-label="add mat" title="Add Mat">
+        <button class="btn btn-square btn-success btn-sm join-item" @click.prevent="addMat" aria-label="add mat"
+          title="Add Mat">
           <PlusIcon class="w-5 h-5" />
         </button>
         <button class="btn btn-square btn-success btn-sm join-item" @click.prevent="createInvite"
@@ -101,7 +102,8 @@
                             :disabled="match.completed || inAction" title="Edit Match">
                             <PencilIcon class="w-4 h-4" />
                           </button>
-                          <button class="btn btn-square btn-sm btn-error join-item" alt="delete match" title="Delete Match">
+                          <button class="btn btn-square btn-sm btn-error join-item" alt="delete match"
+                            title="Delete Match">
                             <XMarkIcon class="w-5 h-5" @click.prevent="deleteMatch(matIndex, groupIndex, index)" />
                           </button>
                         </div>
@@ -139,7 +141,7 @@
 </template>
 
 <script setup>
-import { clone, pick } from 'lodash-es';
+import { clone, omit, pick } from 'lodash-es';
 import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon, ArrowPathIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
 import { useQRCode } from '@vueuse/integrations/useQRCode'
 import { getGroupName, handleServerError, shuffle } from '~/src/utils';
@@ -234,7 +236,7 @@ async function showUpdateGroup(matIndex, groupIndex, groupValue) {
 }
 
 async function updateGroup() {
-  const body = pick(groupToUpdate.value, ["name", "kata", "numberOfJudges", "startTime"]);
+  const body = omit(groupToUpdate.value, "matches");
   const result = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat.value}/g/${group.value}`, { method: 'POST', body, headers: headers.value });
   tournament.value = result;
 }

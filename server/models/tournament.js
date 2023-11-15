@@ -151,7 +151,16 @@ export default class Tournament {
     for (const [groupIndex, group] of mat.groups.entries()) {
       for (const [index, match] of group.matches.entries()) {
         if (!match.completed) {
-          const combinedMatch = { kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores || Array(group.numberOfJudges).fill({}) };
+          const combinedMatch = {
+            kata: group.kata,
+            numberOfJudges: group.numberOfJudges,
+            disableDivideByHalf: group.disableDivideByHalf,
+            disableForgotten: group.disableForgotten,
+            disableMajor: group.disableMajor,
+            uke: match.uke,
+            tori: match.tori,
+            scores: match.scores || Array(group.numberOfJudges).fill({})
+          };
           return { match: combinedMatch, index, groupIndex };
         }
       }
@@ -270,8 +279,4 @@ export default class Tournament {
       group.disableMajor = disableMajor;
     }
   }
-}
-
-function _defaultScore() {
-  return { value: 10, deductions: ':::::' };
 }

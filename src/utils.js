@@ -448,3 +448,38 @@ export function shuffle(array) {
 
   return array;
 }
+
+export function calculateHasMajor(scores) {
+  let hasMajor = scores.some((score) => {
+    if (score.deductions) {
+      const deductions = typeof score.deductions === 'string' ? score.deductions.split(':') : score.deductions;
+      return deductions[4] === '1';
+    }
+  });
+  return hasMajor;
+}
+
+export function calculateMoveScore(deductions) {
+  let total = 10;
+  if (deductions[0] === '1') {
+    total -= 1;
+  }
+  if (deductions[1] === '1') {
+    total -= 1;
+  }
+  if (deductions[2] === '1') {
+    total -= 3;
+  }
+  if (deductions[3] === '1') {
+    total -= 5;
+  }
+  if (deductions[4] === '1') {
+    total -= 10;
+  }
+  if (deductions[5] === '+') {
+    total += 0.5;
+  } else if (deductions[5] === '-') {
+    total -= 0.5;
+  }
+  return Math.min(Math.max(0, total), 10);
+}

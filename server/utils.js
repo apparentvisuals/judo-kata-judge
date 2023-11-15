@@ -1,6 +1,6 @@
 import { customAlphabet } from 'nanoid';
-import { pick } from 'lodash-es';
-import { moveList } from '~/src/utils';
+import { omit } from 'lodash-es';
+import { moveList, calculateHasMajor, calculateMoveScore } from '~/src/utils';
 
 export const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 
@@ -39,7 +39,7 @@ export function createUpdateMessage(tournament, mat) {
     const scores = match.scores;
     const completed = scores.every((judgeScore) => judgeScore.name);
     const judgeState = scores.map((judgeScore) => !!judgeScore.name);
-    update.match = pick(match, ['kata', 'tori', 'uke', 'numberOfJudges']);
+    update.match = omit(match, 'scores');
     update.index = index;
     update.groupIndex = groupIndex;
     update.state = judgeState;
@@ -92,39 +92,6 @@ export function numberOfTechniques(kata) {
   return moveList(kata).length;
 }
 
-export function calculateHasMajor(scores) {
-  let hasMajor = scores.some((score) => {
-    const deductions = score.deductions.split(':');
-    return deductions[4] === '1';
-  });
-  return hasMajor;
-}
-
-export function calculateMoveScore(deductions) {
-  let total = 10;
-  if (deductions[0] === '1') {
-    total -= 1;
-  }
-  if (deductions[1] === '1') {
-    total -= 1;
-  }
-  if (deductions[2] === '1') {
-    total -= 3;
-  }
-  if (deductions[3] === '1') {
-    total -= 5;
-  }
-  if (deductions[4] === '1') {
-    total -= 10;
-  }
-  if (deductions[5] === '+') {
-    total += 0.5;
-  } else if (deductions[5] === '-') {
-    total -= 0.5;
-  }
-  return Math.min(Math.max(0, total), 10);
-}
-
 export function createReport(group, match) {
   const kata = group.kata;
   const numberOfJudges = (match.scores && match.scores.length) || group.numberOfJudges;
@@ -143,7 +110,8 @@ export function createReport(group, match) {
       for (let jj = 0; jj < techniquesCount; jj++) {
         const deductions = judgeScores.scores[jj].deductions.split(':');
         let value = calculateMoveScore(deductions);
-        report[jj].values[ii] = hasMajor ? value / 2 : value;
+        value = hasMajor && !group.disableDivideByHalf ? value / 2 : value;
+        report[jj].values[ii] = value;
         total += value;
       }
       summary.values[ii] = total;
