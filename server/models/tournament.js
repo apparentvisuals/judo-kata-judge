@@ -257,7 +257,7 @@ export default class Tournament {
   }
 
   #assignGroupValues(group, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
-    if (name) {
+    if (name != null) {
       group.name = name;
     }
     if (kata) {
@@ -266,7 +266,7 @@ export default class Tournament {
     if (numberOfJudges) {
       group.numberOfJudges = parseInt(numberOfJudges);
     }
-    if (startTime) {
+    if (startTime != null) {
       group.startTime = startTime;
     }
     if (disableDivideByHalf != null) {
