@@ -14,107 +14,114 @@
       <div class="navbar-center text-primary-content">
         <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
       </div>
-      <div class="navbar-end join">
-        <button class="btn btn-square btn-success btn-sm join-item" @click.prevent="addMat" aria-label="add mat"
-          title="Add Mat">
+      <div class="navbar-end">
+      </div>
+    </div>
+    <div class="m-4">
+      <div class="pb-4 flex flex-row gap-2">
+        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="addMat" title="Create Tournament">
           <PlusIcon class="w-5 h-5" />
+          <span>Add Mat</span>
         </button>
-        <button class="btn btn-square btn-success btn-sm join-item" @click.prevent="createInvite"
-          aria-label="create invite" title="Create Invite">
+        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="createInvite" title="Create Invite">
           <EnvelopeIcon class="w-5 h-5" />
+          <span>View Invite Link</span>
         </button>
-        <button class="btn btn-success btn-sm join-item" @click.prevent="save" title="Save">
+        <div class="flex-1"></div>
+        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="save" title="Save">
           Save
         </button>
       </div>
-    </div>
-    <div class="p-2 flex flex-col gap-2">
-      <div v-for="(mat, matIndex) in tournament.mats" class="bg-base-100 border">
-        <div class="flex justify-between mb-2 p-2">
-          <h2 class="text-lg font-semibold">Mat {{ matIndex + 1 }}</h2>
-          <div class="join">
-            <button class="btn btn-square btn-sm btn-primary join-item" @click.prevent="showAddGroup(matIndex)"
-              aria-label="add group" title="Add Group">
-              <PlusIcon class="w-6 h-6" />
-            </button>
-            <button class="btn btn-square btn-sm btn-error join-item" @click.prevent="showDeleteMat(matIndex)"
-              aria-label="delete mat" title="Delete Mat">
-              <XMarkIcon class="w-6 h-6" />
-            </button>
+      <div class="flex flex-col gap-4">
+        <div v-for="(mat, matIndex) in tournament.mats" class="bg-base-100 border">
+          <div class="flex justify-between mb-2 p-2">
+            <h2 class="text-lg font-semibold">Mat {{ matIndex + 1 }}</h2>
+            <div class="join">
+              <button class="btn btn-square btn-sm btn-primary join-item" @click.prevent="showAddGroup(matIndex)"
+                aria-label="add group" title="Add Group">
+                <PlusIcon class="w-6 h-6" />
+              </button>
+              <button class="btn btn-square btn-sm btn-error join-item" @click.prevent="showDeleteMat(matIndex)"
+                aria-label="delete mat" title="Delete Mat">
+                <XMarkIcon class="w-6 h-6" />
+              </button>
+            </div>
           </div>
-        </div>
-        <draggable v-model="mat.groups" tag="div" group="groups" item-key="name" class="flex flex-col gap-2 p-2">
-          <template #item="{ element: group, index: groupIndex }">
-            <div class="bg-base-100 p-2 border">
-              <div class="flex justify-between mb-2">
-                <div>
-                  <span class="text-lg font-semibold">{{ getGroupName(group, groupIndex) }}</span>
-                  <div class="flex gap-2">
-                    <div class="badge badge-info">Judges: {{ group.numberOfJudges }}</div>
-                    <div v-if="group.startTime" class="badge badge-info">Start Time: {{ group.startTime }}</div>
+          <draggable v-model="mat.groups" tag="div" group="groups" item-key="name" class="flex flex-col gap-2 p-2">
+            <template #item="{ element: group, index: groupIndex }">
+              <div class="bg-base-100 p-2 border">
+                <div class="flex justify-between mb-2">
+                  <div>
+                    <span class="text-lg font-semibold">{{ getGroupName(group, groupIndex) }}</span>
+                    <div class="flex gap-2">
+                      <div class="badge badge-info">Judges: {{ group.numberOfJudges }}</div>
+                      <div v-if="group.startTime" class="badge badge-info">Start Time: {{ group.startTime }}</div>
+                    </div>
+                  </div>
+                  <div class="join">
+                    <button class="btn btn-square btn-sm btn-success join-item"
+                      @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match" title="Add Match">
+                      <PlusIcon class="w-5 h-5" />
+                    </button>
+                    <button class="btn btn-square btn-sm btn-success join-item"
+                      :disabled="!canRandomize(matIndex, groupIndex)"
+                      @click.prevent="randomizeGroup(matIndex, groupIndex)" aria-label="randomize matches in group"
+                      title="Randomize Matches">
+                      <ArrowPathIcon class="w-5 h-5" />
+                    </button>
+                    <button class="btn btn-primary btn-square btn-sm join-item"
+                      @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" title="Edit Group">
+                      <PencilIcon class="w-4 h-4" />
+                    </button>
+                    <button class="btn btn-square btn-sm btn-error join-item"
+                      @click.prevent="showDeleteGroup(matIndex, groupIndex)" aria-label="delete group"
+                      title="Delete Group">
+                      <XMarkIcon class="w-5 h-5" />
+                    </button>
                   </div>
                 </div>
-                <div class="join">
-                  <button class="btn btn-square btn-sm btn-success join-item"
-                    @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match" title="Add Match">
-                    <PlusIcon class="w-5 h-5" />
-                  </button>
-                  <button class="btn btn-square btn-sm btn-success join-item"
-                    :disabled="!canRandomize(matIndex, groupIndex)" @click.prevent="randomizeGroup(matIndex, groupIndex)"
-                    aria-label="randomize matches in group" title="Randomize Matches">
-                    <ArrowPathIcon class="w-5 h-5" />
-                  </button>
-                  <button class="btn btn-primary btn-square btn-sm join-item"
-                    @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" title="Edit Group">
-                    <PencilIcon class="w-4 h-4" />
-                  </button>
-                  <button class="btn btn-square btn-sm btn-error join-item"
-                    @click.prevent="showDeleteGroup(matIndex, groupIndex)" aria-label="delete group" title="Delete Group">
-                    <XMarkIcon class="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-              <table class="table w-full border">
-                <thead>
-                  <tr>
-                    <th class="sm:w-1/2">Tori</th>
-                    <th class="hidden sm:table-cell sm:w-1/2">Uke</th>
-                    <th class="w-8"></th>
-                  </tr>
-                </thead>
-                <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori">
-                  <template #item="{ element: match, index }">
-                    <tr class="bg-base-100">
-                      <td>
-                        <div>{{ match.tori }}</div>
-                        <div class="sm:hidden">{{ match.uke }}</div>
-                      </td>
-                      <td class="hidden sm:table-cell">{{ match.uke }}</td>
-                      <td>
-                        <div class="join">
-                          <NuxtLink class="btn btn-primary btn-square btn-sm join-item"
-                            :class="match.completed ? '' : 'btn-disabled'"
-                            :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank">
-                            <CheckIcon class="w-5 h-5" />
-                          </NuxtLink>
-                          <button class="btn btn-primary btn-square btn-sm join-item"
-                            @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
-                            :disabled="match.completed || inAction" title="Edit Match">
-                            <PencilIcon class="w-4 h-4" />
-                          </button>
-                          <button class="btn btn-square btn-sm btn-error join-item" alt="delete match"
-                            title="Delete Match">
-                            <XMarkIcon class="w-5 h-5" @click.prevent="showDeleteMatch(matIndex, groupIndex, index)" />
-                          </button>
-                        </div>
-                      </td>
+                <table class="table w-full border">
+                  <thead>
+                    <tr>
+                      <th class="sm:w-1/2">Tori</th>
+                      <th class="hidden sm:table-cell sm:w-1/2">Uke</th>
+                      <th class="w-8"></th>
                     </tr>
-                  </template>
-                </draggable>
-              </table>
-            </div>
-          </template>
-        </draggable>
+                  </thead>
+                  <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori">
+                    <template #item="{ element: match, index }">
+                      <tr class="bg-base-100">
+                        <td>
+                          <div>{{ match.tori }}</div>
+                          <div class="sm:hidden">{{ match.uke }}</div>
+                        </td>
+                        <td class="hidden sm:table-cell">{{ match.uke }}</td>
+                        <td>
+                          <div class="join">
+                            <NuxtLink class="btn btn-primary btn-square btn-sm join-item"
+                              :class="match.completed ? '' : 'btn-disabled'"
+                              :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank">
+                              <CheckIcon class="w-5 h-5" />
+                            </NuxtLink>
+                            <button class="btn btn-primary btn-square btn-sm join-item"
+                              @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
+                              :disabled="match.completed || inAction" title="Edit Match">
+                              <PencilIcon class="w-4 h-4" />
+                            </button>
+                            <button class="btn btn-square btn-sm btn-error join-item" alt="delete match"
+                              title="Delete Match">
+                              <XMarkIcon class="w-5 h-5" @click.prevent="showDeleteMatch(matIndex, groupIndex, index)" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </template>
+                  </draggable>
+                </table>
+              </div>
+            </template>
+          </draggable>
+        </div>
       </div>
     </div>
     <Prompt name="delete_mat_modal" @submit="deleteMat" text="Yes">
@@ -227,8 +234,9 @@ async function showAddGroup(matIndex) {
 }
 
 async function addGroup() {
+  const mat = matToEdit.value;
   const body = newGroup.value;
-  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat.value}/g`, { method: 'POST', body, headers: headers.value });
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
   newGroup.value.name = '';
 }

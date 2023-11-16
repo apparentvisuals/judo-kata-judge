@@ -1,17 +1,19 @@
 <template>
+  <div v-if="error" class="toast toast-top">
+    <div class="alert alert-error">
+      <h1 class="text-xl font-bold uppercase">{{ error }}</h1>
+    </div>
+  </div>
   <div class="bg-base-200 h-full overflow-y-auto">
     <AdminNav name="Tournaments" />
-    <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
-      <h1 class="text-3xl font-bold uppercase">{{ error }}</h1>
-    </div>
-    <div class="m-4 py-4">
-      <div class="pb-4">
+    <div class="m-4">
+      <div class="pb-4 flex flex-row gap-2">
         <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" title="Create Tournament">
           <span>Create Tournament</span>
         </button>
       </div>
       <table class="table">
-        <thead>
+        <thead class="bg-base-100">
           <tr>
             <th class="w-12">Code</th>
             <th>Name</th>

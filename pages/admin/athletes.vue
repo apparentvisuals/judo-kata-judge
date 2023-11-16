@@ -4,14 +4,14 @@
     <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
       <h1 class="text-3xl font-bold uppercase">{{ error }}</h1>
     </div>
-    <div class="m-4 py-4">
+    <div class="m-4">
       <div class="pb-4">
         <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" :disabled="inAction">
           <span>Add Athlete</span>
         </button>
       </div>
       <table class="table">
-        <thead>
+        <thead class="bg-base-100">
           <tr>
             <th class="w-12">ID</th>
             <th>Name</th>
