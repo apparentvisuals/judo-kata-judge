@@ -9,3 +9,4 @@ node_modules
 dist
 data/*
 archive/*
+.DS_Store

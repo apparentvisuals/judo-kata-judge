@@ -1,23 +1,25 @@
 <template>
-  <table class="table w-full bg-base-100 mt-2 border" v-for="(group, groupIndex) in schedule">
-    <thead>
-      <tr class="border-none">
-        <th colspan="3" class="text-center text-lg">{{ getGroupName(group, groupIndex) }}</th>
-      </tr>
-      <tr class="border">
-        <th class="w-8"></th>
-        <th>Pair</th>
-        <th class="w-10 text-right">Start</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(match, matchIndex) in group.matches">
-        <td>{{ matchIndex + 1 }}</td>
-        <td>{{ match.tori }} / {{ match.uke }}</td>
-        <td>{{ match.startTime ? `${format(match.startTime, 'HH:mm')}` : '' }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div v-for="(group, groupIndex) in schedule" class="p-2">
+    <table class="table border">
+      <thead>
+        <tr class="border-none">
+          <th colspan="3" class="text-center text-lg">{{ getGroupName(group, groupIndex) }}</th>
+        </tr>
+        <tr class="border">
+          <th class="w-8"></th>
+          <th>Pair</th>
+          <th class="w-10 text-right">Start</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(match, matchIndex) in group.matches">
+          <td>{{ matchIndex + 1 }}</td>
+          <td>{{ match.tori }} / {{ match.uke }}</td>
+          <td>{{ match.startTime ? `${format(match.startTime, 'HH:mm')}` : '' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script setup>
