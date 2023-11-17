@@ -1,28 +1,29 @@
 <template>
-  <ClientOnly>
-    <div class="navbar bg-primary text-primary-content flex gap-2 text-xl">
+  <div class="navbar">
+    <div class="navbar-start gap-2 text-xl">
       <img :src="getOrganizationImage(scores.org)" class="h-12" />
       <h1>{{ scores.name }}</h1>
     </div>
-    <div class="navbar bg-primary text-primary-content">
-      <div class="navbar-start">
-        <div class="flex py-2 gap-2">
-          <a class="btn btn-xl text-xl" v-for="(group, index) in scores.results" @click.prevent="scrollTo(index)"
-            :class="index === resultIndex ? 'btn-info' : 'btn-ghost'">
-            {{ getGroupName(group, index) }}
-          </a>
-        </div>
-      </div>
-      <div class="navbar-end"></div>
+    <div class="navbar-end gap-2" v-if="tournament.org === 'on'">
+      <span class="text-xl">Sponsored by:</span>
+      <img src="/img/sponsors/hatashita.png" class="h-12" />
     </div>
-    <div class="carousel w-full">
-      <div class="carousel-item w-full" v-for="(group, index) in scores.results" :id="index">
-        <div class="w-full">
-          <ResultTable :show-sub-total="showSubTotal" :matches="group.matches" />
-        </div>
+  </div>
+  <div class="navbar">
+    <div class="navbar-start gap-2">
+      <a class="btn btn-primary" v-for="(group, index) in scores.results" @click.prevent="scrollTo(index)"
+        :class="index === resultIndex ? '' : 'btn-outline'">
+        {{ getGroupName(group, index) }}
+      </a>
+    </div>
+  </div>
+  <div class="carousel w-full">
+    <div class="carousel-item w-full" v-for="(group, index) in scores.results" :id="index">
+      <div class="w-full p-2">
+        <ResultTable :show-sub-total="showSubTotal" :matches="group.matches" />
       </div>
     </div>
-  </ClientOnly>
+  </div>
 </template>
 
 <script setup>
@@ -31,6 +32,7 @@ import { getOrganizationImage, getGroupName } from '~/src/utils';
 
 const route = useRoute();
 const inviteCode = computed(() => route.params.invite);
+const autoScroll = computed(() => route.query.scroll);
 
 const tournament = ref({});
 const scores = ref({});
@@ -87,13 +89,15 @@ function _queueChange() {
       scrollTo(newIndex);
     }
     _queueChange();
-  }, 30000);
+  }, 20000);
 };
 
 onMounted(async () => {
   tournament.value = await $fetch(`/api/invites/${inviteCode.value}`);
-  // For automatic cycling of results
   _subscribe();
-  _queueChange();
+  if (autoScroll.value) {
+    // For automatic cycling of results
+    _queueChange();
+  }
 });
 </script>

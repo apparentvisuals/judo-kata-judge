@@ -1,6 +1,6 @@
 <template>
-  <table class="table bg-base-100 overflow-auto text-xl">
-    <thead class="text-xl">
+  <table class="table bg-base-100 overflow-auto text-lg border">
+    <thead class="text-lg">
       <tr>
         <th class="w-8 text-center"></th>
         <th class="w-1/2">Tori</th>
