@@ -1,15 +1,13 @@
 <template>
-  <div class="bg-base-200 h-full overflow-y-auto">
-    <AdminNav name="Judges" />
-    <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
-      <h1 class="text-3xl font-bold uppercase">{{ error }}</h1>
-    </div>
+  <Error :error-string="error" />
+  <AdminNav name="Judges" />
+  <div class="bg-base-200 h-full overflow-auto">
     <div class="m-4">
-      <div class="pb-4">
+      <ActionBar>
         <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" :disabled="inAction">
           <span>Add Judge</span>
         </button>
-      </div>
+      </ActionBar>
       <table class="table">
         <thead class="bg-base-100">
           <tr>

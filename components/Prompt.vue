@@ -3,7 +3,7 @@
     <form id="add-t-form" class="modal-box" @submit.prevent="submit">
       <slot />
       <div class="modal-action">
-        <button for="add-t-form" class="btn btn-sm btn-error btn-outline" type="button" @click="close"
+        <button v-if="cancellable" for="add-t-form" class="btn btn-sm btn-error btn-outline" type="button" @click="close"
           :disabled="disabled">
           Cancel
         </button>
@@ -18,7 +18,15 @@
 
 <script setup>
 
-const props = defineProps(["name", "disabled", "text"]);
+const props = defineProps({
+  "name": String,
+  "disabled": Boolean,
+  "text": String,
+  "cancellable": {
+    type: Boolean,
+    default: true
+  }
+});
 const emit = defineEmits(['submit']);
 
 function close() {

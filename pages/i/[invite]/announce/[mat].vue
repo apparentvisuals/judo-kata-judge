@@ -1,4 +1,5 @@
 <template>
+  <Error :error-string="error" />
   <div class="navbar bg-primary text-primary-content flex gap-4 text-5xl fixed h-32 justify-center">
     <img :src="getOrganizationImage(tournament.org)" class="h-20" />
     <h1>{{ tournament.name }} Mat {{ parseInt(route.params.mat) + 1 }}</h1>
@@ -41,10 +42,10 @@ import { UpdateEvents } from '~/src/event-sources';
 const route = useRoute();
 const inviteCode = computed(() => route.params.invite);
 
-const error = useState('error', () => '');
-const tournament = useState('tournament', () => ({}));
-const currentGroup = useState('current-group', () => -1);
-const currentMatch = useState('current-match', () => -1);
+const error = ref('');
+const tournament = ref({});
+const currentGroup = ref(-1);
+const currentMatch = ref(-1);
 
 const matches = computed(() => {
   const matches = [];

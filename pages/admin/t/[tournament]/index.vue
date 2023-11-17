@@ -1,9 +1,5 @@
 <template>
-  <div v-if="error" class="toast toast-top">
-    <div class="alert alert-error">
-      <h1 class="text-xl font-bold uppercase">{{ error }}</h1>
-    </div>
-  </div>
+  <Error :error-string="error" />
   <div class="bg-base-200 h-full overflow-y-auto">
     <div class="navbar bg-primary shadow-xl">
       <div class="navbar-start text-primary-content">
@@ -18,12 +14,12 @@
       </div>
     </div>
     <div class="m-4">
-      <div class="pb-4 flex flex-row gap-2">
-        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="addMat" title="Create Tournament">
+      <ActionBar>
+        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="addMat" title="Add Mat">
           <PlusIcon class="w-5 h-5" />
           <span>Add Mat</span>
         </button>
-        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="createInvite" title="Create Invite">
+        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="createInvite" title="Show Invite">
           <EnvelopeIcon class="w-5 h-5" />
           <span>View Invite Link</span>
         </button>
@@ -31,7 +27,7 @@
         <button class="btn btn-outline btn-sm btn-primary" @click.prevent="save" title="Save">
           Save
         </button>
-      </div>
+      </ActionBar>
       <div class="flex flex-col gap-4">
         <div v-for="(mat, matIndex) in tournament.mats" class="bg-base-100 border">
           <div class="flex justify-between mb-2 p-2">
@@ -145,14 +141,13 @@
     <Prompt name="delete_match_modal" @submit="deleteMatch" text="Yes">
       <span>Delete this match?</span>
     </Prompt>
-    <ClientOnly>
-      <Prompt v-if="inviteLink" name="view_invite_modal" text="Close">
-        <div class="flex flex-col items-center">
-          <img :src="qrCode" alt="invite link QR code" class="w-48" />
-          <NuxtLink class="btn-link" :to="inviteLink" target="_blank">{{ invite }}</NuxtLink>
-        </div>
-      </Prompt>
-    </ClientOnly>
+    <Prompt name="view_invite_modal" text="Close" :cancellable="false">
+      <div class="flex flex-col items-center">
+        <ClientOnly>
+          <QR :path="invitePath" title="Invite Link" />
+        </ClientOnly>
+      </div>
+    </Prompt>
   </div>
 </template>
 
@@ -190,12 +185,11 @@ const invite = computed(() => {
     }
   }
 });
-const inviteLink = computed(() => {
+const invitePath = computed(() => {
   if (invite.value) {
     return `/i/${invite.value}`;
   }
 });
-const qrCode = useQRCode(inviteLink);
 
 async function addMat() {
   const response = await $fetch(`/api/tournaments/${tournamentId.value}/m`, { method: 'POST', headers: headers.value });
@@ -330,22 +324,11 @@ async function deleteMatch() {
   tournament.value = response;
 }
 
-let timeoutId;
-function _setError(errorString) {
-  if (timeoutId) {
-    clearTimeout(timeoutId);
-  }
-  error.value = errorString;
-  timeoutId = setTimeout(() => {
-    error.value = '';
-  }, 3000);
-}
-
 try {
   tournament.value = await $fetch(`/api/tournaments/${tournamentId.value}`, { headers: headers.value });
   athletes.value = await $fetch(`/api/athletes`, { headers: headers.value });
 } catch (err) {
-  _setError(handleServerError(err));
+  error.value = handleServerError(err);
 }
 
 </script>

@@ -1,4 +1,5 @@
 <template>
+  <Error :error-string="error" />
   <div class="bg bg-base-200 h-full overflow-y-auto">
     <div class="navbar bg-base-100 shadow-xl rounded-box">
       <div class="navbar-start">
@@ -17,8 +18,7 @@
         </div>
       </div>
       <div class="navbar-end">
-        <span v-if="error" class="text-3xl font-bold uppercase">{{ error }}</span>
-        <button v-else class="btn btn-primary" @click.prevent.stop="confirmScore">Submit</button>
+        <button class="btn btn-primary" @click.prevent.stop="confirmScore">Submit</button>
       </div>
     </div>
     <table v-if="!error" class="table w-full">
@@ -52,8 +52,8 @@ import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import { getKataName, handleServerError } from '~/src/utils';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
-const error = useState('error', () => '');
-const tournament = useState('tournament', () => { return {}; });
+const error = ref('');
+const tournament = ref({});
 const scores = useState('scores', () => { return {}; });
 const numberOfMats = computed(() => tournament.value.numberOfMats);
 const matNumber = useState('matNumber', () => 1);

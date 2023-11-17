@@ -1,5 +1,6 @@
 <template>
-  <div class="bg-base-200 h-full overflow-y-auto">
+  <Error :error-string="error" />
+  <div class="bg-base-200 h-full overflow-auto">
     <AdminNav name="Athletes" />
     <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
       <h1 class="text-3xl font-bold uppercase">{{ error }}</h1>

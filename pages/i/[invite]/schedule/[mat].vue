@@ -1,4 +1,5 @@
 <template>
+  <Error :error-string="error" />
   <div class="h-full overflow-auto">
     <div class="navbar">
       <div class="navbar-start gap-2 text-xl">

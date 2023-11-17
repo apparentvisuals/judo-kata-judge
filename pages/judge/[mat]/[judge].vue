@@ -1,9 +1,5 @@
 <template>
-  <div v-if="error" class="toast toast-top z-50">
-    <div class="alert alert-error">
-      <h1 class="text-xl font-bold uppercase">{{ error }}</h1>
-    </div>
-  </div>
+  <Error :error-string="error" />
   <div class="navbar bg-primary fixed text-primary-content">
     <div class="navbar-start gap-2">
       <img :src="getOrganizationImage(tournament.org)" class="h-12" />
@@ -168,7 +164,7 @@ function disabledScore(index) {
 async function submitCode() {
   try {
     inAction.value = true;
-    _setError('');
+    error.value = '';
     const judgeData = await $fetch(`/api/judges/${judgeCode.value}`, { headers });
     judge.value = judgeData;
     if (judgeData.id !== scores.value.id) {
@@ -243,7 +239,7 @@ onMounted(async () => {
   event.connect((data) => {
     loading.value = false;
     if (data.error) {
-      _setError(data.error);
+      error.value = data.error;
       event.close();
       return;
     }
@@ -279,18 +275,6 @@ function _scoreToPayload() {
   }
   return payload;
 }
-
-let timeoutId;
-function _setError(errorString) {
-  if (timeoutId) {
-    clearTimeout(timeoutId);
-  }
-  error.value = errorString;
-  timeoutId = setTimeout(() => {
-    error.value = '';
-  }, 3000);
-}
-
 </script>
 
 <style scoped>
