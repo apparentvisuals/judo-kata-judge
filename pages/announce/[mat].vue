@@ -1,7 +1,8 @@
 <template>
+  <Error :error-string="error" />
   <div class="navbar bg-primary text-primary-content flex gap-4 text-5xl fixed h-32 justify-center">
     <img :src="getOrganizationImage(tournament.org)" class="h-20" />
-    <h1>{{ tournament.name }} Mat {{ parseInt(route.params.mat) + 1 }}</h1>
+    <h1>{{ tournament.name }} Mat {{ parseInt(mat) + 1 }}</h1>
   </div>
   <ClientOnly>
     <div class="flex flex-col fixed top-32 bottom-0 left-0 right-0">
@@ -40,16 +41,17 @@ import { UpdateEvents } from '~/src/event-sources';
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 const route = useRoute();
+const mat = computed(() => route.params.mat);
 
-const error = useState('error', () => '');
-const tournament = useState('tournament', () => ({}));
-const currentGroup = useState('current-group', () => -1);
-const currentMatch = useState('current-match', () => -1);
+const error = ref('');
+const tournament = ref({});
+const currentGroup = ref(-1);
+const currentMatch = ref(-1);
 
 const matches = computed(() => {
   const matches = [];
   if (tournament.value.mats) {
-    const mat = tournament.value.mats[route.params.mat];
+    const mat = tournament.value.mats[mat.value];
     for (const group of mat.groups) {
       for (const match of group.matches) {
         matches.push({ kata: group.kata, tori: match.tori, uke: match.uke });
@@ -63,7 +65,7 @@ const matchIndex = computed(() => {
     return -1;
   }
   if (tournament.value.mats) {
-    const mat = tournament.value.mats[route.params.mat];
+    const mat = tournament.value.mats[mat.value];
     let index = 0;
     for (let gI = 0; gI < mat.groups.length; gI++) {
       if (gI < currentGroup.value) {
@@ -116,7 +118,7 @@ try {
  */
 let event;
 onMounted(async () => {
-  event = new UpdateEvents(route.params.mat, cookie.value.tCode);
+  event = new UpdateEvents(mat.value, cookie.value.tCode);
   event.connect((data) => {
     if (data.error) {
       return;

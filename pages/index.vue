@@ -1,5 +1,6 @@
 <template>
-  <div class="bg-base-200 h-full overflow-y-auto">
+  <Error :error-string="error" />
+  <div class="bg-base-200 h-full overflow-auto">
     <div class="navbar bg-primary shadow-xl">
       <div class="navbar-start flex gap-2 text-primary-content text-xl">
         <img :src="getOrganizationImage(tournament.org)" class="h-12" />
@@ -61,8 +62,8 @@ function logout() {
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 
-const error = useState('error', () => '');
-const tournament = useState('tournament', () => ({}));
+const error = ref('');
+const tournament = ref({});
 
 try {
   tournament.value = await $fetch(`/api/tournaments/${cookie.value.tCode}`);
