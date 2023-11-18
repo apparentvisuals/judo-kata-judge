@@ -1,5 +1,5 @@
 <template>
-  <div class="m-auto w-full p-1 xs:w-80 xs:p-0 max-h-96">
+  <div class="w-full p-1 xs:w-80 max-h-96">
     <form valid="isValid" @submit.prevent="emit('submit')">
       <div class="form-control w-full">
         <label class="label" for="code">

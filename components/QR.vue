@@ -1,6 +1,6 @@
 <template>
   <div class="join join-vertical">
-    <img :src="qr" :alt="`${title} link QR code`" class="w-48 max-w-4xl join-item" />
+    <img :src="qr" :alt="`${title} link QR code`" class="w-36 max-w-4xl join-item" />
     <NuxtLink :to="url" target="_blank" class="btn btn-sm btn-primary w-full join-item">{{ title }}</NuxtLink>
   </div>
 </template>

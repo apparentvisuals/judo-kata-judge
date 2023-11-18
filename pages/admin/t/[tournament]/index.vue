@@ -97,7 +97,7 @@
                             <NuxtLink class="btn btn-primary btn-square btn-sm join-item"
                               :class="match.completed ? '' : 'btn-disabled'"
                               :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank">
-                              <CheckIcon class="w-5 h-5" />
+                              <DocumentTextIcon class="w-5 h-5" />
                             </NuxtLink>
                             <button class="btn btn-primary btn-square btn-sm join-item"
                               @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
@@ -153,8 +153,9 @@
 
 <script setup>
 import { clone, omit, pick } from 'lodash-es';
-import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon, ArrowPathIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
+import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, ArrowPathIcon, DocumentTextIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
 import { getGroupName, handleServerError, shuffle } from '~/src/utils';
+import { Document } from 'postcss';
 
 const DEFAULT_GROUP = { name: '', kata: '', numberOfJudges: 5, startTime: '' };
 const DEFAULT_MATCH = { tori: '', uke: '' };

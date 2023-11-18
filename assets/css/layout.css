@@ -20,8 +20,8 @@ body,
   @apply bg-base-100 z-40 top-0 sticky;
 }
 
-/* 
-td {
-  border: 1px solid;
-  @apply border-base-200;
-} */
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
