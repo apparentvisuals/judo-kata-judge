@@ -154,7 +154,6 @@
 <script setup>
 import { clone, omit, pick } from 'lodash-es';
 import { XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, CheckIcon, ArrowPathIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
-import { useQRCode } from '@vueuse/integrations/useQRCode'
 import { getGroupName, handleServerError, shuffle } from '~/src/utils';
 
 const DEFAULT_GROUP = { name: '', kata: '', numberOfJudges: 5, startTime: '' };

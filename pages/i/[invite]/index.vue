@@ -10,52 +10,27 @@
       </div>
     </div>
     <div class="m-4 py-4" v-if="tournament.mats">
-      <div class="flex pb-4 flex-row gap-48 flex-wrap">
-        <ClientOnly>
+      <ClientOnly>
+        <div class="flex gap-48 flex-wrap">
           <QR :path="resultsPath" title="results" />
-          <QR v-for="(_mat, index) of tournament.mats" :path="`/i/${invite}/schedule/${index}`"
-            :title="`schedule mat ${index + 1}`" />
-          <QR v-for="(_mat, index) of tournament.mats" :path="`/i/${invite}/announce/${index}`"
-            :title="`announce mat ${index + 1}`" />
           <template v-for="(_mat, index) of tournament.mats">
-            <QR :path="`/i/${invite}/judge/${index}/1`" title="judge 1" />
-            <QR :path="`/i/${invite}/judge/${index}/2`" title="judge 2" />
-            <QR :path="`/i/${invite}/judge/${index}/3`" title="judge 3" />
-            <QR :path="`/i/${invite}/judge/${index}/4`" title="judge 4" />
-            <QR :path="`/i/${invite}/judge/${index}/5`" title="judge 5" />
+            <QR :path="`/i/${invite}/schedule/${index}`" :title="`mat ${index + 1} schedule`" />
+            <QR :path="`/i/${invite}/announce/${index}`" :title="`mat ${index + 1} announce`" />
           </template>
-        </ClientOnly>
-      </div>
-      <table class="table print:break-after-page" v-if="tournament.mats.length > 0">
-        <thead>
-          <tr>
-            <th>Mat</th>
-            <th style="width: 460px"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(_mat, index) of tournament.mats">
-            <td class="uppercase text-lg font-bold">{{ index + 1 }}</td>
-            <td>
-              <div class="btn-group">
-                <ClientOnly>
-                  <QR :path="`/i/${invite}/judge/${index}/1`" title="judge 1" />
-                  <QR :path="`/i/${invite}/judge/${index}/2`" title="judge 2" />
-                  <QR :path="`/i/${invite}/judge/${index}/3`" title="judge 3" />
-                  <QR :path="`/i/${invite}/judge/${index}/4`" title="judge 4" />
-                  <QR :path="`/i/${invite}/judge/${index}/5`" title="judge 5" />
-                </ClientOnly>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        </div>
+        <div class="flex gap-48 pt-48" v-for="(_mat, index) of tournament.mats">
+          <QR :path="`/i/${invite}/judge/${index}/1`" :title="`mat ${index + 1} judge 1`" />
+          <QR :path="`/i/${invite}/judge/${index}/2`" :title="`mat ${index + 1} judge 2`" />
+          <QR :path="`/i/${invite}/judge/${index}/3`" :title="`mat ${index + 1} judge 3`" />
+          <QR :path="`/i/${invite}/judge/${index}/4`" :title="`mat ${index + 1} judge 4`" />
+          <QR :path="`/i/${invite}/judge/${index}/5`" :title="`mat ${index + 1} judge 5`" />
+        </div>
+      </ClientOnly>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useQRCode } from '@vueuse/integrations/useQRCode'
 import { getOrganizationImage, handleServerError } from '~/src/utils';
 
 const route = useRoute();
