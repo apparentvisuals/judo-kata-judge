@@ -108,7 +108,7 @@ export function createReport(group, match) {
       let total = 0;
       const hasMajor = calculateHasMajor(judgeScores.scores);
       for (let jj = 0; jj < techniquesCount; jj++) {
-        const deductions = judgeScores.scores[jj].deductions.split(':');
+        const deductions = (judgeScores.scores[jj] && judgeScores.scores[jj].deductions ? judgeScores.scores[jj].deductions : ':::::').split(':');
         let value = calculateMoveScore(deductions);
         value = hasMajor && !group.disableDivideByHalf ? value / 2 : value;
         report[jj].values[ii] = value;
