@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   },
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@vueuse/nuxt'],
   colorMode: {
-    preference: 'business', // default theme
+    preference: 'corporate', // default theme
     dataValue: 'theme', // activate data-theme in <html> tag
     classSuffix: '',
   },

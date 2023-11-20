@@ -48,6 +48,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  colorMode: 'corporate',
+});
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import { getKataName, handleServerError } from '~/src/utils';
 

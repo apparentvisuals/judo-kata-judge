@@ -1,53 +1,51 @@
 <template>
   <Error :error-string="error" />
-  <div class="bg-base-200 h-full overflow-auto">
-    <AdminNav name="Tournaments" />
-    <div class="m-4">
-      <ActionBar>
-        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" title="Create Tournament">
-          <span>Create Tournament</span>
-        </button>
-      </ActionBar>
-      <table class="table">
-        <thead class="bg-base-100">
-          <tr>
-            <th class="w-12">Code</th>
-            <th>Name</th>
-            <th class="w-16"></th>
-          </tr>
-        </thead>
-        <tbody class="bg-base-100">
-          <tr v-for="t in tournaments">
-            <td>{{ t.id }}</td>
-            <td>
-              <NuxtLink class="link" :to="`/admin/t/${t.id}`">{{ t.name }}</NuxtLink>
-            </td>
-            <td>
-              <div class="join">
-                <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(t)"
-                  :disabled="inAction" title="Edit Tournament">
-                  <PencilIcon class="w-4 h-4" />
-                </button>
-                <button class="btn btn-error btn-square btn-sm" @click.prevent="showRemove(t.id)" :disabled="inAction"
-                  title="Delete Tournament">
-                  <XMarkIcon class="w-4 h-4" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <Prompt name="add_t_modal" @submit="add" :disabled="inAction" text="Add">
-      <TournamentInputs :tournament="newTournament" />
-    </Prompt>
-    <Prompt name="edit_t_modal" @submit="update" :disabled="inAction" text="Update">
-      <TournamentInputs :tournament="tournamentToUpdate" />
-    </Prompt>
-    <Prompt name="delete_t_modal" @submit="remove" text="Yes">
-      <span>Delete this tournament?</span>
-    </Prompt>
-  </div>
+  <AdminNav name="Tournaments" />
+  <Container>
+    <ActionBar>
+      <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" title="Create Tournament">
+        <span>Create Tournament</span>
+      </button>
+    </ActionBar>
+    <table class="table border border-base-200">
+      <thead>
+        <tr>
+          <th class="w-12">Code</th>
+          <th>Name</th>
+          <th class="w-16"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="t in tournaments">
+          <td>{{ t.id }}</td>
+          <td>
+            <NuxtLink class="link" :to="`/admin/t/${t.id}`">{{ t.name }}</NuxtLink>
+          </td>
+          <td>
+            <div class="join">
+              <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(t)"
+                :disabled="inAction" title="Edit Tournament">
+                <PencilIcon class="w-4 h-4" />
+              </button>
+              <button class="btn btn-error btn-square btn-sm" @click.prevent="showRemove(t.id)" :disabled="inAction"
+                title="Delete Tournament">
+                <XMarkIcon class="w-5 h-5" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </Container>
+  <Prompt name="add_t_modal" @submit="add" :disabled="inAction" text="Add">
+    <TournamentInputs :tournament="newTournament" />
+  </Prompt>
+  <Prompt name="edit_t_modal" @submit="update" :disabled="inAction" text="Update">
+    <TournamentInputs :tournament="tournamentToUpdate" />
+  </Prompt>
+  <Prompt name="delete_t_modal" @submit="remove" text="Yes">
+    <span>Delete this tournament?</span>
+  </Prompt>
 </template>
 
 <script setup>

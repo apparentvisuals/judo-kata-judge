@@ -73,6 +73,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  colorMode: 'corporate',
+});
 import { clone } from 'lodash-es';
 import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';

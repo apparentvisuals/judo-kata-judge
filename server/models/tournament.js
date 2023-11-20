@@ -256,6 +256,10 @@ export default class Tournament {
     }
   }
 
+  replace(tournament) {
+    this.#tournament = tournament;
+  }
+
   #assignGroupValues(group, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
     if (name != null) {
       group.name = name;

@@ -1,15 +1,13 @@
 html,
-body,
-#__nuxt {
+body {
   width: 100%;
   height: 100%;
 }
 
-@media screen {
-  #__nuxt {
-    @apply bg-base-100;
-  }
-}
+/* 
+html {
+  @apply bg-slate-300;
+} */
 
 .bg {
   background-image: radial-gradient(hsla(var(--bc)/.2) 0.5px, hsla(var(--b2)/1) 0.5px);

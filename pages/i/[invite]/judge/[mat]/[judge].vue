@@ -73,6 +73,10 @@
 </template>
 
 <script setup>
+definePageMeta({
+  colorMode: 'corporate',
+});
+
 import { clone } from 'lodash-es';
 import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
@@ -140,10 +144,10 @@ async function submitCode() {
     codeError.value = '';
     const judgeData = await $fetch(`/api/judges/${judgeCode.value}`, { headers: headers.value });
     judge.value = judgeData;
-    if (judgeData.id !== scores.value.id) {
-      scores.value = { id: judgeData.id, points: Array(moves.value.length).fill().map(() => ({ deductions: Array(6).fill().map('') })) };
-    }
+    console.log(moves.value.length);
+    scores.value = { id: judgeData.id, points: Array(moves.value.length).fill().map(() => ({ deductions: Array(6).fill().map(() => '') })) };
   } catch (err) {
+    console.log(err);
     codeError.value = handleServerError(err);
   } finally {
     inAction.value = false;

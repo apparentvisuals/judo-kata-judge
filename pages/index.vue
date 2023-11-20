@@ -52,6 +52,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  colorMode: 'corporate',
+});
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import { getOrganizationImage, handleServerError } from '~/src/utils';
 
