@@ -8,7 +8,7 @@
         </label>
         <div class="dropdown-content flex flex-col gap-2 items-center w-80 bg-secondary mt-3 p-2 z-50 shadow">
           <img class="h-12 md:hidden" :src="getOrganizationImage(tournament.org)" />
-          <div class="text-lg text-center xl:hidden">{{ tournament.name }}</div>
+          <div class="text-xl font-bold text-center xl:hidden">{{ tournament.name }}</div>
           <button v-if="judgeCode" class="btn btn-sm btn-error w-full" @click.prevent="changeJudge">
             <ArrowPathIcon class="w-5 h-5" />
             Change Judge
@@ -16,7 +16,7 @@
         </div>
       </div>
       <img class="h-12 hidden md:inline" :src="getOrganizationImage(tournament.org)" />
-      <div class="text-lg text-center hidden xl:block">{{ tournament.name }}</div>
+      <div class="text-xl text-center font-bold hidden xl:block">{{ tournament.name }}</div>
     </div>
     <div class="navbar-center gap-2">
       <div class="text-xl font-bold" v-if="judge">{{ judge.name }} ({{ judgeNumber }})</div>
@@ -50,7 +50,7 @@
           /
           <span class="text-blue-500">{{ match.uke }}</span>
         </div>
-        <div class="text-xl">{{ match ? getKataName(match.kata) : '' }}</div>
+        <div class="text-xl">{{ match ? getGroupName(match) : '' }}</div>
       </div>
     </div>
     <ScoreTable :match="match" :scores="scores" />
@@ -69,16 +69,17 @@ import { clone } from 'lodash-es';
 import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 import { ArrowPathIcon, Bars3Icon } from '@heroicons/vue/24/outline';
-import { getKataName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
+import { getGroupName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
 
-const DEFAULT_SCORES = { id: '', points: [] };
 const cookie = useCookie('jkj', { default: () => ({}) });
 
 const route = useRoute();
 const inviteCode = computed(() => route.params.invite);
 const matNumber = computed(() => route.params.mat);
 const judgeNumber = computed(() => route.params.judge);
+
+const DEFAULT_SCORES = { id: '', points: [] };
 
 const error = ref('');
 const judgeCode = computed({
@@ -98,7 +99,7 @@ const match = ref(undefined);
 const judge = ref(undefined);
 const inAction = ref(false);
 const submitted = ref(false);
-const scores = useLocalStorage(`scores-${matNumber.value}-${judgeNumber.value}`, clone(DEFAULT_SCORES));
+const scores = useLocalStorage(`scores`, clone(DEFAULT_SCORES));
 
 const headers = computed(() => ({ authorization: `Bearer ${tournament.value.id}` }));
 
@@ -122,7 +123,7 @@ const status = computed(() => {
 });
 const moves = computed(() => moveList(match.value.kata));
 const canSubmit = computed(() => {
-  return scores.value.points.every((score) => score.value && score.value !== 10);
+  return scores.value.points.every((score) => score.value !== null && score.value !== 10);
 });
 
 async function submitCode() {
@@ -132,7 +133,6 @@ async function submitCode() {
     codeError.value = '';
     const judgeData = await $fetch(`/api/judges/${judgeCode.value}`, { headers: headers.value });
     judge.value = judgeData;
-    scores.value = { id: judgeData.id, points: Array(moves.value.length).fill().map(() => ({ deductions: Array(6).fill().map(() => '') })) };
   } catch (err) {
     codeError.value = handleServerError(err);
   } finally {
@@ -143,7 +143,7 @@ async function submitCode() {
 async function changeJudge() {
   judge.value = undefined;
   judgeCode.value = '';
-  scores.value = clone(DEFAULT_SCORES);
+  scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
 }
 
 function showSubmitScore() {
@@ -162,6 +162,11 @@ async function submitScore() {
  */
 let event;
 onMounted(async () => {
+  if (scores.value.mat !== matNumber.value || scores.value.judge !== judgeNumber.value) {
+    scores.value.mat = matNumber.value;
+    scores.value.judge = judgeNumber.value;
+    scores.value.points = [];
+  }
   tournament.value = await $fetch(`/api/invites/${inviteCode.value}`);
   event = new UpdateEvents(matNumber.value, tournament.value.id);
   event.connect((data) => {
@@ -176,12 +181,11 @@ onMounted(async () => {
       matchIndex.value = data.index;
       groupIndex.value = data.groupIndex;
       match.value = { ...data.match, completed: data.completed, judgeState: data.state };
-      if (!scores.value.points || scores.value.points.length === 0 || !scores.value.points[0].deductions) {
-        const newScores = { points: Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') })) };
-        if (judge.value) {
-          newScores.id = judge.value.id;
-        }
-        scores.value = newScores;
+      if (scores.value.match !== matchIndex.value || scores.value.group !== groupIndex.value || scores.value.kata !== data.match.kata || scores.value.points.length === 0) {
+        scores.value.match = data.index;
+        scores.value.group = data.groupIndex;
+        scores.value.kata = data.match.kata;
+        scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
       }
     }
   });

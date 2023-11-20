@@ -1,20 +1,16 @@
 <template>
   <Error :error-string="error" />
-  <div class="h-full overflow-auto">
-    <div class="navbar">
-      <div class="navbar-start gap-2 text-xl">
-        <img :src="getOrganizationImage(tournament.org)" class="h-12" />
-        <h1>{{ tournament.name }} Mat {{ parseInt(route.params.mat) + 1 }}</h1>
-      </div>
-      <div class="navbar-end gap-2" v-if="tournament.org === 'on'">
-        <span class="text-xl">Sponsored by:</span>
-        <img src="/img/sponsors/hatashita.png" class="h-12" />
-      </div>
+  <UserNav :tournament="tournament" :mat="route.params.mat">
+    <div class="navbar-end w-auto" v-if="tournament.org === 'on'">
+      <img src="/img/sponsors/hatashita.png" class="h-12" />
     </div>
-    <ClientOnly>
-      <ScheduleTable :tournament="tournament" :mat="route.params.mat" />
-    </ClientOnly>
+  </UserNav>
+  <div class="p-2 text-xl font-bold md:hidden">
+    {{ tournament.name }} Mat {{ parseInt(route.params.mat) + 1 }}
   </div>
+  <ClientOnly>
+    <ScheduleTable :tournament="tournament" :mat="route.params.mat" />
+  </ClientOnly>
 </template>
 
 <script setup>
@@ -22,7 +18,7 @@ definePageMeta({
   colorMode: 'corporate',
 });
 
-import { getOrganizationImage, handleServerError } from '~/src/utils';
+import { handleServerError } from '~/src/utils';
 
 const route = useRoute();
 const inviteCode = computed(() => route.params.invite);

@@ -140,7 +140,7 @@ export default class Tournament {
       return;
     }
     const match = group.matches[matchNumber];
-    return { kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores, results: createReport(group, match) };
+    return { name: group.name, kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores, results: createReport(group, match) };
   }
 
   getNextMatch(matNumber) {
@@ -152,6 +152,7 @@ export default class Tournament {
       for (const [index, match] of group.matches.entries()) {
         if (!match.completed) {
           const combinedMatch = {
+            name: group.name,
             kata: group.kata,
             numberOfJudges: group.numberOfJudges,
             disableDivideByHalf: group.disableDivideByHalf,

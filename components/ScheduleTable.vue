@@ -3,7 +3,7 @@
     <table class="table border">
       <thead>
         <tr class="border-none">
-          <th colspan="3" class="text-center text-lg">{{ getGroupName(group, groupIndex) }}</th>
+          <th colspan="3" class="text-center text-lg">{{ group.kata }}</th>
         </tr>
         <tr class="border">
           <th class="w-8"></th>
@@ -39,7 +39,7 @@ const schedule = computed(() => {
     const schedule = [];
     let lastTime = undefined;
     for (const group of mat.groups) {
-      const groupSchedule = { kata: group.kata, matches: [] };
+      const groupSchedule = { kata: getGroupName(group), matches: [] };
       if (group.startTime) {
         lastTime = parse(group.startTime, 'HH:mm', new Date());
       } else if (lastTime) {
@@ -63,23 +63,23 @@ const schedule = computed(() => {
 /**
  * @type UpdateEvents
  */
-let event;
-onMounted(async () => {
-  event = new UpdateEvents(props.mat, props.tournament.id);
-  event.connect((data) => {
-    if (data.error) {
-      return;
-    }
-    currentMatch.value = data.index;
-    currentGroup.value = data.groupIndex;
-  });
-});
+// let event;
+// onMounted(async () => {
+//   event = new UpdateEvents(props.mat, props.tournament.id);
+//   event.connect((data) => {
+//     if (data.error) {
+//       return;
+//     }
+//     currentMatch.value = data.index;
+//     currentGroup.value = data.groupIndex;
+//   });
+// });
 
-onUnmounted(() => {
-  if (event) {
-    event.close();
-  }
-});
+// onUnmounted(() => {
+//   if (event) {
+//     event.close();
+//   }
+// });
 
 </script>
 

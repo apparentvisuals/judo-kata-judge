@@ -6,6 +6,7 @@ export const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 
 export function isDev() {
   return process.env.NODE_ENV !== 'production';
+  // return false;
 }
 
 export function getToken(event) {
