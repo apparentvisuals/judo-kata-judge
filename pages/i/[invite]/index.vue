@@ -30,6 +30,10 @@
 </template>
 
 <script setup>
+definePageMeta({
+  colorMode: 'corporate',
+});
+
 import { getOrganizationImage, handleServerError } from '~/src/utils';
 
 const route = useRoute();
@@ -41,6 +45,9 @@ const tournament = ref({});
 
 try {
   tournament.value = await $fetch(`/api/invites/${invite.value}`);
+  useHead({
+    title: tournament.value.name,
+  });
 } catch (err) {
   error.value = handleServerError(err);
 }

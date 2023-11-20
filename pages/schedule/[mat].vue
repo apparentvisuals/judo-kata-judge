@@ -12,6 +12,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  colorMode: 'corporate',
+});
 import { getOrganizationImage, handleServerError } from '~/src/utils';
 
 const cookie = useCookie('jkj', { default: () => ({}) });

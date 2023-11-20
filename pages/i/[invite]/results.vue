@@ -27,6 +27,10 @@
 </template>
 
 <script setup>
+definePageMeta({
+  colorMode: 'corporate',
+});
+
 import { ref } from 'vue';
 import { getOrganizationImage, getGroupName } from '~/src/utils';
 

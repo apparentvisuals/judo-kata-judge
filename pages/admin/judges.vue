@@ -1,55 +1,53 @@
 <template>
   <Error :error-string="error" />
   <AdminNav name="Judges" />
-  <div class="bg-base-200 h-full overflow-auto">
-    <div class="m-4">
-      <ActionBar>
-        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" :disabled="inAction">
-          <span>Add Judge</span>
-        </button>
-      </ActionBar>
-      <table class="table">
-        <thead class="bg-base-100">
-          <tr>
-            <th class="w-12">ID</th>
-            <th>Name</th>
-            <th>Rank</th>
-            <th>Region</th>
-            <th class="w-16"></th>
-          </tr>
-        </thead>
-        <tbody class="bg-base-100">
-          <tr v-for="j in judges">
-            <td>{{ j.id }}</td>
-            <td>{{ j.name }}</td>
-            <td>{{ getLevelName(j.rank) }}</td>
-            <td>{{ getProvinceName(j.region) }}</td>
-            <td>
-              <div class="join">
-                <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(j)"
-                  :disabled="inAction">
-                  <PencilIcon class="w-4 h-4" />
-                </button>
-                <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(j.id)"
-                  :disabled="inAction">
-                  <XMarkIcon class="w-4 h-4" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <Prompt name="add_judge_modal" @submit="add" :disabled="inAction" text="Add">
-      <JudgeInput :judge="newJudge" />
-    </Prompt>
-    <Prompt name="edit_judge_modal" @submit="update" :disabled="inAction" text="Update">
-      <JudgeInput :judge="judgeToUpdate" />
-    </Prompt>
-    <Prompt name="delete_judge_modal" @submit="remove" text="Yes">
-      <span>Delete this judge?</span>
-    </Prompt>
-  </div>
+  <Container>
+    <ActionBar>
+      <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" :disabled="inAction">
+        <span>Add Judge</span>
+      </button>
+    </ActionBar>
+    <table class="table border border-base-200">
+      <thead>
+        <tr>
+          <th class="w-12">ID</th>
+          <th>Name</th>
+          <th>Rank</th>
+          <th>Region</th>
+          <th class="w-16"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="j in judges">
+          <td>{{ j.id }}</td>
+          <td>{{ j.name }}</td>
+          <td>{{ getLevelName(j.rank) }}</td>
+          <td>{{ getProvinceName(j.region) }}</td>
+          <td>
+            <div class="join">
+              <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(j)"
+                :disabled="inAction">
+                <PencilIcon class="w-4 h-4" />
+              </button>
+              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(j.id)"
+                :disabled="inAction">
+                <XMarkIcon class="w-5 h-5" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </Container>
+  <Prompt name="add_judge_modal" @submit="add" :disabled="inAction" text="Add">
+    <JudgeInput :judge="newJudge" />
+  </Prompt>
+  <Prompt name="edit_judge_modal" @submit="update" :disabled="inAction" text="Update">
+    <JudgeInput :judge="judgeToUpdate" />
+  </Prompt>
+  <Prompt name="delete_judge_modal" @submit="remove" text="Yes">
+    <span>Delete this judge?</span>
+  </Prompt>
 </template>
 
 <script setup>

@@ -36,6 +36,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  colorMode: 'corporate',
+});
 import { getKataName, getOrganizationImage, handleServerError } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
 

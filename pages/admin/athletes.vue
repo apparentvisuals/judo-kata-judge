@@ -1,58 +1,53 @@
 <template>
   <Error :error-string="error" />
-  <div class="bg-base-200 h-full overflow-auto">
-    <AdminNav name="Athletes" />
-    <div v-if="error" class="py-2 px-4 bg-base-200 text-center">
-      <h1 class="text-3xl font-bold uppercase">{{ error }}</h1>
-    </div>
-    <div class="m-4">
-      <div class="pb-4">
-        <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" :disabled="inAction">
-          <span>Add Athlete</span>
-        </button>
-      </div>
-      <table class="table">
-        <thead class="bg-base-100">
-          <tr>
-            <th class="w-12">ID</th>
-            <th>Name</th>
-            <th>Rank</th>
-            <th>Region</th>
-            <th class="w-16"></th>
-          </tr>
-        </thead>
-        <tbody class="bg-base-100">
-          <tr v-for="a in athletes">
-            <td>{{ a.id }}</td>
-            <td>{{ a.name }}</td>
-            <td>{{ getRankName(a.rank) }}</td>
-            <td>{{ getProvinceName(a.region) }}</td>
-            <td>
-              <div class="join">
-                <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(a)"
-                  :disabled="inAction">
-                  <PencilIcon class="w-4 h-4" />
-                </button>
-                <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(a.id)"
-                  :disabled="inAction">
-                  <XMarkIcon class="w-4 h-4" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <Prompt name="add_athlete_modal" @submit="add" :disabled="inAction" text="Add">
-      <AthleteInputs :athlete="newAthlete" />
-    </Prompt>
-    <Prompt name="edit_athlete_modal" @submit="update" :disabled="inAction" text="Update">
-      <AthleteInputs :athlete="athleteToUpdate" />
-    </Prompt>
-    <Prompt name="delete_athlete_modal" @submit="remove" text="Yes">
-      <span>Delete this athlete?</span>
-    </Prompt>
-  </div>
+  <AdminNav name="Athletes" />
+  <Container>
+    <ActionBar>
+      <button class="btn btn-sm btn-secondary" @click.prevent="showAdd" :disabled="inAction">
+        <span>Add Athlete</span>
+      </button>
+    </ActionBar>
+    <table class="table border border-base-200">
+      <thead>
+        <tr>
+          <th class="w-12">ID</th>
+          <th>Name</th>
+          <th>Rank</th>
+          <th>Region</th>
+          <th class="w-16"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="a in athletes">
+          <td>{{ a.id }}</td>
+          <td>{{ a.name }}</td>
+          <td>{{ getRankName(a.rank) }}</td>
+          <td>{{ getProvinceName(a.region) }}</td>
+          <td>
+            <div class="join">
+              <button class="btn btn-secondary btn-square btn-sm join-item" @click.prevent="showUpdate(a)"
+                :disabled="inAction">
+                <PencilIcon class="w-4 h-4" />
+              </button>
+              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(a.id)"
+                :disabled="inAction">
+                <XMarkIcon class="w-5 h-5" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </Container>
+  <Prompt name="add_athlete_modal" @submit="add" :disabled="inAction" text="Add">
+    <AthleteInputs :athlete="newAthlete" />
+  </Prompt>
+  <Prompt name="edit_athlete_modal" @submit="update" :disabled="inAction" text="Update">
+    <AthleteInputs :athlete="athleteToUpdate" />
+  </Prompt>
+  <Prompt name="delete_athlete_modal" @submit="remove" text="Yes">
+    <span>Delete this athlete?</span>
+  </Prompt>
 </template>
 
 <script setup>
