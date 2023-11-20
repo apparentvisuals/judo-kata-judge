@@ -1,17 +1,16 @@
 <template>
-  <div class="navbar">
-    <div class="navbar-start gap-2 text-xl">
+  <div class="navbar bg-base-100 text-xl font-bold justify-between">
+    <div class="navbar-center gap-2">
       <img :src="getOrganizationImage(scores.org)" class="h-12" />
       <h1>{{ scores.name }}</h1>
     </div>
-    <div class="navbar-end gap-2" v-if="tournament.org === 'on'">
-      <span class="text-xl">Sponsored by:</span>
+    <div class="navbar-end">
       <img src="/img/sponsors/hatashita.png" class="h-12" />
     </div>
   </div>
   <div class="navbar">
     <div class="navbar-start gap-2">
-      <a class="btn btn-primary" v-for="(group, index) in scores.results" @click.prevent="scrollTo(index)"
+      <a class="btn btn-neutral" v-for="(group, index) in scores.results" @click.prevent="scrollTo(index)"
         :class="index === resultIndex ? '' : 'btn-outline'">
         {{ getGroupName(group, index) }}
       </a>

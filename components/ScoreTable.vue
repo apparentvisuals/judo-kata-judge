@@ -2,7 +2,7 @@
   <table class="table w-full bg-base-100">
     <thead>
       <tr>
-        <th><span class="hidden md:table-cell">Technique</span></th>
+        <th class="p-0 md:p-2"><span class=" hidden md:table-cell">Technique</span></th>
         <th class="w-[50px] lg:w-12 score">S(1)</th>
         <th class="w-[50px] lg:w-12 score">S(1)</th>
         <th class="w-[50px] lg:w-12 score">M(3)</th>
@@ -18,15 +18,19 @@
           <td :colspan="totalSpan + 1">{{ moves[index] }}</td>
         </tr>
         <tr :class="techniqueColour(score)">
-          <td><span class="hidden md:table-cell">{{ moves[index] }}</span></td>
-          <ScoreTableCell :binary="true" v-model="score.deductions[0]" @click.prevent="toggleScore(score, 0)" hint="S" />
-          <ScoreTableCell :binary="true" v-model="score.deductions[1]" @click.prevent="toggleScore(score, 1)" hint="S" />
-          <ScoreTableCell :binary="true" v-model="score.deductions[2]" @click.prevent="toggleScore(score, 2)" hint="M" />
-          <ScoreTableCell :binary="true" :hidden="match.disableMajor" v-model="score.deductions[3]"
+          <td class="p-0 md:p-2"><span class="hidden md:table-cell">{{ moves[index] }}</span></td>
+          <ScoreTableCell class="score" :binary="true" v-model="score.deductions[0]"
+            @click.prevent="toggleScore(score, 0)" hint="S" />
+          <ScoreTableCell class="score" :binary="true" v-model="score.deductions[1]"
+            @click.prevent="toggleScore(score, 1)" hint="S" />
+          <ScoreTableCell class="score" :binary="true" v-model="score.deductions[2]"
+            @click.prevent="toggleScore(score, 2)" hint="M" />
+          <ScoreTableCell class="score" :binary="true" :hidden="match.disableMajor" v-model="score.deductions[3]"
             @click.prevent="toggleScore(score, 3)" hint="B" />
-          <ScoreTableCell :binary="true" :hidden="match.disableForgotten" v-model="score.deductions[4]"
+          <ScoreTableCell class="score" :binary="true" :hidden="match.disableForgotten" v-model="score.deductions[4]"
             @click.prevent="toggleScore(score, 4)" hint="F" />
-          <ScoreTableCell :binary="false" v-model="score.deductions[5]" @click.prevent="toggleScore(score, 5)" hint="C" />
+          <ScoreTableCell class="score" :binary="false" v-model="score.deductions[5]"
+            @click.prevent="toggleScore(score, 5)" hint="C" />
           <td class="text-center">{{ score.value }}</td>
         </tr>
       </template>
@@ -108,19 +112,19 @@ async function toggleScore(score, index) {
 
 <style scoped>
 .score {
-  @apply px-0 text-center;
+  @apply px-0 text-center py-3;
 }
 
 th,
 td {
-  @apply border py-3;
+  @apply border;
 }
 
-th {
+th.score {
   @apply text-center;
 }
 
-td {
+td.score {
   @apply py-3 px-3;
 }
 </style>
