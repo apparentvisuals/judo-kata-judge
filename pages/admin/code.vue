@@ -1,6 +1,6 @@
 <template>
-  <div class="bg bg-base-200 h-full flex">
-    <div class="m-auto max-w-xs max-h-96">
+  <div class="fixed top-0 bottom-0 w-full flex items-center justify-center">
+    <div class="max-w-xs max-h-96">
       <form valid="isValid" @submit.prevent="submit">
         <div class="form-control w-full max-w-xs">
           <label class="label" for="code">

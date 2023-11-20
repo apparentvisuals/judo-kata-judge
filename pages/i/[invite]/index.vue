@@ -1,16 +1,18 @@
 <template>
   <Error :error-string="error" />
-  <div class="navbar fixed bg-base-100 text-xl font-bold">
-    <div class="navbar-center w-full md:w-auto gap-2">
-      <img :src="getOrganizationImage(tournament.org)" class="h-12" />
-      <h1>{{ tournament.name }}</h1>
+  <UserNav :tournament="tournament">
+    <div class="navbar-end w-auto" v-if="tournament.org === 'on'">
+      <img src="/img/sponsors/hatashita.png" class="h-12" />
     </div>
+  </UserNav>
+  <div class="p-2 text-xl font-bold md:hidden">
+    {{ tournament.name }}
   </div>
   <div class="pt-16">
     <div class="px-12" v-if="tournament.mats">
       <ClientOnly>
         <div class="flex gap-24 flex-wrap py-12" style="page-break-after: always;">
-          <QR :path="resultsPath" title="results" />
+          <QR :path="resultsPath" title="results" params="scroll=1" />
           <template v-for="(_mat, index) of tournament.mats">
             <QR :path="`/i/${invite}/schedule/${index}`" :title="`mat ${index + 1} schedule`" />
             <QR :path="`/i/${invite}/announce/${index}`" :title="`mat ${index + 1} announce`" />
@@ -34,7 +36,7 @@ definePageMeta({
   colorMode: 'corporate',
 });
 
-import { getOrganizationImage, handleServerError } from '~/src/utils';
+import { handleServerError } from '~/src/utils';
 
 const route = useRoute();
 const invite = computed(() => route.params.invite);

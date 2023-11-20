@@ -2,7 +2,7 @@
   <table class="table w-full bg-base-100">
     <thead>
       <tr>
-        <th class="p-0 md:p-2"><span class=" hidden md:table-cell">Technique</span></th>
+        <th class="p-0 w-0 md:w-auto md:p-2"><span class="hidden md:inline">Technique</span></th>
         <th class="w-[50px] lg:w-12 score">S(1)</th>
         <th class="w-[50px] lg:w-12 score">S(1)</th>
         <th class="w-[50px] lg:w-12 score">M(3)</th>
@@ -18,7 +18,7 @@
           <td :colspan="totalSpan + 1">{{ moves[index] }}</td>
         </tr>
         <tr :class="techniqueColour(score)">
-          <td class="p-0 md:p-2"><span class="hidden md:table-cell">{{ moves[index] }}</span></td>
+          <td class="p-0 md:p-2"><span class="hidden md:inline">{{ moves[index] }}</span></td>
           <ScoreTableCell class="score" :binary="true" v-model="score.deductions[0]"
             @click.prevent="toggleScore(score, 0)" hint="S" />
           <ScoreTableCell class="score" :binary="true" v-model="score.deductions[1]"
