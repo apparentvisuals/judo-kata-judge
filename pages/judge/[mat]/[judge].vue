@@ -1,11 +1,10 @@
 <template>
   <Error :error-string="error" />
-  <div class="drawer min-h-full">
+  <div class="drawer lg:drawer-open min-h-full">
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content">
       <div class="navbar bg-primary text-primary-content">
         <div class="navbar-start gap-4 hidden lg:flex">
-          <img :src="getOrganizationImage(tournament.org)" class="h-12 hidden lg:block" />
           <div class="text-xl hidden md:block" v-if="judge">{{ judge.name }} ({{ judgeNumber }})</div>
         </div>
         <div class="navbar-center w-full md:w-auto">

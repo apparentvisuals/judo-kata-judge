@@ -1,71 +1,59 @@
 <template>
   <Error :error-string="error" />
-  <div class="drawer min-h-full">
-    <input id="my-drawer" type="checkbox" class="drawer-toggle" />
-    <div class="drawer-content">
-      <div class="navbar bg-primary text-primary-content">
-        <div class="navbar-start gap-4 hidden lg:flex">
-          <img :src="getOrganizationImage(tournament.org)" class="h-12 hidden lg:block" />
-          <div class="text-xl hidden md:block" v-if="judge">{{ judge.name }} ({{ judgeNumber }})</div>
-        </div>
-        <div class="navbar-center w-full md:w-auto">
-          <label for="my-drawer" class="btn btn-primary btn-square drawer-button lg:hidden print:hidden">
-            <Bars3Icon class="w-6 h-6" />
-          </label>
-          <span class="text-xl">{{ tournament.name }}</span>
-        </div>
-        <div class="navbar-end hidden md:flex">
-          <button v-if="judgeCode" class="btn btn-sm btn-error print:hidden" @click.prevent="changeJudge">
+  <div class="navbar fixed top-0 z-10 bg-base-100">
+    <div class="navbar-start gap-2">
+      <div class="dropdown">
+        <label tabindex="0" class="btn btn-ghost btn-square drawer-button print:hidden">
+          <Bars3Icon class="w-6 h-6" />
+        </label>
+        <div class="dropdown-content flex flex-col gap-2 items-center w-80 bg-secondary mt-3 p-2 z-50 shadow">
+          <img class="h-12 md:hidden" :src="getOrganizationImage(tournament.org)" />
+          <div class="text-lg text-center xl:hidden">{{ tournament.name }}</div>
+          <button v-if="judgeCode" class="btn btn-sm btn-error w-full" @click.prevent="changeJudge">
             <ArrowPathIcon class="w-5 h-5" />
             Change Judge
           </button>
         </div>
       </div>
-      <div v-if="status" class="min-h-full -mt-16 flex flex-col items-center justify-center">
-        <div class="text-center">
-          <span class="text-3xl font-bold">{{ status }}</span>
-        </div>
-        <div class="p-4">
-          <span class="loading loading-ring loading-lg"></span>
-        </div>
+      <img class="h-12 hidden md:inline" :src="getOrganizationImage(tournament.org)" />
+      <div class="text-lg text-center hidden xl:block">{{ tournament.name }}</div>
+    </div>
+    <div class="navbar-center gap-2">
+      <div class="text-xl font-bold" v-if="judge">{{ judge.name }} ({{ judgeNumber }})</div>
+    </div>
+    <div class="navbar-end">
+      <button v-if="match && judge" class="btn btn-sm btn-success print:hidden" @click.prevent="showSubmitScore"
+        :disabled="!canSubmit">submit</button>
+    </div>
+  </div>
+  <div v-if="status" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
+    <div class="text-center">
+      <span class="text-3xl font-bold">{{ status }}</span>
+    </div>
+    <div class="p-2">
+      <span class="loading loading-ring loading-lg"></span>
+    </div>
+  </div>
+  <div v-else-if="match && !judge" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
+    <CodeForm v-model="judgeCode" title="Judge Code" @submit="submitCode" :error="codeError" />
+  </div>
+  <div v-else-if="match" class="pt-16 pb-8">
+    <div class="navbar p-2 justify-between">
+      <div class="text-xl hidden md:block">
+        <span>{{ match.tori }}</span>
+        /
+        <span class="text-blue-500">{{ match.uke }}</span>
       </div>
-      <div v-else-if="match && !judge" class="min-h-full -mt-16 flex flex-col items-center justify-center">
-        <CodeForm v-model="judgeCode" title="Judge Code" @submit="submitCode" :error="codeError" />
-      </div>
-      <div v-else-if="match" class="w-full overflow-auto">
-        <div class="navbar p-4 justify-between">
-          <div class="text-xl hidden md:block">
-            <span>{{ match.tori }}</span>
-            /
-            <span class="text-blue-500">{{ match.uke }}</span>
-          </div>
-          <div class="flex flex-col items-start">
-            <div class="text-xl md:hidden">
-              <span>{{ match.tori }}</span>
-              /
-              <span class="text-blue-500">{{ match.uke }}</span>
-            </div>
-            <div class="text-xl">{{ match ? getKataName(match.kata) : '' }}</div>
-          </div>
-          <button class="btn btn-sm btn-success print:hidden" @click.prevent="showSubmitScore"
-            :disabled="!canSubmit">submit</button>
+      <div class="flex flex-col items-start">
+        <div class="text-xl md:hidden">
+          <span>{{ match.tori }}</span>
+          /
+          <span class="text-blue-500">{{ match.uke }}</span>
         </div>
-        <ScoreTable :match="match" :scores="scores" />
+        <div class="text-xl">{{ match ? getKataName(match.kata) : '' }}</div>
       </div>
     </div>
-    <div class="drawer-side">
-      <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-      <div class="p-4 w-80 min-h-full bg-base-200 text-base-content">
-        <div class="flex gap-2 pb-4 items-center flex-col">
-          <img :src="getOrganizationImage(tournament.org)" class="h-12" />
-          <div class="text-lg text-center">{{ tournament.name }}</div>
-        </div>
-        <button v-if="judgeCode" class="btn btn-sm btn-error w-full" @click.prevent="changeJudge">
-          <ArrowPathIcon class="w-5 h-5" />
-          Change Judge
-        </button>
-      </div>
-    </div>
+    <ScoreTable :match="match" :scores="scores" />
   </div>
   <Prompt name="submit_score_modal" @submit="submitScore" text="Yes">
     <span>Submit final scores? (it can not be undone.)</span>
@@ -144,10 +132,8 @@ async function submitCode() {
     codeError.value = '';
     const judgeData = await $fetch(`/api/judges/${judgeCode.value}`, { headers: headers.value });
     judge.value = judgeData;
-    console.log(moves.value.length);
     scores.value = { id: judgeData.id, points: Array(moves.value.length).fill().map(() => ({ deductions: Array(6).fill().map(() => '') })) };
   } catch (err) {
-    console.log(err);
     codeError.value = handleServerError(err);
   } finally {
     inAction.value = false;

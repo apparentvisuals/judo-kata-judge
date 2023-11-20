@@ -1,12 +1,12 @@
 <template>
   <Error :error-string="error" />
-  <div class="bg-base-100 min-h-full">
-    <div class="navbar">
-      <div class="navbar-center w-full md:w-auto">
-        <img :src="getOrganizationImage(tournament.org)" class="h-12" />
-        <h1>{{ tournament.name }} ({{ tournament.id }})</h1>
-      </div>
+  <div class="navbar fixed bg-base-100 text-xl font-bold">
+    <div class="navbar-center w-full md:w-auto gap-2">
+      <img :src="getOrganizationImage(tournament.org)" class="h-12" />
+      <h1>{{ tournament.name }}</h1>
     </div>
+  </div>
+  <div class="pt-16">
     <div class="px-12" v-if="tournament.mats">
       <ClientOnly>
         <div class="flex gap-24 flex-wrap py-12" style="page-break-after: always;">
