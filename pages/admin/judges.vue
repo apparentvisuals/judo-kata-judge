@@ -3,11 +3,11 @@
   <AdminNav name="Judges" />
   <Container>
     <ActionBar>
-      <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" :disabled="inAction">
+      <button class="btn btn-secondary" @click.prevent="showAdd" :disabled="inAction">
         <span>Add Judge</span>
       </button>
     </ActionBar>
-    <table class="table border border-base-200">
+    <table class="admin-table">
       <thead>
         <tr>
           <th class="w-12">ID</th>

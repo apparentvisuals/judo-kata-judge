@@ -1,11 +1,11 @@
 <template>
-  <div class="navbar fixed top-0 z-10 shadow-xl bg-primary text-primary-content text-xl">
+  <div class="navbar fixed bg-primary top-0 z-10 text-primary-content text-xl">
     <div class="navbar-start">
       <div class="dropdown">
         <label tabindex="0" class="btn btn-ghost btn-square">
           <Bars3Icon class="w=5 h-5" />
         </label>
-        <div class="dropdown-content mt-3 p-2  z-50 shadow bg-secondary text-secondary-content w-52">
+        <div class="dropdown-content mt-3 p-2  z-50 shadow-xl bg-base-200 w-40">
           <ul tabindex="0" class="menu text-base-content">
             <li><nuxt-link to="/admin">Tournaments</nuxt-link></li>
             <li><nuxt-link to="/admin/judges">Judges</nuxt-link></li>

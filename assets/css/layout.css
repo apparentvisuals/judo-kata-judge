@@ -18,3 +18,15 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.admin-table {
+  @apply table text-base-content border-b-secondary border-b;
+}
+
+.admin-table thead {
+  @apply bg-base-300;
+}
+
+.admin-table tr {
+  @apply border-secondary;
+}
