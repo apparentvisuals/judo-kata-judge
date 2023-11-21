@@ -3,11 +3,11 @@
   <AdminNav name="Tournaments" />
   <Container>
     <ActionBar>
-      <button class="btn btn-outline btn-sm btn-primary" @click.prevent="showAdd" title="Create Tournament">
+      <button class="btn btn-secondary" @click.prevent="showAdd" title="Create Tournament">
         <span>Create Tournament</span>
       </button>
     </ActionBar>
-    <table class="table border border-base-200">
+    <table class="admin-table">
       <thead>
         <tr>
           <th class="w-12">Code</th>
@@ -27,8 +27,8 @@
                 :disabled="inAction" title="Edit Tournament">
                 <PencilIcon class="w-4 h-4" />
               </button>
-              <button class="btn btn-error btn-square btn-sm" @click.prevent="showRemove(t.id)" :disabled="inAction"
-                title="Delete Tournament">
+              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(t.id)"
+                :disabled="inAction" title="Delete Tournament">
                 <XMarkIcon class="w-5 h-5" />
               </button>
             </div>

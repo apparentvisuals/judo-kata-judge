@@ -1,5 +1,5 @@
 <template>
-  <div class="navbar bg-primary text-primary-content">
+  <div class="navbar bg-base-100">
     <div class="navbar-start gap-2">
       <img :src="getOrganizationImage(tournament.org)" class="h-12" />
       <div class="text-xl">{{ tournament.name }}</div>
