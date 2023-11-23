@@ -8,7 +8,7 @@
         </label>
         <div class="dropdown-content flex flex-col gap-2 items-center w-80 bg-secondary mt-3 p-2 z-50 shadow">
           <img class="h-12 md:hidden" :src="getOrganizationImage(tournament.org)" />
-          <div class="text-xl font-bold text-center xl:hidden">{{ tournament.name }}</div>
+          <div class="text-xl font-bold text-center xl:hidden">{{ title }}</div>
           <button v-if="judgeCode" class="btn btn-sm btn-error w-full" @click.prevent="changeJudge">
             <ArrowPathIcon class="w-5 h-5" />
             Change Judge
@@ -16,7 +16,7 @@
         </div>
       </div>
       <img class="h-12 hidden md:inline" :src="getOrganizationImage(tournament.org)" />
-      <div class="text-xl text-center font-bold hidden xl:block">{{ tournament.name }}</div>
+      <div class="text-xl text-center font-bold hidden xl:block">{{ title }}</div>
     </div>
     <div class="navbar-center gap-2">
       <div class="text-xl font-bold" v-if="judge">{{ judge.name }} ({{ judgeNumber }})</div>
@@ -102,6 +102,9 @@ const submitted = ref(false);
 const scores = useLocalStorage(`scores`, clone(DEFAULT_SCORES));
 
 const headers = computed(() => ({ authorization: `Bearer ${tournament.value.id}` }));
+const title = computed(() => {
+  return `${tournament.value.name} Mat ${parseInt(matNumber.value) + 1}`;
+});
 
 const status = computed(() => {
   if (loading.value) {
@@ -123,7 +126,7 @@ const status = computed(() => {
 });
 const moves = computed(() => moveList(match.value.kata));
 const canSubmit = computed(() => {
-  return scores.value.points.every((score) => score.value !== null && score.value !== 10);
+  return scores.value.points.every((score) => score.value != null && score.value !== 10);
 });
 
 async function submitCode() {
@@ -170,10 +173,19 @@ onMounted(async () => {
   tournament.value = await $fetch(`/api/invites/${inviteCode.value}`);
   event = new UpdateEvents(matNumber.value, tournament.value.id);
   event.connect((data) => {
+    error.value = '';
     loading.value = false;
     if (data.error) {
       error.value = data.error;
       event.close();
+      return;
+    }
+    if (data.index === -1) {
+      submitted.value = true;
+      matchIndex.value = -1;
+      groupIndex.value = -1;
+      match.value = undefined;
+      scores.value = clone(DEFAULT_SCORES);
       return;
     }
     if (data.index !== matchIndex || data.groupIndex !== groupIndex) {
@@ -201,10 +213,12 @@ onUnmounted(() => {
 });
 
 function _scoreToPayload() {
-  const payload = { id: judge.value.id, name: judge.value.name, scores: [] };
+  const payload = { id: match.value.id };
+  const judgeData = { id: judge.value.id, name: judge.value.name, scores: [] };
   for (const score of scores.value.points) {
-    payload.scores.push({ deductions: (score.deductions || Array(6).fill('')).join(':') });
+    judgeData.scores.push({ deductions: (score.deductions || Array(6).fill('')).join(':') });
   }
+  payload.judge = judgeData;
   return payload;
 }
 </script>

@@ -12,9 +12,12 @@ export default defineEventHandler(async (event) => {
   const tournamentId = getRouterParam(event, 'tournament');
   const matNumber = parseInt(getRouterParam(event, 'mat'));
   const groupNumber = parseInt(getRouterParam(event, 'group'));
-  const { numberOfJudges, name, kata, startTime, disableDivideByHalf, disableForgotten, disableMajor } = await readBody(event);
+  const { id, numberOfJudges, name, kata, startTime, disableDivideByHalf, disableForgotten, disableMajor } = await readBody(event);
   const tournament = await Tournament.get(tournamentId);
-  tournament.updateGroup(matNumber, groupNumber, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor });
+  const updatedGroup = tournament.updateGroup(matNumber, groupNumber, { id, name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor });
+  if (!updatedGroup) {
+    return createError({ statusCode: 400, message: 'data error, group was not updated' });
+  }
   await tournament.save();
   return tournament.data;
 });

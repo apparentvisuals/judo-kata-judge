@@ -221,8 +221,17 @@ async function deleteMat() {
 }
 
 async function save() {
-  const body = tournament.value;
-  await $fetch(`/api/tournaments/${tournamentId.value}`, { method: 'POST', body, headers: headers.value });
+  const body = _tournamentToPayload(tournament.value);
+  try {
+    error.value = '';
+    const response = await $fetch(`/api/tournaments/${tournamentId.value}`, { method: 'POST', body, headers: headers.value });
+    tournament.value = response;
+    if (response.upgrade) {
+      error.value = 'Tournament was upgraded and no changes was applied. Please make your changes again.';
+    }
+  } catch (err) {
+    error.value = handleServerError(err);
+  }
 }
 
 async function showAddGroup(matIndex) {
@@ -241,14 +250,14 @@ async function addGroup() {
 async function showUpdateGroup(matIndex, groupIndex, groupValue) {
   matToEdit.value = matIndex;
   groupToEdit.value = groupIndex;
-  groupToUpdate.value = clone(groupValue);
+  groupToUpdate.value = clone(omit(groupValue, 'matches'));
   edit_group_modal.showModal();
 }
 
 async function updateGroup() {
   const mat = matToEdit.value;
   const group = groupToEdit.value;
-  const body = omit(groupToUpdate.value, "matches");
+  const body = groupToUpdate.value;
   const result = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}`, { method: 'POST', body, headers: headers.value });
   tournament.value = result;
 }
@@ -296,10 +305,7 @@ async function showUpdateMatch(selectedMat, selectedGroup, selectedMatch, matchV
   matToEdit.value = selectedMat;
   groupToEdit.value = selectedGroup;
   matchToEdit.value = selectedMatch;
-  matchToUpdate.value.tori = matchValue.tori;
-  matchToUpdate.value.uke = matchValue.uke;
-  matchToUpdate.value.toriId = matchValue.toriId;
-  matchToUpdate.value.ukeId = matchValue.ukeId;
+  matchToUpdate.value = clone(omit(matchValue, ['scores']));
   edit_match_modal.showModal();
 }
 
@@ -307,7 +313,7 @@ async function updateMatch() {
   const mat = matToEdit.value;
   const group = groupToEdit.value;
   const match = matchToEdit.value;
-  const body = pick(matchToUpdate.value, ['uke', 'ukeId', 'tori', 'toriId']);
+  const body = matchToUpdate.value;
   const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}/match/${match}`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
 }
@@ -332,6 +338,17 @@ try {
   athletes.value = await $fetch(`/api/athletes`, { headers: headers.value });
 } catch (err) {
   error.value = handleServerError(err);
+}
+
+function _tournamentToPayload(tournament) {
+  return tournament;
+  // if (tournament) {
+  //   return {
+  //     mats: tournament.mats.map((map) => {
+
+  //     })
+  //   }
+  // }
 }
 
 </script>

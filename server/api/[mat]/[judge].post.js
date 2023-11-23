@@ -1,6 +1,6 @@
 import Tournament from '~/server/models/tournament';
 import db from '../../db';
-import { notifyAllClients, createUpdateMessage, createSummaryMessage } from '~/server/utils';
+import { notifyAllClients, createUpdateMessage, createSummaryMessage, isMatchComplete } from '~/server/utils';
 
 export default defineEventHandler(async (event) => {
   const authorization = getHeader(event, 'authorization');
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const matNumber = parseInt(getRouterParam(event, 'mat'));
   const judgeNumber = parseInt(getRouterParam(event, 'judge')) - 1;
 
-  const judgeScores = await readBody(event);
+  const { id, judge } = await readBody(event);
 
   const tournament = await Tournament.get(token);
   const { match, index, groupIndex } = tournament.getNextMatch(matNumber);
@@ -23,8 +23,11 @@ export default defineEventHandler(async (event) => {
     return createError({ statusCode: 404, message: 'no more matches' })
   }
 
-  match.scores[judgeNumber] = judgeScores;
-  const updatedMatch = tournament.updateMatch(matNumber, groupIndex, index, { scores: match.scores, completed: _IsMatchComplete(match.scores) });
+  if (id !== match.id) {
+    return createError({ statusCode: 400, message: 'submission aborted, incorrect match' });
+  }
+  match.scores[judgeNumber] = judge;
+  const updatedMatch = tournament.updateMatch(matNumber, groupIndex, index, { id, scores: match.scores, completed: isMatchComplete(match) });
   await tournament.save();
 
   const updates = db.notifications('updates');
@@ -43,7 +46,3 @@ export default defineEventHandler(async (event) => {
 
   return;
 });
-
-function _IsMatchComplete(scores) {
-  return scores.every((judgeScore) => judgeScore.name);
-}

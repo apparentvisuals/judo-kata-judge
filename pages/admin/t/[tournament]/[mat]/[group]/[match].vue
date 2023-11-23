@@ -40,7 +40,7 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 const tournament = ref(undefined);
 const matchData = ref(undefined);
 const moves = computed(() => moveList(matchData.value.kata));
-const numberOfResults = computed(() => matchData.value.scores.length);
+const numberOfResults = computed(() => matchData.value.numberOfJudges);
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 

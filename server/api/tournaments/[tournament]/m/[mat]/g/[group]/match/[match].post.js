@@ -13,9 +13,12 @@ export default defineEventHandler(async (event) => {
   const matNumber = parseInt(getRouterParam(event, 'mat'));
   const groupNumber = parseInt(getRouterParam(event, 'group'));
   const matchNumber = parseInt(getRouterParam(event, 'match'));
-  const { tori, toriId, uke, ukeId } = await readBody(event);
+  const { id, tori, toriId, uke, ukeId } = await readBody(event);
   const tournament = await Tournament.get(tournamentId);
-  tournament.updateMatch(matNumber, groupNumber, matchNumber, { tori, toriId, uke, ukeId });
+  const updatedMatch = tournament.updateMatch(matNumber, groupNumber, matchNumber, { id, tori, toriId, uke, ukeId });
+  if (!updatedMatch) {
+    return createError({ statusCode: 400, message: 'data error, match was not updated' });
+  }
   await tournament.save();
   return tournament.data;
 });
