@@ -3,8 +3,8 @@ import { pick } from 'lodash-es';
 
 import { createReport, isDev } from '~/server/utils';
 
-const key = isDev() ? 'tournament-dev' : 'tournament';
-
+// const key = isDev() ? 'tournament-dev' : 'tournament';
+const key = 'tournament';
 /**
  * {
  *   id: string

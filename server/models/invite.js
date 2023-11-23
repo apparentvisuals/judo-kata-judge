@@ -4,7 +4,9 @@ import { isDev } from "~/server/utils";
 
 const EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 
-const key = isDev() ? 'invite-dev' : 'invite';
+// const key = isDev() ? 'invite-dev' : 'invite';
+const key = 'invite';
+
 export default class Invite {
   static async create(data) {
     const id = nanoid(6);
