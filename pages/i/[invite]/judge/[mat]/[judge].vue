@@ -94,7 +94,6 @@ const codeError = ref('');
 const loading = ref(true);
 const tournament = ref({});
 const matchIndex = ref(-1);
-const groupIndex = ref(-1);
 const match = ref(undefined);
 const judge = ref(undefined);
 const inAction = ref(false);
@@ -157,7 +156,7 @@ async function submitScore() {
   const body = _scoreToPayload();
   await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers: headers.value });
   submitted.value = true;
-  scores.value = clone(DEFAULT_SCORES);
+  scores.value.points = [];
 }
 
 /**
@@ -183,7 +182,6 @@ onMounted(async () => {
     if (data.index === -1) {
       submitted.value = true;
       matchIndex.value = -1;
-      groupIndex.value = -1;
       match.value = undefined;
       scores.value = clone(DEFAULT_SCORES);
       return;
@@ -191,12 +189,9 @@ onMounted(async () => {
     if (data.index !== matchIndex || data.groupIndex !== groupIndex) {
       submitted.value = false;
       matchIndex.value = data.index;
-      groupIndex.value = data.groupIndex;
       match.value = { ...data.match, completed: data.completed, judgeState: data.state };
-      if (scores.value.match !== matchIndex.value || scores.value.group !== groupIndex.value || scores.value.kata !== data.match.kata || scores.value.points.length === 0) {
-        scores.value.match = data.index;
-        scores.value.group = data.groupIndex;
-        scores.value.kata = data.match.kata;
+      if (scores.value.id !== data.match.id || scores.value.points.length === 0) {
+        scores.value.id = data.match.id;
         scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
       }
     }

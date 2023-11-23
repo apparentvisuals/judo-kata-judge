@@ -1,9 +1,6 @@
 export default defineNuxtRouteMiddleware((to, from) => {
   const cookie = useCookie('jkj', { default: () => ({}) });
-
-  if (to.path.startsWith('/i')) {
-    return;
-  } else if (to.path.startsWith('/admin')) {
+  if (to.path.startsWith('/admin')) {
     if (to.path === '/admin/code') {
       return;
     }
@@ -11,18 +8,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
       return navigateTo(
         {
           path: '/admin/code',
-          query: {
-            from: to.path,
-          }
-        },
-        { replace: true }
-      );
-    }
-  } else if (to.path !== '/code') {
-    if (!cookie.value.tCode) {
-      return navigateTo(
-        {
-          path: '/code',
           query: {
             from: to.path,
           }

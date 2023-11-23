@@ -1,53 +1,12 @@
 <template>
-  <Error :error-string="error" />
-  <div class="bg-base-200 h-full overflow-auto">
-    <div class="navbar bg-primary shadow-xl">
-      <div class="navbar-start flex gap-2 text-primary-content text-xl">
-        <img :src="getOrganizationImage(tournament.org)" class="h-12" />
-        <h1>{{ tournament.name }} ({{ tournament.id }})</h1>
-      </div>
-      <div class="navbar-end">
-        <button class="btn btn-sm btn-error" @click.prevent="logout">
-          <ArrowPathIcon class="w-5 h-5" />
-          Change Tournament
-        </button>
-      </div>
-    </div>
-    <div class="m-4 py-4" v-if="tournament.mats">
-      <div class="pb-4">
-        <NuxtLink to="/results" target="_blank" class="btn btn-sm btn-primary">results</NuxtLink>
-      </div>
-      <table class="table" v-if="tournament.mats.length > 0">
-        <thead>
-          <tr>
-            <th>Mat</th>
-            <th class="w-6"></th>
-            <th class="w-6"></th>
-            <th style="width: 460px"></th>
-          </tr>
-        </thead>
-        <tbody class="bg-base-100">
-          <tr v-for="(mat, index) of tournament.mats">
-            <td class="uppercase text-lg font-bold">{{ index + 1 }}</td>
-            <td>
-              <NuxtLink :to="`/schedule/${index}`" target="_blank" class="btn btn-sm btn-primary">schedule</NuxtLink>
-            </td>
-            <td>
-              <NuxtLink :to="`/announce/${index}`" target="_blank" class="btn btn-sm btn-primary">announce</NuxtLink>
-            </td>
-            <td>
-              <div class="btn-group">
-                <NuxtLink :to="`/judge/${index}/1`" target="_blank" class="btn btn-sm btn-primary">judge 1</NuxtLink>
-                <NuxtLink :to="`/judge/${index}/2`" target="_blank" class="btn btn-sm btn-primary">judge 2</NuxtLink>
-                <NuxtLink :to="`/judge/${index}/3`" target="_blank" class="btn btn-sm btn-primary">judge 3</NuxtLink>
-                <NuxtLink :to="`/judge/${index}/4`" target="_blank" class="btn btn-sm btn-primary">judge 4</NuxtLink>
-                <NuxtLink :to="`/judge/${index}/5`" target="_blank" class="btn btn-sm btn-primary">judge 5</NuxtLink>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="fixed top-0 bottom-0 w-full flex flex-col gap-2 items-center justify-center">
+    <h1 class="text-3xl uppercase">Judo Kata Judge</h1>
+    <h2 class="text-xl ">This is the website of the Canadian Judo Kata Judge software. The project is hosted on
+      <a class="btn-link" href="https://github.com/apparentvisuals/judo-kata-judge">Github</a>.
+    </h2>
+    <p>If you have suggestions, ideas, would like to contribute you can raise an issue on our Github page.</p>
+    <p>If you just want to chat about anything Judo related or have questions about this software, you can hop onto our
+      Discord server using this invite link <a class="btn-link" href="https://discord.gg/vsA8J36mpM">Invite Link</a></p>
   </div>
 </template>
 
@@ -55,25 +14,4 @@
 definePageMeta({
   colorMode: 'corporate',
 });
-import { ArrowPathIcon } from '@heroicons/vue/24/outline';
-import { getOrganizationImage, handleServerError } from '~/src/utils';
-
-function logout() {
-  cookie.value.tCode = '';
-  navigateTo('/code');
-}
-
-const cookie = useCookie('jkj', { default: () => ({}) });
-
-const error = ref('');
-const tournament = ref({});
-
-try {
-  tournament.value = await $fetch(`/api/tournaments/${cookie.value.tCode}`);
-} catch (err) {
-  cookie.value.tCode = '';
-  navigateTo('/code');
-  error.value = handleServerError(err);
-}
-
 </script>
