@@ -4,8 +4,8 @@ import { isDev } from "~/server/utils";
 
 const EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 
-// const key = isDev() ? 'invite-dev' : 'invite';
-const key = 'invite';
+const key = isDev() ? 'invite-dev' : 'invite';
+// const key = 'invite';
 
 export default class Invite {
   static async create(data) {
@@ -18,7 +18,9 @@ export default class Invite {
 
   static async get(id) {
     const data = await useStorage(key).getItem(id);
-    return { id, data };
+    if (data) {
+      return { id, data };
+    }
   }
 
   static async getAll() {
