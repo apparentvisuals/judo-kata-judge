@@ -49,8 +49,8 @@ const tournament = ref({});
 const scores = ref({});
 const resultIndex = ref(0);
 const showSubTotal = computed(() => {
-  if (scores.showJudgeTotals != null) {
-    return scores.showJudgeTotals;
+  if (tournament.value.showJudgeTotals != null) {
+    return tournament.value.showJudgeTotals;
   }
   return true;
 });
