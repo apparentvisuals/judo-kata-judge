@@ -14,7 +14,8 @@
       <tbody>
         <tr v-for="(match, matchIndex) in group.matches">
           <td>{{ matchIndex + 1 }}</td>
-          <td>{{ match.tori }} / {{ match.uke }}</td>
+          <td v-if="match.break">Break</td>
+          <td v-else>{{ match.tori }} / {{ match.uke }}</td>
           <td>{{ match.startTime ? `${format(match.startTime, 'HH:mm')}` : '' }}</td>
         </tr>
       </tbody>
@@ -28,10 +29,11 @@ import { duration, getGroupName } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
 
 const DEFAULT_BREAK = 10;
+const DEFAULT_BREAK_EVERY_X_MATCH = 5;
 
 const props = defineProps(['tournament', 'mat']);
-const currentGroup = useState('current-group', () => -1);
-const currentMatch = useState('current-match', () => -1);
+// const currentGroup = useState('current-group', () => -1);
+// const currentMatch = useState('current-match', () => -1);
 
 const schedule = computed(() => {
   if (props.tournament && props.tournament.mats && props.tournament.mats.length > props.mat) {
@@ -45,6 +47,7 @@ const schedule = computed(() => {
       } else if (lastTime) {
         lastTime = addMinutes(lastTime, DEFAULT_BREAK);
       }
+      let matchCount = 0;
       for (const match of group.matches) {
         const matSchedule = { uke: match.uke, tori: match.tori };
         if (lastTime) {
@@ -52,6 +55,13 @@ const schedule = computed(() => {
           lastTime = addMinutes(lastTime, duration(group.kata));
         }
         groupSchedule.matches.push(matSchedule);
+        if (lastTime) {
+          if (matchCount % DEFAULT_BREAK_EVERY_X_MATCH === DEFAULT_BREAK_EVERY_X_MATCH - 1) {
+            groupSchedule.matches.push({ break: true, startTime: lastTime });
+            lastTime = addMinutes(lastTime, DEFAULT_BREAK);
+          }
+        }
+        matchCount += 1;
       }
       schedule.push(groupSchedule);
     }
