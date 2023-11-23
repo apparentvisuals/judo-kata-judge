@@ -104,7 +104,7 @@ export default class Tournament {
   }
 
   createGroup(mat, data) {
-    const group = { matches: [] };
+    const group = { id: nanoid(4), matches: [] };
     this.#assignGroupValues(group, data);
     this.#tournament.mats[mat].groups.push(group);
   }
@@ -123,7 +123,11 @@ export default class Tournament {
 
   updateGroup(matNumber, groupNumber, data) {
     const group = this.getGroup(matNumber, groupNumber);
+    if (!data.id || data.id !== group.id) {
+      return;
+    }
     this.#assignGroupValues(group, data);
+    return group;
   }
 
   deleteGroup(mat, group) {
@@ -140,7 +144,7 @@ export default class Tournament {
       return;
     }
     const match = group.matches[matchNumber];
-    return { name: group.name, kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores, results: createReport(group, match) };
+    return { id: match.id, name: group.name, kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores, results: createReport(group, match) };
   }
 
   getNextMatch(matNumber) {
@@ -152,6 +156,7 @@ export default class Tournament {
       for (const [index, match] of group.matches.entries()) {
         if (!match.completed) {
           const combinedMatch = {
+            id: match.id,
             name: group.name,
             kata: group.kata,
             numberOfJudges: group.numberOfJudges,
@@ -160,7 +165,7 @@ export default class Tournament {
             disableMajor: group.disableMajor,
             uke: match.uke,
             tori: match.tori,
-            scores: match.scores || Array(group.numberOfJudges).fill({})
+            scores: match.scores,
           };
           return { match: combinedMatch, index, groupIndex };
         }
@@ -180,17 +185,19 @@ export default class Tournament {
     }
     const matches = group.matches;
     const match = {
+      id: nanoid(),
       tori,
       toriId,
       uke,
       ukeId,
+      scores: _defaultScores(),
       completed: false,
     };
     matches.push(match);
     return match;
   }
 
-  updateMatch(matNumber, groupNumber, matchNumber, { tori, toriId, uke, ukeId, completed, scores }) {
+  updateMatch(matNumber, groupNumber, matchNumber, { id, tori, toriId, uke, ukeId, completed, scores }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -201,6 +208,9 @@ export default class Tournament {
     }
     const match = group.matches[matchNumber];
     if (!match) {
+      return;
+    }
+    if (!id || id !== match.id) {
       return;
     }
     if (match.completed) {
@@ -261,6 +271,26 @@ export default class Tournament {
     this.#tournament = tournament;
   }
 
+  upgrade() {
+    const mats = this.#tournament.mats;
+    if (mats) {
+      mats.forEach((mat) => {
+        if (mat.groups) {
+          mat.groups.forEach((group) => {
+            group.id = group.id || nanoid(4);
+            if (group.matches) {
+              group.matches.forEach((match) => {
+                match.id = match.id || nanoid();
+                match.scores = match.scores || _defaultScores();
+              });
+            }
+          });
+        }
+      });
+    }
+    this.#tournament.version = 3;
+  }
+
   #assignGroupValues(group, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
     if (name != null) {
       group.name = name;
@@ -284,4 +314,8 @@ export default class Tournament {
       group.disableMajor = disableMajor;
     }
   }
+}
+
+function _defaultScores() {
+  return Array(5).fill({});
 }

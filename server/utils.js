@@ -38,7 +38,7 @@ export function createUpdateMessage(tournament, mat) {
   const { match, index, groupIndex } = tournament.getNextMatch(mat);
   if (match) {
     const scores = match.scores;
-    const completed = scores.every((judgeScore) => judgeScore.name);
+    const completed = isMatchComplete(match);
     const judgeState = scores.map((judgeScore) => !!judgeScore.name);
     update.match = omit(match, 'scores');
     update.index = index;
@@ -95,8 +95,8 @@ export function numberOfTechniques(kata) {
 
 export function createReport(group, match) {
   const kata = group.kata;
-  const numberOfJudges = (match.scores && match.scores.length) || group.numberOfJudges;
-  const scores = match.scores || Array(numberOfJudges).fill({});
+  const numberOfJudges = group.numberOfJudges;
+  const scores = match.scores;
   const techniquesCount = numberOfTechniques(kata);
   const report = _defaultTechniqueScore(group, match);
   const summary = {
@@ -142,6 +142,19 @@ export function createReport(group, match) {
   summary.total = total;
 
   return { report, summary };
+}
+
+export function isMatchComplete(match) {
+  const numberOfJudges = match.numberOfJudges;
+  const scores = match.scores;
+  let completed = true;
+  for (let ii = 0; ii < numberOfJudges; ii++) {
+    if (scores[ii].name == null) {
+      completed = false;
+      break;
+    }
+  }
+  return completed;
 }
 
 function _defaultTechniqueScore(group, match) {

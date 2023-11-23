@@ -13,12 +13,19 @@ export default defineEventHandler(async (event) => {
   if (!tournamentId) {
     return createError({ statusCode: 404, message: 'Tournament not found' });
   }
-  const body = await readBody(event);
+  const { name, org, showJudgeTotals, mats } = await readBody(event);
   const tournament = await Tournament.get(tournamentId);
   if (!tournament) {
     return createError({ statusCode: 404, message: 'Tournament not found' });
   }
-  tournament.update(body);
-  await tournament.save();
-  return tournament.data;
+  if (tournament.data.version !== 3) {
+    tournament.upgrade();
+    await tournament.save();
+    return { ...tournament.data, upgrade: true };
+  } else {
+    tournament.update({ name, org, showJudgeTotals, mats });
+    await tournament.save();
+    return tournament.data;
+  }
+
 });
