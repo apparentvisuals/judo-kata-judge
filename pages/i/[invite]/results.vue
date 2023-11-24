@@ -5,12 +5,12 @@
         <label tabindex="0" class="btn btn-ghost btn-square drawer-button print:hidden">
           <Bars3Icon class="w-6 h-6" />
         </label>
-        <div class="dropdown-content flex flex-col gap-2 items-center w-80 bg-secondary mt-3 p-2 shadow">
+        <div tabindex="0" class="dropdown-content flex flex-col gap-2 items-center w-80 bg-secondary mt-3 p-2 shadow">
           <img class="h-12 md:hidden" :src="getOrganizationImage(tournament.org)" />
           <div class="text-lg text-center md:hidden">{{ tournament.name }}</div>
           <ul class="menu">
             <li v-for="(group, index) in scores.results">
-              <a href="#" :class="index === resultIndex ? 'active' : ''" @click.prevent="scrollTo(index)">
+              <a href="#" :class="index === resultIndex ? 'active' : ''" @click.prevent="show(index)">
                 {{ getGroupName(group, index) }}
               </a>
             </li>
@@ -90,10 +90,8 @@ function _subscribe() {
   };
 }
 
-function scrollTo(index) {
+function show(index) {
   if (index != null) {
-    // const element = document.getElementById(`${index}`);
-    // element.scrollIntoView(false);
     resultIndex.value = index;
   }
 }

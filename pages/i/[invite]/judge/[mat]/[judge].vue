@@ -6,10 +6,11 @@
         <label tabindex="0" class="btn btn-ghost btn-square drawer-button print:hidden">
           <Bars3Icon class="w-6 h-6" />
         </label>
-        <div class="dropdown-content flex flex-col gap-2 items-center w-80 bg-secondary mt-3 p-2 z-50 shadow">
+        <div tabindex="0"
+          class="dropdown-content flex flex-col gap-2 items-center w-80 bg-secondary mt-3 p-2 z-50 shadow">
           <img class="h-12 md:hidden" :src="getOrganizationImage(tournament.org)" />
           <div class="text-xl font-bold text-center xl:hidden">{{ title }}</div>
-          <button v-if="judgeCode" class="btn btn-sm btn-error w-full" @click.prevent="changeJudge">
+          <button v-if="judgeCode" class="btn btn-sm btn-error w-full" @click.prevent.stop="changeJudge">
             <ArrowPathIcon class="w-5 h-5" />
             Change Judge
           </button>
@@ -23,7 +24,7 @@
     </div>
     <div class="navbar-end">
       <button v-if="match && judge" class="btn btn-sm btn-success print:hidden" @click.prevent="showSubmitScore"
-        :disabled="!canSubmit">submit</button>
+        :disabled="!canSubmit">Submit</button>
     </div>
   </div>
   <div v-if="status" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
@@ -153,10 +154,18 @@ function showSubmitScore() {
 }
 
 async function submitScore() {
-  const body = _scoreToPayload();
-  await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers: headers.value });
-  submitted.value = true;
-  scores.value.points = [];
+  try {
+    inAction.value = true;
+    error.value = '';
+    const body = _scoreToPayload();
+    await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers: headers.value });
+    submitted.value = true;
+    scores.value.points = [];
+  } catch (err) {
+    error.value = handleServerError(err);
+  } finally {
+    inAction.value = false;
+  }
 }
 
 /**
