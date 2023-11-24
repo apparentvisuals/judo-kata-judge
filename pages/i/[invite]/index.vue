@@ -14,7 +14,7 @@
         <div class="flex gap-24 flex-wrap py-12" style="page-break-after: always;">
           <QR :path="resultsPath" title="results" params="scroll=1" />
           <template v-for="(_mat, index) of tournament.mats">
-            <QR :path="`/i/${invite}/schedule/${index}`" :title="`Mat ${index + 1} Cchedule`" />
+            <QR :path="`/i/${invite}/schedule/${index}`" :title="`Mat ${index + 1} Schedule`" />
             <QR :path="`/i/${invite}/announce/${index}`" :title="`Mat ${index + 1} Announce`" />
           </template>
         </div>
