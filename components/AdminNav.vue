@@ -5,8 +5,8 @@
         <label tabindex="0" class="btn btn-ghost btn-square">
           <Bars3Icon class="w=5 h-5" />
         </label>
-        <div class="dropdown-content mt-3 p-2  z-50 shadow-xl bg-base-200 w-40">
-          <ul tabindex="0" class="menu text-base-content">
+        <div tabindex="0" class="dropdown-content mt-3 p-2  z-50 shadow-xl bg-base-200 w-40">
+          <ul class="menu text-base-content">
             <li><nuxt-link to="/admin">Tournaments</nuxt-link></li>
             <li><nuxt-link to="/admin/judges">Judges</nuxt-link></li>
             <li><nuxt-link to="/admin/athletes">Athletes</nuxt-link></li>

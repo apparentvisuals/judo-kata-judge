@@ -30,13 +30,13 @@ export default defineEventHandler(async (event) => {
   const updatedMatch = tournament.updateMatch(matNumber, groupIndex, index, { id, scores: match.scores, completed: isMatchComplete(match) });
   await tournament.save();
 
-  const updates = db.notifications('updates');
+  const updates = db.notifications(`updates-${token}-${matNumber}`);
   updates.notify(() => {
     const clients = db.clients(`${token}-${matNumber}`);
     notifyAllClients(clients.match.list, createUpdateMessage(tournament, matNumber));
   });
 
-  const summary = db.notifications('summary');
+  const summary = db.notifications('summary-${token}');
   summary.notify(() => {
     if (updatedMatch.completed) {
       const summaryClients = db.clients(`${token}--1`);

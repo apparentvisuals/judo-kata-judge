@@ -1,6 +1,14 @@
 import Tournament from '~/server/models/tournament';
+import { getToken, getAuth } from '~/server/utils';
 
 export default defineEventHandler(async (event) => {
+  const token = getToken(event);
+  if (!token) {
+    return createError({ statusCode: 401, message: 'unauthorized' });
+  }
+  if (token !== getAuth()) {
+    return createError({ statusCode: 403, message: 'forbidden' });
+  }
   try {
     const tournamentId = getRouterParam(event, 'tournament');
     if (!tournamentId) {
