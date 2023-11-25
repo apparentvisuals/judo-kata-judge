@@ -76,7 +76,7 @@ export function createSummaryMessage(tournament) {
         }
         return matchSummary;
       });
-      return { name: group.name, kata: group.kata, matches: summary };
+      return { name: group.name, kata: group.kata, numberOfJudges: group.numberOfJudges, matches: summary };
     });
     summary.results.push(...groupsSummary);
   }

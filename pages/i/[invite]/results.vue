@@ -28,7 +28,7 @@
     <div class="text-center pb-2">
       <h2 class="text-xl font-bold">{{ getGroupName(group, resultIndex) }}</h2>
     </div>
-    <ResultTable :show-sub-total="showSubTotal" :matches="group.matches" />
+    <ResultTable :show-sub-total="showSubTotal" :matches="group.matches" :judges="group.numberOfJudges" />
   </Container>
 </template>
 
@@ -101,7 +101,7 @@ function _queueChange() {
     if (scores.value.results && scores.value.results.length > 0) {
       const index = resultIndex.value;
       const newIndex = (index + 1) % scores.value.results.length;
-      scrollTo(newIndex);
+      show(newIndex);
     }
     _queueChange();
   }, 20000);
