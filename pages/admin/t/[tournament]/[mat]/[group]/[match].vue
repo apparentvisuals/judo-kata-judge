@@ -9,7 +9,7 @@
     </div>
   </div>
   <div class="p-2 flex justify-between">
-    <div class="text-xl hidden md:block">
+    <div class="text-sm">
       <span>{{ match.tori }}</span>/<span class="text-blue-500">{{ match.uke }}</span>
     </div>
     <div v-for="index of numberOfResults">
