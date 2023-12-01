@@ -1,9 +1,9 @@
 <template>
   <Error :error-string="error" />
   <UserNav :tournament="tournament" :mat="route.params.mat">
-    <div class="navbar-end w-auto" v-if="tournament.org === 'on'">
+    <!-- <div class="navbar-end w-auto" v-if="tournament.org === 'on'">
       <img src="/img/sponsors/hatashita.png" class="h-12" />
-    </div>
+    </div> -->
   </UserNav>
   <div class="p-2 text-xl font-bold md:hidden">
     {{ tournament.name }} Mat {{ parseInt(route.params.mat) + 1 }}

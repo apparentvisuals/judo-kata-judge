@@ -20,9 +20,9 @@
       <img class="h-12" :src="getOrganizationImage(tournament.org)" />
       <h1 class="hidden md:inline">{{ tournament.name }}</h1>
     </div>
-    <div class="navbar-end w-auto" v-if="tournament.org === 'on'">
+    <!-- <div class="navbar-end w-auto" v-if="tournament.org === 'on'">
       <img src="/img/sponsors/hatashita.png" class="h-12" />
-    </div>
+    </div> -->
   </div>
   <Container>
     <div class="text-center pb-2">
