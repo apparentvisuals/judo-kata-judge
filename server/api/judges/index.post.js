@@ -11,8 +11,7 @@ export default defineEventHandler(async (event) => {
   }
   try {
     const { name, rank, region } = await readBody(event);
-    const response = await Judge.create({ name, rank, region });
-    return response;
+    return await Judge.create({ name, rank, region });
   } catch (err) {
     return createError({ statusCode: 400, message: err.message });
   }

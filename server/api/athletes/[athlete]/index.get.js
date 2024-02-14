@@ -13,9 +13,13 @@ export default defineEventHandler(async (event) => {
     return createError({ statusCode: 403, message: 'forbidden' });
   }
 
+  const athleteId = getRouterParam(event, 'athlete');
+  if (!athleteId) {
+    return createError({ statusCode: 404, message: 'Athlete not found' });
+  }
+
   try {
-    const athleteId = getRouterParam(event, 'athlete');
-    const athlete = await Athlete.get(athleteId.toUpperCase());
+    const athlete = await Athlete.get(athleteId);
     if (!athlete) {
       return createError({ statusCode: 404, message: 'Athlete not found' });
     }

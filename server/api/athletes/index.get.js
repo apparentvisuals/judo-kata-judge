@@ -10,8 +10,7 @@ export default defineEventHandler(async (event) => {
     return createError({ statusCode: 403, message: 'forbidden' });
   }
   try {
-    const athletes = await Athlete.getAll();
-    return athletes;
+    return await Athlete.getAll();
   } catch (err) {
     return createError({ statusCode: 400, message: err.message });
   }

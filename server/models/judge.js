@@ -1,41 +1,71 @@
-import { isDev, nanoid } from "~/server/utils";
+import { pick } from 'lodash-es';
 
-const key = isDev() ? 'judge-dev' : 'judge';
+import { isDev, nanoid } from "~/server/utils";
+import { database, log } from './cosmos';
+
+const key = isDev() ? 'judges-dev' : 'judges';
+const judges = database.container(key);
+
 
 export default class Judge {
-  static async create(data) {
+  static async create({ name, region, rank }) {
     const id = nanoid(4);
-    const judge = data;
-    await useStorage(key).setItem(id, judge);
-    return { id, ...judge };
+    const judge = {
+      id,
+      name,
+      region,
+      rank,
+    };
+    const response = await judges.items.create(judge);
+    log(`create new judge with id ${id}`, response);
+    return pick(response.resource, ['id', 'name', 'region', 'rank', '_etag']);
   }
 
-  static async update(id, data) {
-    const judge = data;
-    await useStorage(key).setItem(id, judge);
-    return { id, ...judge };
-  }
-
-  static async get(id) {
-    const judge = await useStorage(key).getItem(id);
-    if (judge) {
-      return { id, ...judge };
+  static async update(id, changes, options) {
+    try {
+      const patchOperations = [];
+      Object.keys(changes).forEach(key => {
+        patchOperations.push({
+          op: 'replace',
+          path: `/${key}`,
+          value: changes[key],
+        });
+      });
+      const response = await judges.item(id).patch(patchOperations, {
+        accessCondition: { type: "IfMatch", condition: options._etag },
+      });
+      log(`update judge with id ${id}`, response);
+      return pick(response.resource, ['id', 'name', 'region', 'rank', '_etag']);
+    } catch (err) {
+      if (err.code === 412) {
+        throw new Error('judge out of date, refresh and try again');
+      } else {
+        throw err;
+      }
     }
   }
 
   static async getAll() {
-    const judgeIds = await useStorage(key).getKeys();
-    const loadJudges = judgeIds.map((id) => {
-      return (async () => {
-        const judge = await useStorage(key).getItem(id);
-        return { id, name: judge.name, region: judge.region, rank: judge.rank };
-      })();
-    });
-    const judges = await Promise.all(loadJudges);
-    return judges;
+    const querySpec = { query: 'SELECT c.id, c.name, c.region, c.rank, c._etag from c' };
+    try {
+      const response = await judges.items.query(querySpec).fetchAll();
+      log('get all judges', response);
+      return response.resources;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  static async get(id) {
+    const response = await judges.item(id).read();
+    if (response && response.resource) {
+      log(`get judge with id ${id}`, response);
+      return pick(response.resource, ['id', 'name', 'region', 'rank', '_etag']);
+    }
   }
 
   static async remove(id) {
-    await useStorage(key).removeItem(id);
+    const response = await judges.item(id).delete();
+    log(`delete judge with id ${id}`, response);
   }
 }
