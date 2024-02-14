@@ -2,8 +2,11 @@ import { nanoid } from 'nanoid';
 import { pick } from 'lodash-es';
 
 import { createReport, isDev } from '~/server/utils';
+import { database, log } from './cosmos';
 
-const key = isDev() ? 'tournament-dev' : 'tournament';
+const key = isDev() ? 'tournaments-dev' : 'tournaments';
+const tournaments = database.container(key);
+
 // const key = 'tournament';
 /**
  * {
@@ -34,46 +37,74 @@ const key = isDev() ? 'tournament-dev' : 'tournament';
 export default class Tournament {
   #id;
   #tournament;
-  constructor(id, data) {
+  #etag;
+  constructor(id, data, etag) {
     this.#id = id;
-    this.#tournament = data;
-  }
-
-  static async getAll() {
-    const tournamentsIds = await useStorage(key).getKeys();
-    const loadTournaments = tournamentsIds.map((id) => {
-      return (async () => {
-        const tournament = await Tournament.get(id);
-        return pick(tournament.data, ['id', 'name', 'org', 'showJudgeTotals']);
-      })();
-    });
-    const tournaments = await Promise.all(loadTournaments);
-    return tournaments;
-  }
-
-  static async get(id) {
-    const tournament = await useStorage(key).getItem(id);
-    if (tournament) {
-      return new Tournament(id, tournament);
-    }
+    this.#tournament = pick(data, ['id', 'name', 'org', 'showJudgeTotals', 'mats', 'invites', 'value']);
+    this.#etag = etag;
   }
 
   static async create({ name = 'Tournament 1', org, showJudgeTotals = true }) {
     const id = nanoid(6);
     const tournamentData = {
+      id,
       name,
       org,
       showJudgeTotals,
       mats: [],
       invites: {},
     };
-    const tournament = new Tournament(id, tournamentData);
-    await tournament.save();
-    return tournament;
+    const response = await tournaments.items.create(tournamentData);
+    log(`create new tournament with id ${id}`, response);
+    return response.resource;
+  }
+
+  static async update(id, changes, options) {
+    try {
+      const patchOperations = [];
+      Object.keys(changes).forEach(key => {
+        patchOperations.push({
+          op: 'replace',
+          path: `/${key}`,
+          value: changes[key],
+        });
+      });
+      const response = await tournaments.item(id).patch(patchOperations, {
+        accessCondition: { type: "IfMatch", condition: options._etag },
+      });
+      log(`update tournament with id ${id}`, response);
+      return response.resource;
+    } catch (err) {
+      if (err.code === 412) {
+        throw new Error('tournament out of date, refresh and try again');
+      } else {
+        throw err;
+      }
+    }
+  }
+
+  static async getAll() {
+    const querySpec = { query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c._etag from c' };
+    try {
+      const response = await tournaments.items.query(querySpec).fetchAll();
+      log('get all tournaments', response);
+      return response.resources;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  static async get(id) {
+    const response = await tournaments.item(id).read();
+    if (response && response.resource) {
+      log(`get tournament with id ${id}`, response);
+      return new Tournament(id, response.resource, response.resource._etag);
+    }
   }
 
   static async remove(id) {
-    await useStorage(key).removeItem(id);
+    const response = await tournaments.item(id).delete();
+    log(`delete tournament with id ${id}`, response);
   }
 
   getMat(matNumber) {
@@ -255,7 +286,10 @@ export default class Tournament {
   }
 
   async save() {
-    await useStorage(key).setItem(this.#id, this.#tournament);
+    const response = await tournaments.items.upsert({ id: this.#id, ...this.#tournament }, {
+      accessCondition: { type: "IfMatch", condition: this.#etag },
+    });
+    log(`update tournament with id ${this.#id}`, response);
   }
 
   update(tournament) {

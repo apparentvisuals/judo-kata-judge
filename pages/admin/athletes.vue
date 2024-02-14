@@ -18,18 +18,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="a in athletes">
+        <tr v-for="(a, index) in athletes">
           <td>{{ a.id }}</td>
           <td>{{ a.name }}</td>
           <td>{{ getRankName(a.rank) }}</td>
           <td>{{ getProvinceName(a.region) }}</td>
           <td>
             <div class="join">
-              <button class="btn btn-secondary btn-square btn-sm join-item" @click.prevent="showUpdate(a)"
+              <button class="btn btn-secondary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
                 :disabled="inAction">
                 <PencilIcon class="w-4 h-4" />
               </button>
-              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(a.id)"
+              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
                 :disabled="inAction">
                 <XMarkIcon class="w-5 h-5" />
               </button>
@@ -43,7 +43,7 @@
     <AthleteInputs :athlete="newAthlete" />
   </Prompt>
   <Prompt name="edit_athlete_modal" @submit="update" :disabled="inAction" text="Update">
-    <AthleteInputs :athlete="athleteToUpdate" />
+    <AthleteInputs :athlete="toUpdate" />
   </Prompt>
   <Prompt name="delete_athlete_modal" @submit="remove" text="Yes">
     <span>Delete this athlete?</span>
@@ -51,32 +51,31 @@
 </template>
 
 <script setup>
-import { clone, pick } from 'lodash-es';
+import { clone, pickBy } from 'lodash-es';
 import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
 import { getProvinceName, getRankName, handleServerError } from '~/src/utils';
+
+useHead({
+  title: 'Athletes - Kata Admin',
+});
 
 const DEFAULT = { name: '', region: 'on', rank: '1d' };
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 
-const error = useState('error', () => '');
-const athletes = useState('athletes', () => ({}));
-const inAction = useState('in-action', () => false);
-const newAthlete = useState('new-athlete', () => clone(DEFAULT));
-const athleteToDelete = useState('athlete-to-delete', () => undefined);
-const athleteToUpdate = useState('athlete-to-update', () => clone(DEFAULT));
+const error = ref('');
+const inAction = ref(false);
+const newAthlete = ref(clone(DEFAULT));
+const deleteIndex = ref(-1);
+const updateIndex = ref(-1);
+const toUpdate = ref(clone(DEFAULT));
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
-try {
-  inAction.value = true;
-  athletes.value = await $fetch(`/api/athletes`, { headers });
-  error.value = '';
-} catch (err) {
-  error.value = handleServerError(err);
-} finally {
-  inAction.value = false;
-}
+const { data: athletes, error: err } = await useFetch(`/api/athletes`, { headers });
+watch(err, (newErr) => {
+  error.value = handleServerError(newErr);
+});
 
 async function showAdd() {
   add_athlete_modal.showModal();
@@ -86,8 +85,8 @@ async function add() {
   inAction.value = true;
   try {
     const body = newAthlete.value;
-    const result = await $fetch(`/api/athletes`, { method: 'POST', body, headers });
-    athletes.value.push(result);
+    const athlete = await $fetch(`/api/athletes`, { method: 'POST', body, headers });
+    athletes.value.push(athlete);
     newAthlete.value = clone(DEFAULT);
     error.value = '';
   } catch (err) {
@@ -97,22 +96,21 @@ async function add() {
   }
 }
 
-function showUpdate(athlete) {
-  athleteToUpdate.value = clone(athlete);
-  athleteToUpdate.value.originalAthlete = athlete;
+function showUpdate(index) {
+  updateIndex.value = index;
+  toUpdate.value = clone(athletes.value[index]);
   edit_athlete_modal.showModal();
 }
 
 async function update() {
   try {
-    const id = athleteToUpdate.value.id;
-    const body = pick(athleteToUpdate.value, ["name", "rank", "region"]);
-    const result = await $fetch(`/api/athletes/${id}`, { method: 'POST', body, headers });
-    const originalAthlete = athleteToUpdate.value.originalAthlete;
-    originalAthlete.name = result.name;
-    originalAthlete.rank = result.rank;
-    originalAthlete.region = result.region;
-    athleteToUpdate.value = clone(DEFAULT);
+    const id = toUpdate.value.id;
+    const original = athletes.value[updateIndex.value];
+    const body = pickBy(toUpdate.value, (value, key) => _filterUpdate(value, key, original));
+    const athlete = await $fetch(`/api/athletes/${id}`, { method: 'POST', body, headers });
+    Object.assign(original, athlete);
+    updateIndex.value = -1;
+    toUpdate.value = clone(DEFAULT);
     error.value = '';
   } catch (err) {
     error.value = handleServerError(err);
@@ -121,24 +119,36 @@ async function update() {
   }
 }
 
-async function showRemove(id) {
-  athleteToDelete.value = id;
+async function showRemove(index) {
+  deleteIndex.value = index;
   delete_athlete_modal.showModal();
 }
 
 async function remove() {
-  if (athleteToDelete.value) {
-    const id = athleteToDelete.value;
+  if (deleteIndex.value > -1) {
+    const id = athletes.value[deleteIndex.value].id;
     try {
       inAction.value = true;
-      athletes.value = await $fetch(`/api/athletes/${id}`, { method: 'DELETE', headers });
+      await $fetch(`/api/athletes/${id}`, { method: 'DELETE', headers });
+      athletes.value.splice(deleteIndex.value, 1);
       error.value = '';
-      athleteToDelete.value = undefined;
     } catch (err) {
       error.value = handleServerError(err);
     } finally {
       inAction.value = false;
     }
   }
+}
+
+function _filterUpdate(value, key, original) {
+  if (key === '_etag') {
+    return true;
+  }
+  if (["name", "rank", "region"].includes(key)) {
+    if (original[key] !== value) {
+      return true;
+    }
+  }
+  return false;
 }
 </script>

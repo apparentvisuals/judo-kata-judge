@@ -16,18 +16,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="t in tournaments">
+        <tr v-for="(t, index) in tournaments">
           <td>{{ t.id }}</td>
           <td>
             <NuxtLink class="link" :to="`/admin/t/${t.id}`">{{ t.name }}</NuxtLink>
           </td>
           <td>
             <div class="join">
-              <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(t)"
+              <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
                 :disabled="inAction" title="Edit Tournament">
                 <PencilIcon class="w-4 h-4" />
               </button>
-              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(t.id)"
+              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
                 :disabled="inAction" title="Delete Tournament">
                 <XMarkIcon class="w-5 h-5" />
               </button>
@@ -41,7 +41,7 @@
     <TournamentInputs :tournament="newTournament" />
   </Prompt>
   <Prompt name="edit_t_modal" @submit="update" :disabled="inAction" text="Update">
-    <TournamentInputs :tournament="tournamentToUpdate" />
+    <TournamentInputs :tournament="toUpdate" />
   </Prompt>
   <Prompt name="delete_t_modal" @submit="remove" text="Yes">
     <span>Delete this tournament?</span>
@@ -49,32 +49,31 @@
 </template>
 
 <script setup>
-import { clone, pick } from 'lodash-es';
+import { clone, pickBy } from 'lodash-es';
 import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
 import { handleServerError } from '~/src/utils';
 
-const DEFAULT = { name: '', showJudgeTotals: true };
+useHead({
+  title: 'Tournaments - Kata Admin',
+});
+
+const DEFAULT = { name: '', org: 'jc', showJudgeTotals: true };
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 
 const error = ref('');
-const tournaments = ref({});
 const inAction = ref(false);
-const newTournament = ref(Object.assign(DEFAULT));
-const tournamentToDelete = ref();
-const tournamentToUpdate = ref(Object.assign(DEFAULT));
+const newTournament = ref(clone(DEFAULT));
+const deleteIndex = ref(-1);
+const updateIndex = ref(-1);
+const toUpdate = ref(clone(DEFAULT));
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
-try {
-  inAction.value = true;
-  tournaments.value = await $fetch(`/api/tournaments`, { headers: { authorization: `Bearer ${cookie.value.adminCode}` } });
-  error.value = '';
-} catch (err) {
-  error.value = handleServerError(err);
-} finally {
-  inAction.value = false;
-}
+const { data: tournaments, error: err } = await useFetch(`/api/tournaments`, { headers });
+watch(err, (newErr) => {
+  error.value = handleServerError(newErr);
+});
 
 function showAdd() {
   add_t_modal.showModal();
@@ -84,9 +83,9 @@ async function add() {
   try {
     inAction.value = true;
     const body = newTournament.value;
-    const result = await $fetch(`/api/tournaments`, { method: 'POST', body, headers });
-    tournaments.value.push({ id: result.id, name: result.name });
-    newTournament.value = Object.assign(DEFAULT);
+    const tournament = await $fetch(`/api/tournaments`, { method: 'POST', body, headers });
+    tournaments.value.push(tournament);
+    newTournament.value = clone(DEFAULT);
     error.value = '';
   } catch (err) {
     error.value = handleServerError(err);
@@ -95,22 +94,21 @@ async function add() {
   }
 }
 
-function showUpdate(tournament) {
-  tournamentToUpdate.value = clone(tournament);
-  tournamentToUpdate.value.originalTournament = tournament;
+function showUpdate(index) {
+  updateIndex.value = index;
+  toUpdate.value = clone(tournaments.value[index]);
   edit_t_modal.showModal();
 }
 
 async function update() {
   try {
-    const id = tournamentToUpdate.value.id;
-    const body = pick(tournamentToUpdate.value, ["name", "org", "showJudgeTotals"]);
-    const result = await $fetch(`/api/tournaments/${id}`, { method: 'POST', body, headers });
-    const originalTournament = tournamentToUpdate.value.originalTournament;
-    originalTournament.name = result.name;
-    originalTournament.org = result.org;
-    originalTournament.showJudgeTotals = result.showJudgeTotals;
-    tournamentToUpdate.value = clone(DEFAULT);
+    const id = toUpdate.value.id;
+    const original = tournaments.value[updateIndex.value];
+    const body = pickBy(toUpdate.value, (value, key) => _filterUpdate(value, key, original));
+    const tournament = await $fetch(`/api/tournaments/${id}`, { method: 'POST', body, headers });
+    Object.assign(original, tournament);
+    updateIndex.value = -1;
+    toUpdate.value = clone(DEFAULT);
     error.value = '';
   } catch (err) {
     error.value = handleServerError(err);
@@ -119,17 +117,18 @@ async function update() {
   }
 }
 
-async function showRemove(id) {
-  tournamentToDelete.value = id;
+async function showRemove(index) {
+  deleteIndex.value = index;
   delete_t_modal.showModal();
 }
 
 async function remove() {
-  if (tournamentToDelete.value) {
-    const id = tournamentToDelete.value;
+  if (deleteIndex.value > -1) {
+    const id = tournaments.value[deleteIndex.value].id;
     try {
       inAction.value = true;
-      tournaments.value = await $fetch(`/api/tournaments/${id}`, { method: 'DELETE', headers });
+      await $fetch(`/api/tournaments/${id}`, { method: 'DELETE', headers });
+      tournaments.value.splice(deleteIndex.value, 1);
       error.value = '';
     } catch (err) {
       error.value = handleServerError(err);
@@ -137,5 +136,17 @@ async function remove() {
       inAction.value = false;
     }
   }
+}
+
+function _filterUpdate(value, key, original) {
+  if (key === '_etag') {
+    return true;
+  }
+  if (["name", "org", "showJudgeTotals"].includes(key)) {
+    if (original[key] !== value) {
+      return true;
+    }
+  }
+  return false;
 }
 </script>
