@@ -18,18 +18,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="j in judges">
+        <tr v-for="(j, index) in judges">
           <td>{{ j.id }}</td>
           <td>{{ j.name }}</td>
           <td>{{ getLevelName(j.rank) }}</td>
           <td>{{ getProvinceName(j.region) }}</td>
           <td>
             <div class="join">
-              <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(j)"
+              <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
                 :disabled="inAction">
                 <PencilIcon class="w-4 h-4" />
               </button>
-              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(j.id)"
+              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
                 :disabled="inAction">
                 <XMarkIcon class="w-5 h-5" />
               </button>
@@ -43,7 +43,7 @@
     <JudgeInput :judge="newJudge" />
   </Prompt>
   <Prompt name="edit_judge_modal" @submit="update" :disabled="inAction" text="Update">
-    <JudgeInput :judge="judgeToUpdate" />
+    <JudgeInput :judge="toUpdate" />
   </Prompt>
   <Prompt name="delete_judge_modal" @submit="remove" text="Yes">
     <span>Delete this judge?</span>
@@ -51,32 +51,31 @@
 </template>
 
 <script setup>
-import { clone, pick } from 'lodash-es';
+import { clone, pickBy } from 'lodash-es';
 import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
 import { getLevelName, getProvinceName, handleServerError } from '~/src/utils';
+
+useHead({
+  title: 'Judges - Kata Admin',
+});
 
 const DEFAULT = { name: '', region: 'on', rank: 'n' };
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 
-const error = useState('error', () => '');
-const inAction = useState('in-action', () => false);
-const judges = useState('judges', () => ({}));
-const newJudge = useState('new-judge', () => clone(DEFAULT));
-const judgeToDelete = useState('judge-to-delete', () => undefined);
-const judgeToUpdate = useState('judge-to-update', () => clone(DEFAULT));
+const error = ref('');
+const inAction = ref(false);
+const newJudge = ref(clone(DEFAULT));
+const deleteIndex = ref(-1);
+const updateIndex = ref(-1);
+const toUpdate = ref(clone(DEFAULT));
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
-try {
-  inAction.value = true;
-  judges.value = await $fetch(`/api/judges`, { headers });
-  error.value = '';
-} catch (err) {
-  error.value = handleServerError(err);
-} finally {
-  inAction.value = false;
-}
+const { data: judges, error: err } = await useFetch(`/api/judges`, { headers });
+watch(err, (newErr) => {
+  error.value = handleServerError(newErr);
+});
 
 function showAdd() {
   add_judge_modal.showModal();
@@ -96,22 +95,21 @@ async function add() {
   }
 }
 
-function showUpdate(judge) {
-  judgeToUpdate.value = clone(judge);
-  judgeToUpdate.value.originalJudge = judge;
+function showUpdate(index) {
+  updateIndex.value = index;
+  toUpdate.value = clone(judges.value[index]);
   edit_judge_modal.showModal();
 }
 
 async function update() {
   try {
-    const id = judgeToUpdate.value.id;
-    const body = pick(judgeToUpdate.value, ["name", "rank", "region"]);
-    const result = await $fetch(`/api/judges/${id}`, { method: 'POST', body, headers });
-    const originalJudge = judgeToUpdate.value.originalJudge;
-    originalJudge.name = result.name;
-    originalJudge.rank = result.rank;
-    originalJudge.region = result.region;
-    judgeToUpdate.value = clone(DEFAULT);
+    const id = toUpdate.value.id;
+    const original = judges.value[updateIndex.value];
+    const body = pickBy(toUpdate.value, (value, key) => _filterUpdate(value, key, original));
+    const judge = await $fetch(`/api/judges/${id}`, { method: 'POST', body, headers });
+    Object.assign(original, judge);
+    updateIndex.value = -1;
+    toUpdate.value = clone(DEFAULT);
     error.value = '';
   } catch (err) {
     error.value = handleServerError(err);
@@ -120,17 +118,19 @@ async function update() {
   }
 }
 
-async function showRemove(id) {
-  judgeToDelete.value = id;
+async function showRemove(index) {
+  deleteIndex.value = index;
   delete_judge_modal.showModal();
 }
 
 async function remove() {
-  if (judgeToDelete.value) {
-    const id = judgeToDelete.value;
+  if (deleteIndex.value > -1) {
+    const id = judges.value[deleteIndex.value].id;
     try {
       inAction.value = true;
-      judges.value = await $fetch(`/api/judges/${id}`, { method: 'DELETE', headers });
+      await $fetch(`/api/judges/${id}`, { method: 'DELETE', headers });
+      judges.value.splice(deleteIndex.value, 1);
+      deleteIndex.value = -1;
       error.value = '';
     } catch (err) {
       error.value = handleServerError(err);
@@ -138,5 +138,17 @@ async function remove() {
       inAction.value = false;
     }
   }
+}
+
+function _filterUpdate(value, key, original) {
+  if (key === '_etag') {
+    return true;
+  }
+  if (["name", "rank", "region"].includes(key)) {
+    if (original[key] !== value) {
+      return true;
+    }
+  }
+  return false;
 }
 </script>

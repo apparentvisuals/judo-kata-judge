@@ -11,9 +11,7 @@ export default defineEventHandler(async (event) => {
   }
   try {
     const athleteId = getRouterParam(event, 'athlete');
-    await Athlete.remove(athleteId.toUpperCase());
-    const athletes = await Athlete.getAll();
-    return athletes;
+    await Athlete.remove(athleteId);
   } catch (err) {
     return createError({ statusCode: 400, message: err.message });
   }

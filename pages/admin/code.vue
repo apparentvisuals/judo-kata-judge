@@ -11,7 +11,7 @@
             <span for="code" class="label-text-alt text-error" v-if="error">{{ error }}</span>
           </label>
         </div>
-        <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        <button type="submit" class="btn btn-primary mt-4" :disabled="inAction">Submit</button>
       </form>
     </div>
   </div>
@@ -20,14 +20,20 @@
 <script setup>
 import { handleServerError } from '~/src/utils';
 
+useHead({
+  title: 'Kata Admin',
+});
+
 const cookie = useCookie('jkj', { default: () => ({}) });
 const route = useRoute();
 
+const inAction = ref(false);
 const code = ref('');
 const error = ref('');
 
 async function submit() {
   try {
+    inAction.value = true;
     await $fetch('/api/login', { headers: { authorization: `Bearer ${code.value}` } });
     cookie.value.adminCode = code.value;
     if (route.query.from) {
@@ -41,6 +47,8 @@ async function submit() {
     } else {
       error.value = handleServerError(err);
     }
+  } finally {
+    inAction.value = false;
   }
 }
 </script>

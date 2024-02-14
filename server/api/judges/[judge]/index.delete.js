@@ -15,8 +15,6 @@ export default defineEventHandler(async (event) => {
       return createError({ statusCode: 404, message: 'Judge not found' });
     }
     await Judge.remove(judgeId.toUpperCase());
-    const judges = await Judge.getAll();
-    return judges;
   } catch (err) {
     return createError({ statusCode: 400, message: err.message });
   }

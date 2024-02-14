@@ -15,8 +15,6 @@ export default defineEventHandler(async (event) => {
       return createError({ statusCode: 404, message: 'Tournament not found' });
     }
     await Tournament.remove(tournamentId);
-    const tournaments = await Tournament.getAll();
-    return tournaments;
   } catch (err) {
     return createError({ statusCode: 400, message: err.message });
   }

@@ -1,3 +1,4 @@
+import { omitBy, isNil } from 'lodash-es';
 import Tournament from '~/server/models/tournament';
 import { getAuth, getToken } from '~/server/utils';
 
@@ -9,23 +10,19 @@ export default defineEventHandler(async (event) => {
   if (token !== getAuth()) {
     return createError({ statusCode: 403, message: 'forbidden' });
   }
+
   const tournamentId = getRouterParam(event, 'tournament');
   if (!tournamentId) {
     return createError({ statusCode: 404, message: 'Tournament not found' });
   }
-  const { name, org, showJudgeTotals, mats } = await readBody(event);
-  const tournament = await Tournament.get(tournamentId);
-  if (!tournament) {
-    return createError({ statusCode: 404, message: 'Tournament not found' });
-  }
-  if (tournament.data.version !== 3) {
-    tournament.upgrade();
-    await tournament.save();
-    return { ...tournament.data, upgrade: true };
-  } else {
-    tournament.update({ name, org, showJudgeTotals, mats });
-    await tournament.save();
-    return tournament.data;
+  const { name, org, showJudgeTotals, mats, _etag } = await readBody(event);
+  if (!_etag) {
+    return createError({ statusCode: 400, message: 'Invalid update data' });
   }
 
+  try {
+    return await Tournament.update(tournamentId, omitBy({ name, org, showJudgeTotals, mats }, isNil), { _etag });
+  } catch (err) {
+    return createError({ statusCode: 400, message: err.message });
+  }
 });

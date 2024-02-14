@@ -11,8 +11,7 @@ export default defineEventHandler(async (event) => {
   }
   try {
     const { name, org, showJudgeTotals } = await readBody(event);
-    const tournament = await Tournament.create({ name, org, showJudgeTotals });
-    return tournament.data;
+    return await Tournament.create({ name, org, showJudgeTotals });
   } catch (err) {
     return createError({ statusCode: 400, message: err.message });
   }
