@@ -19,11 +19,11 @@ function getClient() {
 }
 
 export function log(message, response) {
-  _log(20, message, response ? [response.headers['x-ms-request-charge']] : []);
+  _log(20, message, response ? { rc: response.headers['x-ms-request-charge'] } : {});
 }
 
 function _log(level, message, props) {
-  console.log(`[${new Date().toISOString()}]${_levelText(level)}${_propText(props)} ${message}`);
+  console.log(`[${new Date().toISOString()}]${_levelText(level)} ${message} ${_propText(props)}`);
 }
 
 function _levelText(level) {
@@ -42,9 +42,9 @@ function _levelText(level) {
 }
 
 function _propText(props) {
-  let string = '';
-  (props || []).forEach(prop => {
-    string += `[${prop}]`;
+  let strings = [];
+  Object.keys(props || {}).forEach(key => {
+    strings.push(`${key}=${props[key]}`);
   });
-  return string;
+  return strings.join(' ');
 }

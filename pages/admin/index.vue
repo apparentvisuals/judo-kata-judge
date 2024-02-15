@@ -10,16 +10,18 @@
     <table class="admin-table">
       <thead>
         <tr>
-          <th class="w-12">Code</th>
-          <th>Name</th>
+          <th class="w-1/2">Name</th>
+          <th class="w-1/2">Region</th>
           <th class="w-16"></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(t, index) in tournaments">
-          <td>{{ t.id }}</td>
           <td>
             <NuxtLink class="link" :to="`/admin/t/${t.id}`">{{ t.name }}</NuxtLink>
+          </td>
+          <td>
+            {{ getOrganization(t.org) }}
           </td>
           <td>
             <div class="join">
@@ -51,7 +53,7 @@
 <script setup>
 import { clone, pickBy } from 'lodash-es';
 import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
-import { handleServerError } from '~/src/utils';
+import { getOrganization, handleServerError } from '~/src/utils';
 
 useHead({
   title: 'Tournaments - Kata Admin',

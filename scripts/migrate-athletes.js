@@ -1,3 +1,4 @@
+import { omit } from 'lodash-es';
 import { database, log } from "../server/models/cosmos.js";
 
 const athletes = database.container('athletes');
@@ -15,6 +16,6 @@ await Promise.all(normalizedAthletes.map(athlete => _doCreate(athlete)));
 
 
 async function _doCreate(athlete) {
-  const response = await athletesDev.items.upsert(athlete);
+  const response = await athletes.items.upsert(omit(athlete, 'value'));
   log(`moved athlete with id ${response.resource.id}`, response);
 }
