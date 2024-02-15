@@ -6,11 +6,13 @@ export default defineEventHandler(async (event) => {
   if (!token) {
     return createError({ statusCode: 401, message: 'unauthorized' });
   }
-  if (token !== getAuth()) {
+  const context = getAuth(token);
+  if (!context) {
     return createError({ statusCode: 403, message: 'forbidden' });
   }
+
   try {
-    const tournaments = await Tournament.getAll();
+    const tournaments = await Tournament.getAll(context);
     return tournaments;
   } catch (err) {
     return createError({ statusCode: 400, message: err.message });

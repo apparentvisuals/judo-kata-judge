@@ -23,8 +23,9 @@
         <span>View Invite Link</span>
       </button>
       <div class="flex-1"></div>
-      <button class="btn btn-secondary" @click.prevent="save" title="Save">
-        Save
+      <button v-if="isReordering" class="btn btn-error" @click.prevent="cancel" title="Cancel">Cancel</button>
+      <button class="btn btn-secondary" @click.prevent="save" :title="isReordering ? 'Save' : 'Reorder'">
+        {{ isReordering ? 'Save' : 'Reorder' }}
       </button>
     </ActionBar>
     <div class="flex flex-col gap-4">
@@ -43,12 +44,12 @@
           </div>
         </div>
         <draggable v-model="mat.groups" tag="div" group="groups" item-key="name" class="flex flex-col gap-2 p-2"
-          handle=".handle">
+          handle=".handle" :disabled="!isReordering">
           <template #item="{ element: group, index: groupIndex }">
             <div class="bg-base-100 p-2 border border-secondary">
               <div class="flex justify-between mb-2">
                 <div class="flex gap-2">
-                  <ArrowsUpDownIcon class="handle w-6 h-6" />
+                  <ArrowsUpDownIcon v-show="isReordering" class="handle w-6 h-6" />
                   <span class="text-lg font-semibold">{{ getGroupName(group, groupIndex) }}</span>
                   <div class="join join-horizontal">
                     <div class="badge badge-lg badge-info join-item">Judges: {{ group.numberOfJudges }}</div>
@@ -80,16 +81,17 @@
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th class="w-8"></th>
+                    <th v-if="isReordering" class="w-8"></th>
                     <th class="sm:w-1/2">Tori</th>
                     <th class="hidden sm:table-cell sm:w-1/2">Uke</th>
                     <th class="w-8"></th>
                   </tr>
                 </thead>
-                <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori" handle=".handle">
+                <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori" handle=".handle"
+                  :disabled="!isReordering">
                   <template #item="{ element: match, index }">
                     <tr class="bg-base-100">
-                      <td>
+                      <td v-if="isReordering" class="px-0">
                         <ArrowsUpDownIcon class="handle w-6 h-6" />
                       </td>
                       <td>
@@ -156,7 +158,7 @@
 </template>
 
 <script setup>
-import { clone, omit, pick } from 'lodash-es';
+import { clone, omit } from 'lodash-es';
 import { ArrowsUpDownIcon, XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, ArrowPathIcon, DocumentTextIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
 import { getGroupName, handleServerError, shuffle } from '~/src/utils';
 
@@ -171,8 +173,8 @@ const headers = computed(() => ({ authorization: `Bearer ${cookie.value.adminCod
 
 const error = ref('');
 const inAction = ref(false);
-const tournament = ref({});
-const athletes = ref([]);
+// const tournament = ref({});
+// const athletes = ref([]);
 const newGroup = ref(clone(DEFAULT_GROUP));
 const newMatch = ref(clone(DEFAULT_MATCH));
 const matToEdit = ref();
@@ -180,6 +182,8 @@ const groupToEdit = ref();
 const matchToEdit = ref();
 const groupToUpdate = ref(clone(DEFAULT_GROUP));
 const matchToUpdate = ref(clone(DEFAULT_MATCH));
+const isReordering = ref(false);
+
 const invite = computed(() => {
   if (tournament.value.invites) {
     const inviteCodes = Object.keys(tournament.value.invites);
@@ -220,17 +224,27 @@ async function deleteMat() {
   tournament.value = response;
 }
 
+async function cancel() {
+  isReordering.value = false;
+}
+
 async function save() {
-  const body = _tournamentToPayload(tournament.value);
-  try {
-    error.value = '';
-    const response = await $fetch(`/api/tournaments/${tournamentId.value}`, { method: 'POST', body, headers: headers.value });
-    tournament.value = response;
-    if (response.upgrade) {
-      error.value = 'Tournament was upgraded and no changes was applied. Please make your changes again.';
+  if (isReordering.value) {
+    const body = _tournamentToPayload(tournament.value);
+    try {
+      error.value = '';
+      const response = await $fetch(`/api/tournaments/${tournamentId.value}`, { method: 'POST', body, headers: headers.value });
+      tournament.value = response;
+      if (response.upgrade) {
+        error.value = 'Tournament was upgraded and no changes was applied. Please make your changes again.';
+      }
+    } catch (err) {
+      error.value = handleServerError(err);
+    } finally {
+      isReordering.value = false;
     }
-  } catch (err) {
-    error.value = handleServerError(err);
+  } else {
+    isReordering.value = true
   }
 }
 
@@ -333,22 +347,23 @@ async function deleteMatch() {
   tournament.value = response;
 }
 
-try {
-  tournament.value = await $fetch(`/api/tournaments/${tournamentId.value}`, { headers: headers.value });
-  athletes.value = await $fetch(`/api/athletes`, { headers: headers.value });
-} catch (err) {
+const { data: tournament, error: tError } = await useFetch(`/api/tournaments/${tournamentId.value}`, { headers: headers.value });
+watch(tError, (error) => {
   error.value = handleServerError(err);
-}
+});
+const { data: athletes, error: aError } = await useFetch(`/api/athletes`, { headers: headers.value });
+watch(aError, (error) => {
+  error.value = handleServerError(err);
+});
+// try {
+//   tournament.value = await $fetch(`/api/tournaments/${tournamentId.value}`, { headers: headers.value });
+//   athletes.value = await $fetch(`/api/athletes`, { headers: headers.value });
+// } catch (err) {
+//   error.value = handleServerError(err);
+// }
 
 function _tournamentToPayload(tournament) {
   return tournament;
-  // if (tournament) {
-  //   return {
-  //     mats: tournament.mats.map((map) => {
-
-  //     })
-  //   }
-  // }
 }
 
 </script>

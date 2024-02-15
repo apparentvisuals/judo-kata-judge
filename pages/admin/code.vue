@@ -6,18 +6,22 @@
           <label class="label" for="code">
             <span class="label-text">Admin Code</span>
           </label>
-          <input id="code" name="code" type="text" class="input input-bordered" v-model="code" />
+          <input id="code" name="code" type="text" class="input input-bordered" v-model="code" :disabled="inAction" />
           <label class="label">
-            <span for="code" class="label-text-alt text-error" v-if="error">{{ error }}</span>
+            <span for="code" class="label-text-alt text-error" v-show="error">{{ error }}</span>
           </label>
         </div>
-        <button type="submit" class="btn btn-primary mt-4" :disabled="inAction">Submit</button>
+        <button type="submit" class="btn btn-primary mt-4" :disabled="inAction">
+          Submit
+          <i v-show="inAction" class="loading loading-spinner loading-xs"></i>
+        </button>
       </form>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ka } from 'date-fns/locale';
 import { handleServerError } from '~/src/utils';
 
 useHead({
@@ -33,6 +37,11 @@ const error = ref('');
 
 async function submit() {
   try {
+    error.value = '';
+    if (code.value.length === 0) {
+      error.value = 'Password can not be empty';
+      return;
+    }
     inAction.value = true;
     await $fetch('/api/login', { headers: { authorization: `Bearer ${code.value}` } });
     cookie.value.adminCode = code.value;

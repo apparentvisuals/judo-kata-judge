@@ -76,6 +76,7 @@ export default class Tournament {
       return response.resource;
     } catch (err) {
       if (err.code === 412) {
+        log(`attemped to update out of date tournament ${id} with etag ${options._etag}`);
         throw new Error('tournament out of date, refresh and try again');
       } else {
         throw err;
@@ -83,8 +84,8 @@ export default class Tournament {
     }
   }
 
-  static async getAll() {
-    const querySpec = { query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c._etag from c' };
+  static async getAll(options) {
+    const querySpec = _getQuery(options);
     try {
       const response = await tournaments.items.query(querySpec).fetchAll();
       log('get all tournaments', response);
@@ -282,7 +283,7 @@ export default class Tournament {
   }
 
   get data() {
-    return { ...this.#tournament, id: this.#id };
+    return { ...this.#tournament, id: this.#id, _etag: this.#etag };
   }
 
   async save() {
@@ -303,26 +304,6 @@ export default class Tournament {
 
   replace(tournament) {
     this.#tournament = tournament;
-  }
-
-  upgrade() {
-    const mats = this.#tournament.mats;
-    if (mats) {
-      mats.forEach((mat) => {
-        if (mat.groups) {
-          mat.groups.forEach((group) => {
-            group.id = group.id || nanoid(4);
-            if (group.matches) {
-              group.matches.forEach((match) => {
-                match.id = match.id || nanoid();
-                match.scores = match.scores || _defaultScores();
-              });
-            }
-          });
-        }
-      });
-    }
-    this.#tournament.version = 3;
   }
 
   #assignGroupValues(group, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
@@ -352,4 +333,20 @@ export default class Tournament {
 
 function _defaultScores() {
   return Array(5).fill({});
+}
+
+function _getQuery(options) {
+  if (options.org) {
+    return {
+      query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c._etag FROM c WHERE c.org = @org',
+      parameters: [
+        {
+          name: '@org',
+          value: options.org,
+        },
+      ],
+    };
+  } else {
+    return { query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c._etag FROM c' };
+  }
 }

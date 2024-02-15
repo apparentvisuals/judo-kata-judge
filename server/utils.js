@@ -4,9 +4,26 @@ import { moveList, calculateHasMajor, calculateMoveScore } from '~/src/utils';
 
 export const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 
+const KEYSET = {
+  [process.env.AUTH_KEY]: {},
+  [process.env.JC_KEY]: { org: 'jc' },
+  [process.env.AB_KEY]: { org: 'ab' },
+  [process.env.BC_KEY]: { org: 'bc' },
+  [process.env.SK_KEY]: { org: 'sk' },
+  [process.env.MB_KEY]: { org: 'mb' },
+  [process.env.ON_KEY]: { org: 'on' },
+  [process.env.QC_KEY]: { org: 'qc' },
+  [process.env.NB_KEY]: { org: 'nb' },
+  [process.env.NS_KEY]: { org: 'ns' },
+  [process.env.PE_KEY]: { org: 'pe' },
+  [process.env.NL_KEY]: { org: 'nl' },
+  [process.env.YT_KEY]: { org: 'yt' },
+  [process.env.NT_KEY]: { org: 'nt' },
+  [process.env.NU_KEY]: { org: 'nu' },
+};
+
 export function isDev() {
   return process.env.NODE_ENV !== 'production';
-  // return false;
 }
 
 export function getToken(event) {
@@ -21,8 +38,13 @@ export function getToken(event) {
   return token;
 }
 
-export function getAuth() {
-  return process.env.AUTH_KEY;
+export function getAuth(key) {
+  if (key) {
+    const context = KEYSET[key];
+    if (context) {
+      return context;
+    }
+  }
 }
 
 export function createNoMatchMessage() {

@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   if (!token) {
     return createError({ statusCode: 401, message: 'unauthorized' });
   }
-  if (token !== getAuth()) {
+  if (!getAuth(token)) {
     return createError({ statusCode: 403, message: 'forbidden' });
   }
 
