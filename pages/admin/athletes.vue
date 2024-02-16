@@ -73,9 +73,9 @@ const toUpdate = ref(clone(DEFAULT));
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
 const { data: athletes, error: err } = await useFetch(`/api/athletes`, { headers });
-watch(err, (newErr) => {
-  error.value = handleServerError(newErr);
-});
+if (err.value) {
+  error.value = handleServerError(err);
+}
 
 async function showAdd() {
   add_athlete_modal.showModal();

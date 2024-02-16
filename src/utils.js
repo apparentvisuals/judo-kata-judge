@@ -427,7 +427,7 @@ export function handleServerError(err) {
   if (err.response) {
     return err.response._data.message;
   } else {
-    return err.message;
+    return err.statusMessage || err.message;
   }
 }
 

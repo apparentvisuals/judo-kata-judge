@@ -26,7 +26,6 @@
 <script setup>
 import { addMinutes, format, parse } from 'date-fns';
 import { duration, getGroupName } from '~/src/utils';
-import { UpdateEvents } from '~/src/event-sources';
 
 const DEFAULT_BREAK = 10;
 const DEFAULT_BREAK_EVERY_X_MATCH = 5;
@@ -69,28 +68,6 @@ const schedule = computed(() => {
   }
   return [];
 });
-
-/**
- * @type UpdateEvents
- */
-// let event;
-// onMounted(async () => {
-//   event = new UpdateEvents(props.mat, props.tournament.id);
-//   event.connect((data) => {
-//     if (data.error) {
-//       return;
-//     }
-//     currentMatch.value = data.index;
-//     currentGroup.value = data.groupIndex;
-//   });
-// });
-
-// onUnmounted(() => {
-//   if (event) {
-//     event.close();
-//   }
-// });
-
 </script>
 
 <style scoped>
