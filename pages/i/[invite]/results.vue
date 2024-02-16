@@ -45,9 +45,10 @@ const route = useRoute();
 const inviteCode = computed(() => route.params.invite);
 const autoScroll = computed(() => route.query.scroll);
 
-const tournament = ref({});
 const scores = ref({});
 const resultIndex = ref(0);
+const { data: tournament } = await useFetch(`/api/invites/${inviteCode.value}`);
+
 const showSubTotal = computed(() => {
   if (tournament.value.showJudgeTotals != null) {
     return tournament.value.showJudgeTotals;
@@ -72,7 +73,7 @@ function _subscribe() {
   if (events) {
     events.close();
   }
-  events = new EventSource(`/api/summary?token=${tournament.value.id}`);
+  events = new EventSource(`/api/summary?token=${inviteCode.value}`);
   events.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (!data.error) {
@@ -108,7 +109,6 @@ function _queueChange() {
 };
 
 onMounted(async () => {
-  tournament.value = await $fetch(`/api/invites/${inviteCode.value}`);
   _subscribe();
   if (autoScroll.value) {
     // For automatic cycling of results

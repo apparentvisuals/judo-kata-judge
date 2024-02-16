@@ -8,7 +8,7 @@
         </label>
         <div tabindex="0"
           class="dropdown-content flex flex-col gap-2 items-center w-80 bg-secondary mt-3 p-2 z-50 shadow">
-          <img class="h-12 md:hidden" :src="getOrganizationImage(tournament.org)" />
+          <img class="h-12 md:hidden" :src="getOrganizationImage(tournament || {}.org)" />
           <div class="text-xl font-bold text-center xl:hidden">{{ title }}</div>
           <button v-if="judgeCode" class="btn btn-sm btn-error w-full" @click.prevent.stop="changeJudge">
             <ArrowPathIcon class="w-5 h-5" />
@@ -16,7 +16,7 @@
           </button>
         </div>
       </div>
-      <img class="h-12 hidden md:inline" :src="getOrganizationImage(tournament.org)" />
+      <img class="h-12 hidden md:inline" :src="getOrganizationImage(tournament || {}.org)" />
       <div class="text-xl text-center font-bold hidden xl:block">{{ title }}</div>
     </div>
     <div class="navbar-center gap-2">
@@ -93,7 +93,6 @@ const judgeCode = computed({
 });
 const codeError = ref('');
 const loading = ref(true);
-const tournament = ref({});
 const matchIndex = ref(-1);
 const match = ref(undefined);
 const judge = ref(undefined);
@@ -101,12 +100,24 @@ const inAction = ref(false);
 const submitted = ref(false);
 const scores = useLocalStorage(`scores`, clone(DEFAULT_SCORES));
 
-const headers = computed(() => ({ authorization: `Bearer ${tournament.value.id}` }));
+const headers = computed(() => {
+  if (tournament.value) {
+    return { authorization: `Bearer ${tournament.value.id}` };
+  } else {
+    return {};
+  }
+});
+
 const title = computed(() => {
-  return `${tournament.value.name} Mat ${parseInt(matNumber.value) + 1}`;
+  if (tournament.value) {
+    return `${tournament.value.name} Mat ${parseInt(matNumber.value) + 1}`;
+  }
 });
 
 const status = computed(() => {
+  if (!tournament.value) {
+    return error.value;
+  }
   if (loading.value) {
     return 'Loading...';
   }
@@ -124,7 +135,9 @@ const status = computed(() => {
   }
   return '';
 });
+
 const moves = computed(() => moveList(match.value.kata));
+
 const canSubmit = computed(() => {
   return scores.value.points.every((score) => score.value != null && score.value !== 10);
 });
@@ -147,6 +160,10 @@ async function changeJudge() {
   judge.value = undefined;
   judgeCode.value = '';
   scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
+  if (event) {
+    event.close();
+    event = null;
+  }
 }
 
 function showSubmitScore() {
@@ -168,6 +185,9 @@ async function submitScore() {
   }
 }
 
+const { data: tournament, error: err } = await useFetch(`/api/invites/${inviteCode.value}`);
+if (err.value) error.value = handleServerError(err.value);
+
 /**
  * @type UpdateEvents
  */
@@ -178,35 +198,36 @@ onMounted(async () => {
     scores.value.judge = judgeNumber.value;
     scores.value.points = [];
   }
-  tournament.value = await $fetch(`/api/invites/${inviteCode.value}`);
-  event = new UpdateEvents(matNumber.value, tournament.value.id);
-  event.connect((data) => {
-    error.value = '';
-    loading.value = false;
-    if (data.error) {
-      error.value = data.error;
-      event.close();
-      return;
-    }
-    if (data.index === -1) {
-      submitted.value = true;
-      matchIndex.value = -1;
-      match.value = undefined;
-      scores.value = clone(DEFAULT_SCORES);
-      return;
-    }
-    if (data.index !== matchIndex || data.groupIndex !== groupIndex) {
-      submitted.value = false;
-      matchIndex.value = data.index;
-      match.value = { ...data.match, completed: data.completed, judgeState: data.state };
-      if (scores.value.id !== data.match.id || scores.value.points.length === 0) {
-        scores.value.id = data.match.id;
-        scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
+  if (tournament.value) {
+    event = new UpdateEvents(matNumber.value, inviteCode.value);
+    event.connect((data) => {
+      error.value = '';
+      loading.value = false;
+      if (data.error) {
+        error.value = data.error;
+        event.close();
+        return;
       }
+      if (data.index === -1) {
+        submitted.value = true;
+        matchIndex.value = -1;
+        match.value = undefined;
+        scores.value = clone(DEFAULT_SCORES);
+        return;
+      }
+      if (data.index !== matchIndex || data.groupIndex !== groupIndex) {
+        submitted.value = false;
+        matchIndex.value = data.index;
+        match.value = { ...data.match, completed: data.completed, judgeState: data.state };
+        if (scores.value.id !== data.match.id || scores.value.points.length === 0) {
+          scores.value.id = data.match.id;
+          scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
+        }
+      }
+    });
+    if (judgeCode.value) {
+      await submitCode();
     }
-  });
-  if (judgeCode.value) {
-    await submitCode();
   }
 });
 
