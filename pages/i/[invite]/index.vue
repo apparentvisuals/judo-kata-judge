@@ -43,15 +43,13 @@ const invite = computed(() => route.params.invite);
 const resultsPath = computed(() => `/i/${invite.value}/results`);
 
 const error = ref('');
-const tournament = ref({});
 
-try {
-  tournament.value = await $fetch(`/api/invites/${invite.value}`);
-  useHead({
-    title: tournament.value.name,
-  });
-} catch (err) {
+const { data: tournament, error: err } = await useFetch(`/api/invites/${invite.value}`);
+if (err.value) {
   error.value = handleServerError(err);
 }
 
+useHead({
+  title: tournament.value.name,
+});
 </script>

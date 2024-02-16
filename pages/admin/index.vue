@@ -73,9 +73,9 @@ const toUpdate = ref(clone(DEFAULT));
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
 const { data: tournaments, error: err } = await useFetch(`/api/tournaments`, { headers });
-watch(err, (newErr) => {
-  error.value = handleServerError(newErr);
-});
+if (err.value) {
+  error.value = handleServerError(err);
+}
 
 function showAdd() {
   add_t_modal.showModal();

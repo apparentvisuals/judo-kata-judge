@@ -47,7 +47,6 @@ const route = useRoute();
 const inviteCode = computed(() => route.params.invite);
 
 const error = ref('');
-const tournament = ref({});
 const currentGroup = ref(-1);
 const currentMatch = ref(-1);
 
@@ -63,6 +62,7 @@ const matches = computed(() => {
   }
   return matches;
 });
+
 const matchIndex = computed(() => {
   if (currentMatch.value === -1) {
     return -1;
@@ -110,9 +110,8 @@ const onDoubleDeck = computed(() => {
   }
 });
 
-try {
-  tournament.value = await $fetch(`/api/invites/${inviteCode.value}`);
-} catch (err) {
+const { data: tournament, error: err } = await useFetch(`/api/invites/${inviteCode.value}`);
+if (err.value) {
   error.value = handleServerError(err);
 }
 
@@ -121,7 +120,7 @@ try {
  */
 let event;
 onMounted(async () => {
-  event = new UpdateEvents(route.params.mat, tournament.value.id);
+  event = new UpdateEvents(route.params.mat, inviteCode.value);
   event.connect((data) => {
     if (data.error) {
       return;
