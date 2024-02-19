@@ -1,5 +1,6 @@
+import Match from '~/server/models/match';
 import Tournament from '~/server/models/tournament';
-import { getAuth, getToken } from '~/server/utils';
+import { createReport, getAuth, getToken, matchDataToScores } from '~/server/utils';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
@@ -14,5 +15,10 @@ export default defineEventHandler(async (event) => {
   const groupNumber = parseInt(getRouterParam(event, 'group'));
   const matchNumber = parseInt(getRouterParam(event, 'match'));
   const tournament = await Tournament.get(tournamentId);
-  return tournament.getMatch(matNumber, groupNumber, matchNumber);
+  const group = tournament.getGroup(matNumber, groupNumber);
+  const match = tournament.getMatch(matNumber, groupNumber, matchNumber);
+  const matchData = await Match.get(match.id);
+  match.scores = matchDataToScores(matchData);
+  match.results = createReport(group, match);
+  return match;
 });

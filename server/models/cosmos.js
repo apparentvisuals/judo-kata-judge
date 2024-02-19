@@ -1,25 +1,38 @@
 import { CosmosClient } from "@azure/cosmos";
 import { DefaultAzureCredential } from "@azure/identity";
 
+const TRACE = 10;
+const DEBUG = 20;
+const INFO = 30;
+const WARN = 40;
+const ERROR = 50;
+
 const endpoint = 'https://judo-kata-judge.documents.azure.com:443/';
 const client = getClient();
-
-export const database = client.database('judo-kata-judge');
-
 function getClient() {
   const key = process.env.COSMOS_KEY;
   if (key) {
-    console.log('authenticating cosmos with key');
+    info('authenticating cosmos with key');
     return new CosmosClient({ endpoint, key });
   } else {
-    console.log('authenticating cosmos with creds');
+    info('authenticating cosmos with creds');
     const aadCredentials = new DefaultAzureCredential();
     return new CosmosClient({ endpoint, aadCredentials });
   }
 }
 
+export const database = client.database('judo-kata-judge');
 export function log(message, response) {
-  _log(20, message, response ? { rc: response.headers['x-ms-request-charge'] } : {});
+  _log(DEBUG, message, response ? { rc: response.headers['x-ms-request-charge'] } : {});
+}
+export function info(message, response) {
+  _log(INFO, message, response ? { rc: response.headers['x-ms-request-charge'] } : {});
+}
+export function warn(message, response) {
+  _log(WARN, message, response ? { rc: response.headers['x-ms-request-charge'] } : {});
+}
+export function error(message, response) {
+  _log(ERROR, message, response ? { rc: response.headers['x-ms-request-charge'] } : {});
 }
 
 function _log(level, message, props) {
@@ -28,15 +41,15 @@ function _log(level, message, props) {
 
 function _levelText(level) {
   switch (level) {
-    case 10:
+    case TRACE:
       return '[TRACE]';
-    case 20:
+    case DEBUG:
       return '[DEBUG]';
-    case 30:
+    case INFO:
       return '[INFO] ';
-    case 40:
+    case WARN:
       return '[WARN] ';
-    case 50:
+    case ERROR:
       return '[ERROR]';
   }
 }
