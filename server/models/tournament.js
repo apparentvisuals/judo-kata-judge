@@ -1,8 +1,9 @@
 import { nanoid } from 'nanoid';
 import { pick } from 'lodash-es';
 
-import { createReport, isDev } from '~/server/utils';
+import { createReport, isDev, matchDataToScores } from '~/server/utils';
 import { database, log } from './cosmos';
+import Match from './match';
 
 const key = isDev() ? 'tournaments-dev' : 'tournaments';
 const tournaments = database.container(key);
@@ -64,7 +65,7 @@ export default class Tournament {
       const patchOperations = [];
       Object.keys(changes).forEach(key => {
         patchOperations.push({
-          op: 'replace',
+          op: 'add',
           path: `/${key}`,
           value: changes[key],
         });
@@ -85,7 +86,7 @@ export default class Tournament {
   }
 
   static async getAll(options) {
-    const querySpec = _getQuery(options);
+    const querySpec = _getAllQuery(options);
     try {
       const response = await tournaments.items.query(querySpec).fetchAll();
       log('get all tournaments', response);
@@ -176,7 +177,16 @@ export default class Tournament {
       return;
     }
     const match = group.matches[matchNumber];
-    return { id: match.id, name: group.name, kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores, results: createReport(group, match) };
+    return {
+      tName: this.#tournament.name,
+      org: this.#tournament.org,
+      id: match.id,
+      name: group.name,
+      kata: group.kata,
+      numberOfJudges: group.numberOfJudges,
+      uke: match.uke,
+      tori: match.tori,
+    };
   }
 
   getNextMatch(matNumber) {
@@ -199,7 +209,7 @@ export default class Tournament {
             tori: match.tori,
             scores: match.scores,
           };
-          return { match: combinedMatch, index, groupIndex };
+          return { match: combinedMatch, group, index, groupIndex };
         }
       }
     }
@@ -222,14 +232,13 @@ export default class Tournament {
       toriId,
       uke,
       ukeId,
-      scores: _defaultScores(),
       completed: false,
     };
     matches.push(match);
     return match;
   }
 
-  updateMatch(matNumber, groupNumber, matchNumber, { id, tori, toriId, uke, ukeId, completed, scores }) {
+  async updateMatch(matNumber, groupNumber, matchNumber, { id, tori, toriId, uke, ukeId, completed, summary }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -250,17 +259,17 @@ export default class Tournament {
     }
     if (tori != null) {
       match.tori = tori;
+      match.toriId = toriId;
     }
-    match.toriId = toriId;
     if (uke != null) {
       match.uke = uke;
+      match.ukeId = ukeId;
     }
-    match.ukeId = ukeId;
     if (completed != null) {
       match.completed = completed;
     }
-    if (scores != null) {
-      match.scores = scores;
+    if (summary != null) {
+      match.summary = summary;
     }
     return match;
   }
@@ -275,7 +284,7 @@ export default class Tournament {
       return;
     }
     const matches = group.matches;
-    matches.splice(matchNumber, 1);
+    return matches.splice(matchNumber, 1)[0];
   }
 
   get id() {
@@ -335,7 +344,7 @@ function _defaultScores() {
   return Array(5).fill({});
 }
 
-function _getQuery(options) {
+function _getAllQuery(options) {
   if (options.org) {
     return {
       query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c._etag FROM c WHERE c.org = @org',

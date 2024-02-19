@@ -1,6 +1,7 @@
 import { customAlphabet } from 'nanoid';
 import { omit } from 'lodash-es';
 import { moveList, calculateHasMajor, calculateMoveScore } from '~/src/utils';
+import Match from './models/match';
 
 export const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 
@@ -51,7 +52,7 @@ export function createNoMatchMessage() {
   return `data: ${JSON.stringify({ error: 'no more matches' })}\n\n`
 }
 
-export function createUpdateMessage(tournament, mat) {
+export async function createUpdateMessage(tournament, mat, matchData) {
   const update = {
     tournament: tournament.data.name,
     org: tournament.data.org,
@@ -59,9 +60,10 @@ export function createUpdateMessage(tournament, mat) {
   };
   const { match, index, groupIndex } = tournament.getNextMatch(mat);
   if (match) {
-    const scores = match.scores;
-    const completed = isMatchComplete(match);
-    const judgeState = scores.map((judgeScore) => !!judgeScore.name);
+    matchData = matchData || await Match.get(match.id);
+    match.scores = matchDataToScores(matchData);
+    const completed = !!match.completed;
+    const judgeState = match.scores.map((judgeScore) => !!judgeScore.name);
     update.match = omit(match, 'scores');
     update.index = index;
     update.groupIndex = groupIndex;
@@ -91,10 +93,9 @@ export function createSummaryMessage(tournament) {
           uke: match.uke,
           scores: [],
         }
-        const results = createReport(group, match);
         if (match.completed) {
-          matchSummary.scores = results.summary.values;
-          matchSummary.total = results.summary.total;
+          matchSummary.scores = match.summary.scores;
+          matchSummary.total = match.summary.total;
         }
         return matchSummary;
       });
@@ -177,6 +178,18 @@ export function isMatchComplete(match) {
     }
   }
   return completed;
+}
+
+export function matchDataToScores(match) {
+  // 0 if this match has no submissions
+  const numberOfJudges = match.numberOfJudges || 0;
+  const scores = Array(numberOfJudges);
+  for (let ii = 0; ii < numberOfJudges; ii++) {
+    if (match[ii + 1]) {
+      scores[ii] = match[ii + 1];
+    }
+  }
+  return scores;
 }
 
 function _defaultTechniqueScore(group, match) {

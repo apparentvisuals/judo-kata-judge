@@ -1,8 +1,8 @@
 <template>
   <div class="navbar bg-base-100">
     <div class="navbar-start gap-2">
-      <img :src="getOrganizationImage(tournament.org)" class="h-12" />
-      <div class="text-xl">{{ tournament.name }}</div>
+      <img :src="getOrganizationImage(match.org)" class="h-12" />
+      <div class="text-xl">{{ match.tName }}</div>
     </div>
     <div class="navbar-end">
       <div class="text-xl">{{ getKataName(match.kata) }}</div>
@@ -46,8 +46,6 @@ const route = useRoute();
 const cookie = useCookie('jkj', { default: () => ({}) });
 
 const error = ref('');
-const tournament = ref(undefined);
-const match = ref(undefined);
 const moves = computed(() => moveList(match.value.kata));
 const numberOfResults = computed(() => match.value.numberOfJudges);
 
@@ -57,10 +55,8 @@ const mat = route.params.mat;
 const group = route.params.group;
 const matchNumber = route.params.match;
 
-try {
-  tournament.value = await $fetch(`/api/tournaments/${route.params.tournament}`, { headers });
-  match.value = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}/match/${matchNumber}`, { headers });
-} catch (err) {
+const { data: match, error: err } = await useFetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}/match/${matchNumber}`, { headers });
+if (err) {
   error.value = handleServerError(err);
 }
 

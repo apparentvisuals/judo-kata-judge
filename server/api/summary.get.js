@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import db from '~/server/db';
 import { createSummaryMessage } from '~/server/utils';
 import Invite from '~/server/models/invite';
+import { error } from '../models/cosmos';
 
 export default defineEventHandler(async (event) => {
   const { token } = getQuery(event);
@@ -33,6 +34,7 @@ export default defineEventHandler(async (event) => {
 
     event._handled = true;
   } catch (err) {
+    error(err.stack);
     return createError({ statusCode: 400, message: err.message });
   }
 });

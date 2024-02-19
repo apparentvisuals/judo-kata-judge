@@ -32,7 +32,8 @@ export default defineEventHandler(async (event) => {
       console.log(`m${matNumber}:${id} connection closed`);
       clients.match.remove(id);
     });
-    const message = createUpdateMessage(tournament, matNumber);
+
+    const message = await createUpdateMessage(tournament, matNumber);
     res.write(message);
 
     event._handled = true;
