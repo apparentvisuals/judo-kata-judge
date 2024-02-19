@@ -26,7 +26,7 @@ export default class Judge {
       const patchOperations = [];
       Object.keys(changes).forEach(key => {
         patchOperations.push({
-          op: 'replace',
+          op: 'add',
           path: `/${key}`,
           value: changes[key],
         });
