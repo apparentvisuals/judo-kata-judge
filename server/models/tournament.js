@@ -70,11 +70,7 @@ export default class Tournament {
 
   static async getAll(options) {
     const querySpec = _getAllQuery(options);
-    try {
-      return await shimGetAll(KEY, querySpec);
-    } catch (err) {
-      console.log(err);
-    }
+    return await shimGetAll(KEY, querySpec);
   }
 
   static async get(id) {
