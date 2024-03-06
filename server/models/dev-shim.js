@@ -2,7 +2,7 @@ import { isDev } from "../utils";
 import { database, log } from './cosmos';
 import { omit, omitBy, isNil } from 'lodash-es';
 
-const useShim = true;
+const useShim = false;
 
 export async function shimGet(key, id) {
   if (isDev()) {
@@ -14,13 +14,13 @@ export async function shimGet(key, id) {
       const container = database.container(`${key}-dev`);
       const response = await container.item(id).read();
       log(`get ${key} with id ${id}`, response);
-      return response.resources;
+      return response.resource;
     }
   } else {
     const container = database.container(key);
     const response = await container.item(id).read();
     log(`get ${key} with id ${id}`, response);
-    return response.resources;
+    return response.resource;
   }
 }
 
@@ -40,13 +40,13 @@ export async function shimGetAll(key, querySpec) {
     } else {
       const container = database.container(`${key}-dev`);
       const response = await container.items.query(querySpec).fetchAll();
-      log(`get all ${key}`, response.resources);
+      log(`get all ${key}`, response);
       return response.resources;
     }
   } else {
     const container = database.container(key);
     const response = await container.items.query(querySpec).fetchAll();
-    log(`get all ${key}`, response.resources);
+    log(`get all ${key}`, response);
     return response.resources;
   }
 }
@@ -61,14 +61,14 @@ export async function shimCreate(key, data) {
     } else {
       const container = database.container(`${key}-dev`);
       const response = await container.items.create(data);
-      log(`create new ${key} with id ${id}`, response.resources);
-      return response.resources;
+      log(`create new ${key} with id ${id}`, response);
+      return response.resource;
     }
   } else {
     const container = database.container(key);
     const response = await container.items.create(data);
-    log(`create new ${key} with id ${id}`, response.resources);
-    return response.resources;
+    log(`create new ${key} with id ${id}`, response);
+    return response.resource;
   }
 }
 
