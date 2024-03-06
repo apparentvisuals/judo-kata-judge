@@ -1,7 +1,7 @@
 import { pick } from 'lodash-es';
 
-import { isDev } from "~/server/utils";
-import { database, log, warn } from './cosmos';
+import { warn } from './cosmos';
+import { shimCreate, shimDelete, shimGet, shimUpdate } from './dev-shim';
 
 const key = isDev() ? 'matches-dev' : 'matches';
 const matches = database.container(key);
