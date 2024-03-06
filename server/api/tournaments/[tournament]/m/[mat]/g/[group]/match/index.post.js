@@ -1,3 +1,4 @@
+import Match from '~/server/models/match';
 import Tournament from '~/server/models/tournament';
 import { getAuth, getToken } from '~/server/utils';
 
@@ -14,7 +15,8 @@ export default defineEventHandler(async (event) => {
   const groupNumber = parseInt(getRouterParam(event, 'group'));
   const { tori, toriId, uke, ukeId } = await readBody(event);
   const tournament = await Tournament.get(tournamentId);
-  await tournament.createMatch(matNumber, groupNumber, { tori, toriId, uke, ukeId });
+  const match = await tournament.createMatch(matNumber, groupNumber, { tori, toriId, uke, ukeId });
+  await Match.create(match.id);
   await tournament.save();
   return tournament.data;
 });

@@ -7,7 +7,7 @@
   </div>
   <div class="form-control w-full">
     <label class="label" for="province">
-      <span class="label-text">Province</span>
+      <span class="label-text">Region</span>
     </label>
     <select id="province" class="select select-bordered" v-model="judge.region">
       <option v-for="province of Object.keys(PROVINCE_MAP)" :value="province">

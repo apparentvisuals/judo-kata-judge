@@ -1,13 +1,11 @@
 import { nanoid } from 'nanoid';
 import { pick } from 'lodash-es';
 
-import { createReport, isDev } from '~/server/utils';
-import { database, log } from './cosmos';
+import { log } from './cosmos';
+import { shimCreate, shimDelete, shimGet, shimGetAll, shimUpdate } from './dev-shim';
 
-const key = isDev() ? 'tournaments-dev' : 'tournaments';
-const tournaments = database.container(key);
+const KEY = 'tournaments';
 
-// const key = 'tournament';
 /**
  * {
  *   id: string
@@ -46,7 +44,7 @@ export default class Tournament {
 
   static async create({ name = 'Tournament 1', org, showJudgeTotals = true }) {
     const id = nanoid(6);
-    const tournamentData = {
+    const tournament = {
       id,
       name,
       org,
@@ -54,26 +52,12 @@ export default class Tournament {
       mats: [],
       invites: {},
     };
-    const response = await tournaments.items.create(tournamentData);
-    log(`create new tournament with id ${id}`, response);
-    return response.resource;
+    return await shimCreate(KEY, tournament);
   }
 
   static async update(id, changes, options) {
     try {
-      const patchOperations = [];
-      Object.keys(changes).forEach(key => {
-        patchOperations.push({
-          op: 'replace',
-          path: `/${key}`,
-          value: changes[key],
-        });
-      });
-      const response = await tournaments.item(id).patch(patchOperations, {
-        accessCondition: { type: "IfMatch", condition: options._etag },
-      });
-      log(`update tournament with id ${id}`, response);
-      return response.resource;
+      return await shimUpdate(KEY, id, changes, options);
     } catch (err) {
       if (err.code === 412) {
         log(`attemped to update out of date tournament ${id} with etag ${options._etag}`);
@@ -85,27 +69,23 @@ export default class Tournament {
   }
 
   static async getAll(options) {
-    const querySpec = _getQuery(options);
+    const querySpec = _getAllQuery(options);
     try {
-      const response = await tournaments.items.query(querySpec).fetchAll();
-      log('get all tournaments', response);
-      return response.resources;
+      return await shimGetAll(KEY, querySpec);
     } catch (err) {
       console.log(err);
     }
   }
 
   static async get(id) {
-    const response = await tournaments.item(id).read();
-    if (response && response.resource) {
-      log(`get tournament with id ${id}`, response);
-      return new Tournament(id, response.resource, response.resource._etag);
+    const data = await shimGet(KEY, id);
+    if (data) {
+      return new Tournament(id, data, data._etag);
     }
   }
 
   static async remove(id) {
-    const response = await tournaments.item(id).delete();
-    log(`delete tournament with id ${id}`, response);
+    await shimDelete(KEY, id);
   }
 
   getMat(matNumber) {
@@ -176,7 +156,16 @@ export default class Tournament {
       return;
     }
     const match = group.matches[matchNumber];
-    return { id: match.id, name: group.name, kata: group.kata, numberOfJudges: group.numberOfJudges, uke: match.uke, tori: match.tori, scores: match.scores, results: createReport(group, match) };
+    return {
+      tName: this.#tournament.name,
+      org: this.#tournament.org,
+      id: match.id,
+      name: group.name,
+      kata: group.kata,
+      numberOfJudges: group.numberOfJudges,
+      uke: match.uke,
+      tori: match.tori,
+    };
   }
 
   getNextMatch(matNumber) {
@@ -199,7 +188,7 @@ export default class Tournament {
             tori: match.tori,
             scores: match.scores,
           };
-          return { match: combinedMatch, index, groupIndex };
+          return { match: combinedMatch, group, index, groupIndex };
         }
       }
     }
@@ -222,14 +211,13 @@ export default class Tournament {
       toriId,
       uke,
       ukeId,
-      scores: _defaultScores(),
       completed: false,
     };
     matches.push(match);
     return match;
   }
 
-  updateMatch(matNumber, groupNumber, matchNumber, { id, tori, toriId, uke, ukeId, completed, scores }) {
+  async updateMatch(matNumber, groupNumber, matchNumber, { id, tori, toriId, uke, ukeId, completed, summary }) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
       return;
@@ -250,17 +238,17 @@ export default class Tournament {
     }
     if (tori != null) {
       match.tori = tori;
+      match.toriId = toriId;
     }
-    match.toriId = toriId;
     if (uke != null) {
       match.uke = uke;
+      match.ukeId = ukeId;
     }
-    match.ukeId = ukeId;
     if (completed != null) {
       match.completed = completed;
     }
-    if (scores != null) {
-      match.scores = scores;
+    if (summary != null) {
+      match.summary = summary;
     }
     return match;
   }
@@ -275,7 +263,7 @@ export default class Tournament {
       return;
     }
     const matches = group.matches;
-    matches.splice(matchNumber, 1);
+    return matches.splice(matchNumber, 1)[0];
   }
 
   get id() {
@@ -335,7 +323,7 @@ function _defaultScores() {
   return Array(5).fill({});
 }
 
-function _getQuery(options) {
+function _getAllQuery(options) {
   if (options.org) {
     return {
       query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c._etag FROM c WHERE c.org = @org',

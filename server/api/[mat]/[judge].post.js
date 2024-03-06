@@ -1,6 +1,7 @@
-import Tournament from '~/server/models/tournament';
 import db from '../../db';
-import { notifyAllClients, createUpdateMessage, createSummaryMessage, isMatchComplete } from '~/server/utils';
+import { notifyAllClients, createUpdateMessage, createSummaryMessage, matchDataToScores, createReport } from '~/server/utils';
+import Match from '~/server/models/match';
+import Invite from '~/server/models/invite';
 
 export default defineEventHandler(async (event) => {
   const authorization = getHeader(event, 'authorization');
@@ -13,36 +14,51 @@ export default defineEventHandler(async (event) => {
   }
 
   const matNumber = parseInt(getRouterParam(event, 'mat'));
-  const judgeNumber = parseInt(getRouterParam(event, 'judge')) - 1;
+  const judgeNumber = parseInt(getRouterParam(event, 'judge'));
 
-  const { id, judge } = await readBody(event);
-
-  const tournament = await Tournament.get(token);
-  const { match, index, groupIndex } = tournament.getNextMatch(matNumber);
+  const tournament = await Invite.getTournament(token);
+  const { match, group, index, groupIndex } = tournament.getNextMatch(matNumber);
   if (!match) {
     return createError({ statusCode: 404, message: 'no more matches' })
   }
 
+  const { id, judge } = await readBody(event);
   if (id !== match.id) {
     return createError({ statusCode: 400, message: 'submission aborted, incorrect match' });
   }
-  match.scores[judgeNumber] = judge;
-  const updatedMatch = tournament.updateMatch(matNumber, groupIndex, index, { id, scores: match.scores, completed: isMatchComplete(match) });
-  await tournament.save();
 
+  let matchData = await Match.get(id);
+  if (matchData[judgeNumber] && matchData[judgeNumber].id) {
+    return createError({ statusCode: 400, statusMessage: 'submission aborted, judge has already submitted' });
+  }
+
+  matchData[judgeNumber] = judge;
+  matchData.numberOfJudges = match.numberOfJudges;
+  const scores = matchDataToScores(matchData);
+  const completed = scores.every((score) => score.id != null);
+  const changes = { completed, numberOfJudges: match.numberOfJudges, [judgeNumber]: judge };
+  matchData = await Match.update(id, changes, { _etag: matchData._etag });
+  if (matchData.completed) {
+    const results = createReport(group, { scores });
+    const summary = { scores: results.summary.values, total: results.summary.total };
+    tournament.updateMatch(matNumber, groupIndex, index, { id, completed, summary });
+    await tournament.save();
+  }
+
+  const message = await createUpdateMessage(tournament, matNumber, matchData);
   const updates = db.notifications(`updates-${token}-${matNumber}`);
   updates.notify(() => {
     const clients = db.clients(`${token}-${matNumber}`);
-    notifyAllClients(clients.match.list, createUpdateMessage(tournament, matNumber));
+    notifyAllClients(clients.match.list, message);
   });
 
   const summary = db.notifications('summary-${token}');
   summary.notify(() => {
-    if (updatedMatch.completed) {
+    if (matchData.completed) {
       const summaryClients = db.clients(`${token}--1`);
       notifyAllClients(summaryClients.summary.list, createSummaryMessage(tournament.data));
     }
   });
 
-  return;
+  return {};
 });
