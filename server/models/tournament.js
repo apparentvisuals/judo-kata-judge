@@ -1,14 +1,11 @@
 import { nanoid } from 'nanoid';
 import { pick } from 'lodash-es';
 
-import { createReport, isDev, matchDataToScores } from '~/server/utils';
-import { database, log } from './cosmos';
-import Match from './match';
+import { log } from './cosmos';
+import { shimCreate, shimDelete, shimGet, shimGetAll, shimUpdate, shimUpsert } from './dev-shim';
 
-const key = isDev() ? 'tournaments-dev' : 'tournaments';
-const tournaments = database.container(key);
+const KEY = 'tournaments';
 
-// const key = 'tournament';
 /**
  * {
  *   id: string
@@ -47,7 +44,7 @@ export default class Tournament {
 
   static async create({ name = 'Tournament 1', org, showJudgeTotals = true }) {
     const id = nanoid(6);
-    const tournamentData = {
+    const tournament = {
       id,
       name,
       org,
@@ -55,26 +52,12 @@ export default class Tournament {
       mats: [],
       invites: {},
     };
-    const response = await tournaments.items.create(tournamentData);
-    log(`create new tournament with id ${id}`, response);
-    return response.resource;
+    return await shimCreate(KEY, tournament);
   }
 
   static async update(id, changes, options) {
     try {
-      const patchOperations = [];
-      Object.keys(changes).forEach(key => {
-        patchOperations.push({
-          op: 'add',
-          path: `/${key}`,
-          value: changes[key],
-        });
-      });
-      const response = await tournaments.item(id).patch(patchOperations, {
-        accessCondition: { type: "IfMatch", condition: options._etag },
-      });
-      log(`update tournament with id ${id}`, response);
-      return response.resource;
+      return await shimUpdate(KEY, id, changes, options);
     } catch (err) {
       if (err.code === 412) {
         log(`attemped to update out of date tournament ${id} with etag ${options._etag}`);
@@ -87,26 +70,18 @@ export default class Tournament {
 
   static async getAll(options) {
     const querySpec = _getAllQuery(options);
-    try {
-      const response = await tournaments.items.query(querySpec).fetchAll();
-      log('get all tournaments', response);
-      return response.resources;
-    } catch (err) {
-      console.log(err);
-    }
+    return await shimGetAll(KEY, querySpec);
   }
 
   static async get(id) {
-    const response = await tournaments.item(id).read();
-    if (response && response.resource) {
-      log(`get tournament with id ${id}`, response);
-      return new Tournament(id, response.resource, response.resource._etag);
+    const data = await shimGet(KEY, id);
+    if (data) {
+      return new Tournament(id, data, data._etag);
     }
   }
 
   static async remove(id) {
-    const response = await tournaments.item(id).delete();
-    log(`delete tournament with id ${id}`, response);
+    await shimDelete(KEY, id);
   }
 
   getMat(matNumber) {
@@ -296,10 +271,7 @@ export default class Tournament {
   }
 
   async save() {
-    const response = await tournaments.items.upsert({ id: this.#id, ...this.#tournament }, {
-      accessCondition: { type: "IfMatch", condition: this.#etag },
-    });
-    log(`update tournament with id ${this.#id}`, response);
+    await shimUpsert(KEY, this.#id, this.#tournament, { _etag: this.#etag });
   }
 
   update(tournament) {

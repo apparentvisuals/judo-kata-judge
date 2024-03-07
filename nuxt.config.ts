@@ -16,53 +16,21 @@ export default defineNuxtConfig({
   },
   nitro: {
     storage: {
-      'tournament': {
-        driver: 'azureCosmos',
-        endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
-        accountKey: process.env.COSMOS_KEY,
-        containerName: 'tournaments',
-        databaseName: 'judo-kata-judge'
-      },
-      'tournament-dev': {
+      'tournaments-dev': {
         driver: 'fs',
         base: './data/tournaments'
       },
-      'judge': {
-        driver: 'azureCosmos',
-        endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
-        accountKey: process.env.COSMOS_KEY,
-        containerName: 'judges',
-        databaseName: 'judo-kata-judge'
-      },
-      'judge-dev': {
+      'judges-dev': {
         driver: 'fs',
         base: './data/judges'
       },
-      'athlete': {
-        driver: 'azureCosmos',
-        endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
-        accountKey: process.env.COSMOS_KEY,
-        containerName: 'athletes',
-        databaseName: 'judo-kata-judge'
-      },
-      'athlete-dev': {
+      'athletes-dev': {
         driver: 'fs',
         base: './data/athletes'
       },
-      'invite': {
-        driver: 'azureCosmos',
-        endpoint: 'https://judo-kata-judge.documents.azure.com:443/',
-        accountKey: process.env.COSMOS_KEY,
-        containerName: 'invites',
-        databaseName: 'judo-kata-judge'
-      },
-      'invite-dev': {
+      'invites-dev': {
         driver: 'fs',
         base: './data/invites'
-      },
-      'archive': {
-        driver: 'fs',
-        base: './data/archive'
       }
     }
   },

@@ -1,11 +1,9 @@
 import { pick } from 'lodash-es';
 
-import { isDev, nanoid } from "~/server/utils";
-import { database, log } from './cosmos';
+import { nanoid } from "~/server/utils";
+import { shimCreate, shimDelete, shimGet, shimGetAll, shimUpdate } from './dev-shim';
 
-const key = isDev() ? 'judges-dev' : 'judges';
-const judges = database.container(key);
-
+const KEY = 'judges';
 
 export default class Judge {
   static async create({ name, region, rank }) {
@@ -16,26 +14,14 @@ export default class Judge {
       region,
       rank,
     };
-    const response = await judges.items.create(judge);
-    log(`create new judge with id ${id}`, response);
-    return pick(response.resource, ['id', 'name', 'region', 'rank', '_etag']);
+    const data = await shimCreate(KEY, judge);
+    return pick(data, ['id', 'name', 'region', 'rank', '_etag']);
   }
 
   static async update(id, changes, options) {
     try {
-      const patchOperations = [];
-      Object.keys(changes).forEach(key => {
-        patchOperations.push({
-          op: 'add',
-          path: `/${key}`,
-          value: changes[key],
-        });
-      });
-      const response = await judges.item(id).patch(patchOperations, {
-        accessCondition: { type: "IfMatch", condition: options._etag },
-      });
-      log(`update judge with id ${id}`, response);
-      return pick(response.resource, ['id', 'name', 'region', 'rank', '_etag']);
+      const data = await shimUpdate(KEY, id, changes, options);
+      return pick(data, ['id', 'name', 'region', 'rank', '_etag']);
     } catch (err) {
       if (err.code === 412) {
         throw new Error('judge out of date, refresh and try again');
@@ -47,25 +33,17 @@ export default class Judge {
 
   static async getAll() {
     const querySpec = { query: 'SELECT c.id, c.name, c.region, c.rank, c._etag from c' };
-    try {
-      const response = await judges.items.query(querySpec).fetchAll();
-      log('get all judges', response);
-      return response.resources;
-    } catch (err) {
-      console.log(err);
-    }
+    return await shimGetAll(KEY, querySpec);
   }
 
   static async get(id) {
-    const response = await judges.item(id).read();
-    if (response && response.resource) {
-      log(`get judge with id ${id}`, response);
-      return pick(response.resource, ['id', 'name', 'region', 'rank', '_etag']);
+    const data = await shimGet(KEY, id);
+    if (data) {
+      return pick(data, ['id', 'name', 'region', 'rank', '_etag']);
     }
   }
 
   static async remove(id) {
-    const response = await judges.item(id).delete();
-    log(`delete judge with id ${id}`, response);
+    return await shimDelete(KEY, id);
   }
 }

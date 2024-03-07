@@ -46,6 +46,7 @@ export const PROVINCE_MAP = {
   'yt': 'Yukon',
   'nt': 'Northwest Territories',
   'nu': 'Nunavut',
+  'us': 'United States',
 };
 
 export const LEVEL_MAP = {
