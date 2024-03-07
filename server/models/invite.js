@@ -1,14 +1,12 @@
 import { nanoid } from 'nanoid';
 import { pick } from 'lodash-es';
 
-import { isDev } from "~/server/utils";
-import { database, log } from './cosmos';
 import Tournament from './tournament';
+import { shimCreate, shimDelete, shimGet } from './dev-shim';
 
 const EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 
-const key = isDev() ? 'invites-dev' : 'invites';
-const invites = database.container(key);
+const KEY = 'invites';
 
 export default class Invite {
   static async create({ tournament }) {
@@ -19,23 +17,19 @@ export default class Invite {
       tournament,
       exp: ts + (EXPIRY_SECONDS * 1000),
     }
-    const response = await invites.items.create(invite);
-    log(`create new invite with id ${id}`, response);
-    return pick(response.resource, ['id', 'tournament', 'exp']);
+    const data = await shimCreate(KEY, invite);
+    return pick(data, ['id', 'tournament', 'exp']);
   }
 
   static async get(id) {
-    const response = await invites.item(id).read();
-    if (response && response.resource) {
-      log(`get invite with id ${id}`, response);
-      return pick(response.resource, ['id', 'tournament', 'exp']);
+    const data = await shimGet(KEY, id);
+    if (data) {
+      return pick(data, ['id', 'tournament', 'exp']);
     }
-    return {};
   }
 
   static async remove(id) {
-    const response = await invites.item(id).delete();
-    log(`delete invite with id ${id}`, response);
+    await shimDelete(KEY, id);
   }
 
   static async getTournament(id) {

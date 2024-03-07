@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    return await Tournament.update(tournamentId, omitBy({ name, org, showJudgeTotals, mats }, isNil), { _etag });
+    return await Tournament.update(tournamentId, { name, org, showJudgeTotals, mats }, { _etag });
   } catch (err) {
     return createError({ statusCode: 400, message: err.message });
   }
