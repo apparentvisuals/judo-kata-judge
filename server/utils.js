@@ -187,6 +187,8 @@ export function matchDataToScores(match) {
   for (let ii = 0; ii < numberOfJudges; ii++) {
     if (match[ii + 1]) {
       scores[ii] = match[ii + 1];
+    } else {
+      scores[ii] = {};
     }
   }
   return scores;

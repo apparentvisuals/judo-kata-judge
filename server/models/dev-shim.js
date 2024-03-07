@@ -87,7 +87,7 @@ export async function shimUpdate(key, id, data, options) {
       const patchOperations = [];
       Object.keys(changes).forEach(key => {
         patchOperations.push({
-          op: 'replace',
+          op: 'add',
           path: `/${key}`,
           value: changes[key],
         });
@@ -103,7 +103,7 @@ export async function shimUpdate(key, id, data, options) {
     const patchOperations = [];
     Object.keys(changes).forEach(key => {
       patchOperations.push({
-        op: 'replace',
+        op: 'add',
         path: `/${key}`,
         value: changes[key],
       });
