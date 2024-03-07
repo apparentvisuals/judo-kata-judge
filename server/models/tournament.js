@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import { pick } from 'lodash-es';
 
 import { log } from './cosmos';
-import { shimCreate, shimDelete, shimGet, shimGetAll, shimUpdate } from './dev-shim';
+import { shimCreate, shimDelete, shimGet, shimGetAll, shimUpdate, shimUpsert } from './dev-shim';
 
 const KEY = 'tournaments';
 
@@ -271,10 +271,7 @@ export default class Tournament {
   }
 
   async save() {
-    const response = await tournaments.items.upsert({ id: this.#id, ...this.#tournament }, {
-      accessCondition: { type: "IfMatch", condition: this.#etag },
-    });
-    log(`update tournament with id ${this.#id}`, response);
+    await shimUpsert(KEY, this.#id, this.#tournament, { _etag: this.#etag });
   }
 
   update(tournament) {

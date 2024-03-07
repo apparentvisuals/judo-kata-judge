@@ -117,6 +117,28 @@ export async function shimUpdate(key, id, data, options) {
   }
 }
 
+export async function shimUpsert(key, id, data, options) {
+  if (isDev()) {
+    if (useShim) {
+      await useStorage(`${key}-dev`).setItem(id, data);
+      log(`update ${key} with id ${id}`);
+      return { id, ...data, _etag: '1' };
+    } else {
+      const container = database.container(`${key}-dev`);
+      const response = await container.items.upsert({ id, ...data }, {
+        accessCondition: { type: "IfMatch", condition: options._etag },
+      });
+      log(`upsert ${key} with id ${id}`, response);
+    }
+  } else {
+    const container = database.container(`${key}`);
+    const response = await container.items.upsert({ id, ...data }, {
+      accessCondition: { type: "IfMatch", condition: options._etag },
+    });
+    log(`upsert ${key} with id ${id}`, response);
+  }
+}
+
 export async function shimDelete(key, id) {
   if (isDev()) {
     if (useShim) {

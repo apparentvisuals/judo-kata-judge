@@ -1,7 +1,7 @@
 import { pick } from 'lodash-es';
 
 import { nanoid } from "~/server/utils";
-import { shimCreate, shimDelete, shimGet, shimGetAll } from './dev-shim';
+import { shimCreate, shimDelete, shimGet, shimGetAll, shimUpdate } from './dev-shim';
 
 const KEY = 'judges';
 
