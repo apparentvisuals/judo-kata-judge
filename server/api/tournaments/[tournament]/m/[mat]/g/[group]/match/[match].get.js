@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   const match = tournament.getMatch(matNumber, groupNumber, matchNumber);
 
   const matchData = await Match.get(match.id);
-  const scores = matchDataToScores(matchData);
+  const scores = matchDataToScores(matchData, group);
   const results = createReport(group, { ...match, scores });
   return {
     ...match,

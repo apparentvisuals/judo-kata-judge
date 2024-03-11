@@ -92,7 +92,6 @@ const judge = ref(undefined);
 const inAction = ref(false);
 const scores = useLocalStorage(`scores`, clone(DEFAULT_SCORES));
 
-const headers = { authorization: `Bearer ${inviteCode.value}` };
 const moves = computed(() => group.value ? moveList(group.value.kata) : []);
 
 const title = computed(() => {
@@ -138,7 +137,7 @@ async function submitCode() {
     inAction.value = true;
     error.value = '';
     codeError.value = '';
-    judge.value = await $fetch(`/api/judges/${judgeCode.value}`, { headers });
+    judge.value = await $fetch(`/api/invites/${inviteCode.value}/${matNumber.value}/${judgeCode.value}`);
   } catch (err) {
     codeError.value = handleServerError(err);
   } finally {
@@ -164,7 +163,7 @@ async function submitScore() {
     inAction.value = true;
     error.value = '';
     const body = _scoreToPayload();
-    const response = await $fetch(`/api/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body, headers });
+    const response = await $fetch(`/api/invites/${inviteCode.value}/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body });
     state.value = response;
     scores.value.points = [];
   } catch (err) {
