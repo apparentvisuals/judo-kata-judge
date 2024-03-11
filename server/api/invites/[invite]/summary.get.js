@@ -1,18 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import db from '~/server/db';
-import { createSummaryMessage } from '~/server/utils';
-import Invite from '~/server/models/invite';
-import { error } from '../models/cosmos';
+import { createInitialSummaryEvent, objectToEventString } from '~/server/utils';
+import { error } from '~/server/models/cosmos';
 
 export default defineEventHandler(async (event) => {
-  const { token } = getQuery(event);
-  if (!token) {
-    return createError({ statusCode: 401, message: 'unauthorized' });
-  }
+  const invite = getRouterParam(event, 'invite');
 
   try {
-    const tournament = await Invite.getTournament(token);
     const req = event.node.req;
     const res = event.node.res;
     const headers = {
@@ -23,14 +18,14 @@ export default defineEventHandler(async (event) => {
     setHeaders(event, headers);
 
     const id = uuidv4();
-    const clients = db.clients(`${token}--1`);
+    const clients = db.clients(`${invite}--1`);
     clients.summary.add(id, res);
 
     req.on('close', () => {
       console.log(`${id} summary connection closed`);
       clients.summary.remove(id);
     });
-    res.write(createSummaryMessage(tournament.data));
+    res.write(objectToEventString(await createInitialSummaryEvent(invite)));
 
     event._handled = true;
   } catch (err) {

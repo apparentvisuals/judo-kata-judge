@@ -1,8 +1,8 @@
 <template>
   <div class="navbar bg-base-100">
     <div class="navbar-start gap-2">
-      <img :src="getOrganizationImage(match.org)" class="h-12" />
-      <div class="text-xl">{{ match.tName }}</div>
+      <img :src="getOrganizationImage(match.tournament.org)" class="h-12" />
+      <div class="text-xl">{{ match.tournament.name }}</div>
     </div>
     <div class="navbar-end">
       <div class="text-xl">{{ getKataName(match.kata) }}</div>

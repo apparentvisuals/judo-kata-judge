@@ -1,5 +1,8 @@
+/**
+ * Called by a judge when submitting scores
+ */
 import db from '../../db';
-import { notifyAllClients, createUpdateMessage, createSummaryMessage, matchDataToScores, createReport } from '~/server/utils';
+import { notifyAllClients, createSummaryMessage, matchDataToScores, createReport, createUpdateEvent, objectToEventString, createSummaryEvent } from '~/server/utils';
 import Match from '~/server/models/match';
 import Invite from '~/server/models/invite';
 
@@ -17,7 +20,7 @@ export default defineEventHandler(async (event) => {
   const judgeNumber = parseInt(getRouterParam(event, 'judge'));
 
   const tournament = await Invite.getTournament(token);
-  const { match, group, index, groupIndex } = tournament.getNextMatch(matNumber);
+  const { match, group, matchIndex, groupIndex } = tournament.getNextMatch(matNumber);
   if (!match) {
     return createError({ statusCode: 404, message: 'no more matches' })
   }
@@ -34,18 +37,20 @@ export default defineEventHandler(async (event) => {
 
   matchData[judgeNumber] = judge;
   matchData.numberOfJudges = match.numberOfJudges;
-  const scores = matchDataToScores(matchData);
+
+  const scores = matchDataToScores(matchData, group);
   const completed = scores.every((score) => score.id != null);
   const changes = { completed, numberOfJudges: match.numberOfJudges, [judgeNumber]: judge };
   matchData = await Match.update(id, changes, { _etag: matchData._etag });
+
   if (matchData.completed) {
     const results = createReport(group, { scores });
     const summary = { scores: results.summary.values, total: results.summary.total };
-    tournament.updateMatch(matNumber, groupIndex, index, { id, completed, summary });
+    tournament.updateMatch(matNumber, groupIndex, matchIndex, { id, completed, summary });
     await tournament.save();
   }
 
-  const message = await createUpdateMessage(tournament, matNumber, matchData);
+  const message = objectToEventString(await createUpdateEvent(tournament, matNumber));
   const updates = db.notifications(`updates-${token}-${matNumber}`);
   updates.notify(() => {
     const clients = db.clients(`${token}-${matNumber}`);
@@ -56,9 +61,9 @@ export default defineEventHandler(async (event) => {
   summary.notify(() => {
     if (matchData.completed) {
       const summaryClients = db.clients(`${token}--1`);
-      notifyAllClients(summaryClients.summary.list, createSummaryMessage(tournament.data));
+      notifyAllClients(summaryClients.summary.list, objectToEventString(createSummaryEvent(tournament.data)));
     }
   });
 
-  return {};
+  return scores.map((judgeScore) => !!judgeScore.name);
 });

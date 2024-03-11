@@ -118,14 +118,15 @@ if (err.value) {
 /**
  * @type UpdateEvents
  */
-let event;
+let event = new UpdateEvents(route.params.mat, inviteCode.value);
 onMounted(async () => {
-  event = new UpdateEvents(route.params.mat, inviteCode.value);
   event.connect((data) => {
     if (data.error) {
+      error.value = handleServerError(data.error);
+      event.close();
       return;
     }
-    currentMatch.value = data.index;
+    currentMatch.value = data.matchIndex;
     currentGroup.value = data.groupIndex;
   });
 });
