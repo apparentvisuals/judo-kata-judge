@@ -1,16 +1,15 @@
+import Invite from '~/server/models/invite';
 import Judge from '~/server/models/judge';
 
 export default defineEventHandler(async (event) => {
-  const token = getToken(event);
-  if (!token) {
-    return createError({ statusCode: 401, message: 'unauthorized' });
-  }
-  if (!getAuth(token)) {
-    return createError({ statusCode: 403, message: 'forbidden' });
-  }
-
+  const invite = getRouterParam(event, 'invite');
   const judgeId = getRouterParam(event, 'judge');
   if (!judgeId) {
+    return createError({ statusCode: 404, message: 'Judge not found' });
+  }
+
+  const inviteData = await Invite.get(invite);
+  if (!inviteData) {
     return createError({ statusCode: 404, message: 'Judge not found' });
   }
 

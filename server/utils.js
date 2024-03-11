@@ -1,7 +1,8 @@
 import { customAlphabet } from 'nanoid';
-import { omit } from 'lodash-es';
+import { omit, pick } from 'lodash-es';
 import { moveList, calculateHasMajor, calculateMoveScore } from '~/src/utils';
 import Match from './models/match';
+import Invite from './models/invite';
 
 export const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 
@@ -48,35 +49,83 @@ export function getAuth(key) {
   }
 }
 
+export function objectToEventString(object) {
+  if (object) {
+    return `data: ${JSON.stringify(object)}\n\n`;
+  }
+  return 'data: \n\n';
+}
+
 export function createNoMatchMessage() {
   return `data: ${JSON.stringify({ error: 'no more matches' })}\n\n`
 }
 
-export async function createUpdateMessage(tournament, mat, matchData) {
-  const update = {
-    tournament: tournament.data.name,
-    org: tournament.data.org,
-    mat,
-  };
-  const { match, index, groupIndex } = tournament.getNextMatch(mat);
-  if (match) {
-    matchData = matchData || await Match.get(match.id);
-    match.scores = matchDataToScores(matchData);
-    const completed = !!match.completed;
-    const judgeState = match.scores.map((judgeScore) => !!judgeScore.name);
-    update.match = omit(match, 'scores');
-    update.index = index;
-    update.groupIndex = groupIndex;
-    update.state = judgeState;
-    update.completed = completed;
-  } else {
-    update.index = -1;
-  }
-  return `data: ${JSON.stringify(update)}\n\n`;
+export async function createInitialUpdateEvent(id, matNumber) {
+  const initialUpdateEvent = {};
+  const tournament = await Invite.getTournament(id);
+  initialUpdateEvent.tournament = pick(tournament.data, ['name', 'org']);
+
+  const updateEvent = await createUpdateEvent(tournament, matNumber);
+  Object.assign(initialUpdateEvent, updateEvent);
+  return initialUpdateEvent;
 }
 
-export function createReportMessage(report) {
-  return `data: ${JSON.stringify(report)}\n\n`;
+export async function createUpdateEvent(tournament, matNumber) {
+  const update = {
+    matNumber,
+  };
+  const { match, group, matchIndex, groupIndex } = tournament.getNextMatch(matNumber);
+  if (match) {
+    const matchData = await Match.get(match.id);
+    const scores = matchDataToScores(matchData, group);
+    const judgeState = scores.map((judgeScore) => !!judgeScore.name);
+    update.match = match;
+    update.group = pick(group, ['kata', 'name', 'numberOfJudges', 'disableDivideByHalf', 'disableMajor', 'disableForgotten']);
+    update.matchIndex = matchIndex;
+    update.groupIndex = groupIndex;
+    update.state = judgeState;
+  } else {
+    update.matchIndex = -1;
+    update.groupIndex = -1;
+  }
+  return update;
+}
+
+export async function createInitialSummaryEvent(id) {
+  const initialSummaryEvent = {};
+  const tournament = await Invite.getTournament(id);
+  initialSummaryEvent.tournament = pick(tournament.data, ['name', 'org', 'showJudgeTotals']);
+
+  const summaryEvent = createSummaryEvent(tournament.data);
+  Object.assign(initialSummaryEvent, summaryEvent);
+  return initialSummaryEvent;
+}
+
+export function createSummaryEvent(tournament) {
+  const summary = { results: [] };
+  for (const mat of tournament.mats) {
+    const groups = mat.groups;
+    const groupsSummary = groups.map((group) => {
+      const matches = group.matches;
+      const summary = matches.map((match) => {
+        const matchSummary = {
+          number: match.number,
+          kata: group.kata,
+          tori: match.tori,
+          uke: match.uke,
+          scores: [],
+        }
+        if (match.completed) {
+          matchSummary.scores = match.summary.scores;
+          matchSummary.total = match.summary.total;
+        }
+        return matchSummary;
+      });
+      return { name: group.name, kata: group.kata, matches: summary };
+    });
+    summary.results.push(...groupsSummary);
+  }
+  return summary;
 }
 
 export function createSummaryMessage(tournament) {
@@ -103,7 +152,7 @@ export function createSummaryMessage(tournament) {
     });
     summary.results.push(...groupsSummary);
   }
-  return `data: ${JSON.stringify(summary)}\n\n`;
+  return summary;
 }
 
 export function notifyAllClients(clients, message) {
@@ -118,10 +167,10 @@ export function numberOfTechniques(kata) {
 
 export function createReport(group, match) {
   const kata = group.kata;
-  const numberOfJudges = group.numberOfJudges;
+  const numberOfJudges = match.completed ? match.scores.length : group.numberOfJudges;
   const scores = match.scores;
   const techniquesCount = numberOfTechniques(kata);
-  const report = _defaultTechniqueScore(group, match);
+  const report = _defaultTechniqueScore(numberOfJudges, techniquesCount);
   const summary = {
     total: 0,
     values: new Array(numberOfJudges),
@@ -180,9 +229,10 @@ export function isMatchComplete(match) {
   return completed;
 }
 
-export function matchDataToScores(match) {
+export function matchDataToScores(match, group) {
   // 0 if this match has no submissions
-  const numberOfJudges = match.numberOfJudges || 0;
+  // if match is completed then use array size instead of numberOfJudges
+  const numberOfJudges = match.numberOfJudges || group.numberOfJudges || 0;
   const scores = Array(numberOfJudges);
   for (let ii = 0; ii < numberOfJudges; ii++) {
     if (match[ii + 1]) {
@@ -194,10 +244,7 @@ export function matchDataToScores(match) {
   return scores;
 }
 
-function _defaultTechniqueScore(group, match) {
-  const kata = group.kata;
-  const numberOfJudges = (match.score && match.scores.length) || group.numberOfJudges;
-  const techniquesCount = numberOfTechniques(kata);
+function _defaultTechniqueScore(numberOfJudges, techniquesCount) {
   const report = new Array(techniquesCount).fill().map((_el) => {
     return { values: new Array(numberOfJudges).fill().map(() => 10) };
   });

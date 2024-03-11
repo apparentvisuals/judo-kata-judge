@@ -1,20 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import db from '../../db';
-import { createUpdateMessage } from '~/server/utils';
-import Invite from '~/server/models/invite';
+import db from '~/server/db';
+import { createInitialUpdateEvent, objectToEventString } from '~/server/utils';
 
 export default defineEventHandler(async (event) => {
-  const { token } = getQuery(event);
-  if (!token) {
-    return createError({ statusCode: 401, message: 'unauthorized' });
-  }
-
+  const invite = getRouterParam(event, 'invite');
   const matNumber = parseInt(getRouterParam(event, 'mat'));
 
   try {
-    const tournament = await Invite.getTournament(token);
-
     const req = event.node.req;
     const res = event.node.res;
     const headers = {
@@ -25,7 +18,7 @@ export default defineEventHandler(async (event) => {
     setHeaders(event, headers);
 
     const id = uuidv4();
-    const clients = db.clients(`${token}-${matNumber}`);
+    const clients = db.clients(`${invite}-${matNumber}`);
     clients.match.add(id, res);
 
     req.on('close', () => {
@@ -33,7 +26,8 @@ export default defineEventHandler(async (event) => {
       clients.match.remove(id);
     });
 
-    const message = await createUpdateMessage(tournament, matNumber);
+    const update = await createInitialUpdateEvent(invite, matNumber);
+    const message = objectToEventString(update);
     res.write(message);
 
     event._handled = true;

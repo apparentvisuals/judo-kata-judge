@@ -20,9 +20,6 @@
       <img class="h-12" :src="getOrganizationImage(tournament.org)" />
       <h1 class="hidden md:inline">{{ tournament.name }}</h1>
     </div>
-    <!-- <div class="navbar-end w-auto" v-if="tournament.org === 'on'">
-      <img src="/img/sponsors/hatashita.png" class="h-12" />
-    </div> -->
   </div>
   <Container>
     <div class="text-center pb-2">
@@ -33,21 +30,22 @@
 </template>
 
 <script setup>
-definePageMeta({
-  colorMode: 'corporate',
-});
-
 import { ref } from 'vue';
 import { Bars3Icon } from '@heroicons/vue/24/outline';
 import { getOrganizationImage, getGroupName } from '~/src/utils';
+import { SummaryEvents } from '~/src/event-sources';
+
+definePageMeta({
+  colorMode: 'corporate',
+});
 
 const route = useRoute();
 const inviteCode = computed(() => route.params.invite);
 const autoScroll = computed(() => route.query.scroll);
 
+const tournament = ref({});
 const scores = ref({});
 const resultIndex = ref(0);
-const { data: tournament } = await useFetch(`/api/invites/${inviteCode.value}`);
 
 const showSubTotal = computed(() => {
   if (tournament.value.showJudgeTotals != null) {
@@ -62,35 +60,6 @@ const group = computed(() => {
   return {};
 })
 
-onUnmounted(() => {
-  if (events) {
-    events.close();
-  }
-});
-
-let events;
-function _subscribe() {
-  if (events) {
-    events.close();
-  }
-  events = new EventSource(`/api/summary?token=${inviteCode.value}`);
-  events.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (!data.error) {
-      data.results.forEach((group) => {
-        group.matches.sort((a, b) => {
-          const aTotal = a.total || 0;
-          const bTotal = b.total || 0;
-          return bTotal - aTotal;
-        });
-      });
-      scores.value = data;
-    } else {
-      events.close();
-    }
-  };
-}
-
 function show(index) {
   if (index != null) {
     resultIndex.value = index;
@@ -102,17 +71,42 @@ function _queueChange() {
     if (scores.value.results && scores.value.results.length > 0) {
       const index = resultIndex.value;
       const newIndex = (index + 1) % scores.value.results.length;
-      scrollTo(newIndex);
+      show(newIndex);
     }
     _queueChange();
   }, 20000);
 };
 
+let event = new SummaryEvents(inviteCode.value);
 onMounted(async () => {
-  _subscribe();
+  event.connect((data) => {
+    if (data.error) {
+      event.close();
+      return;
+    }
+
+    if (data.tournament) {
+      tournament.value = data.tournament;
+    }
+
+    data.results.forEach((group) => {
+      group.matches.sort((a, b) => {
+        const aTotal = a.total || 0;
+        const bTotal = b.total || 0;
+        return bTotal - aTotal;
+      });
+    });
+    scores.value = data;
+  });
   if (autoScroll.value) {
     // For automatic cycling of results
     _queueChange();
+  }
+});
+
+onUnmounted(() => {
+  if (event) {
+    event.close();
   }
 });
 </script>
