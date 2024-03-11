@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
   matchData = await Match.update(id, changes, { _etag: matchData._etag });
 
   if (matchData.completed) {
-    const results = createReport(group, { scores });
+    const results = createReport(group, { completed, scores });
     const summary = { scores: results.summary.values, total: results.summary.total };
     tournament.updateMatch(matNumber, groupIndex, matchIndex, { id, completed, summary });
     await tournament.save();
