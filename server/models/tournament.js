@@ -151,40 +151,18 @@ export default class Tournament {
     if (!group) {
       return;
     }
-    const match = group.matches[matchNumber];
-    return {
-      tName: this.#tournament.name,
-      org: this.#tournament.org,
-      id: match.id,
-      name: group.name,
-      kata: group.kata,
-      numberOfJudges: group.numberOfJudges,
-      uke: match.uke,
-      tori: match.tori,
-    };
+    return group.matches[matchNumber];
   }
 
   getNextMatch(matNumber) {
     const mat = this.#tournament.mats[matNumber];
     if (!mat) {
-      return;
+      return {};
     }
     for (const [groupIndex, group] of mat.groups.entries()) {
-      for (const [index, match] of group.matches.entries()) {
+      for (const [matchIndex, match] of group.matches.entries()) {
         if (!match.completed) {
-          const combinedMatch = {
-            id: match.id,
-            name: group.name,
-            kata: group.kata,
-            numberOfJudges: group.numberOfJudges,
-            disableDivideByHalf: group.disableDivideByHalf,
-            disableForgotten: group.disableForgotten,
-            disableMajor: group.disableMajor,
-            uke: match.uke,
-            tori: match.tori,
-            scores: match.scores,
-          };
-          return { match: combinedMatch, group, index, groupIndex };
+          return { match, group, matchIndex, groupIndex };
         }
       }
     }

@@ -6,8 +6,8 @@
         <th class="w-[50px] lg:w-12 score">S(1)</th>
         <th class="w-[50px] lg:w-12 score">S(1)</th>
         <th class="w-[50px] lg:w-12 score">M(3)</th>
-        <th class="w-[50px] lg:w-12 score" v-show="!match.disableMajor">B(5)</th>
-        <th class="w-[50px] lg:w-12 score" v-show="!match.disableForgotten">F(0)</th>
+        <th class="w-[50px] lg:w-12 score" v-show="!group.disableMajor">B(5)</th>
+        <th class="w-[50px] lg:w-12 score" v-show="!group.disableForgotten">F(0)</th>
         <th class="w-[50px] lg:w-12 score">C</th>
         <th class="w-20 text-center">Score</th>
       </tr>
@@ -25,9 +25,9 @@
             @click.prevent="toggleScore(score, 1)" hint="S" />
           <ScoreTableCell class="score" :binary="true" v-model="score.deductions[2]"
             @click.prevent="toggleScore(score, 2)" hint="M" />
-          <ScoreTableCell class="score" :binary="true" :hidden="match.disableMajor" v-model="score.deductions[3]"
+          <ScoreTableCell class="score" :binary="true" :hidden="group.disableMajor" v-model="score.deductions[3]"
             @click.prevent="toggleScore(score, 3)" hint="B" />
-          <ScoreTableCell class="score" :binary="true" :hidden="match.disableForgotten" v-model="score.deductions[4]"
+          <ScoreTableCell class="score" :binary="true" :hidden="group.disableForgotten" v-model="score.deductions[4]"
             @click.prevent="toggleScore(score, 4)" hint="F" />
           <ScoreTableCell class="score" :binary="false" v-model="score.deductions[5]"
             @click.prevent="toggleScore(score, 5)" hint="C" />
@@ -45,9 +45,9 @@
 <script setup>
 import { calculateHasMajor, calculateMoveScore, moveList } from '~/src/utils';
 
-const props = defineProps(['match', 'scores', 'disabled']);
+const props = defineProps(['match', 'group', 'scores', 'disabled']);
 
-const moves = computed(() => moveList(props.match.kata));
+const moves = computed(() => moveList(props.group.kata));
 const hasMajor = computed(() => calculateHasMajor(props.scores.points));
 const total = computed(() => {
   const total = props.scores.points.reduce((acc, score) => {
@@ -57,7 +57,7 @@ const total = computed(() => {
       return acc += 10;
     }
   }, 0);
-  if (hasMajor.value && !props.match.disableDivideByHalf) {
+  if (hasMajor.value && !props.group.disableDivideByHalf) {
     return total / 2;
   }
   return total;
@@ -65,10 +65,10 @@ const total = computed(() => {
 
 const totalSpan = computed(() => {
   let span = 7;
-  if (props.match.disableMajor) {
+  if (props.group.disableMajor) {
     span -= 1;
   }
-  if (props.match.disableForgotten) {
+  if (props.group.disableForgotten) {
     span -= 1;
   }
   return span;
