@@ -23,6 +23,7 @@
         <span>View Invite Link</span>
       </button>
       <div class="flex-1"></div>
+      <button class="btn btn-secondary" title="make a copy" @click.prevent="cloneT">Make a copy</button>
       <button v-if="isReordering" class="btn btn-error" @click.prevent="cancel" title="Cancel">Cancel</button>
       <button class="btn btn-secondary" @click.prevent="save" :title="isReordering ? 'Save' : 'Reorder'">
         {{ isReordering ? 'Save' : 'Reorder' }}
@@ -173,8 +174,6 @@ const headers = computed(() => ({ authorization: `Bearer ${cookie.value.adminCod
 
 const error = ref('');
 const inAction = ref(false);
-// const tournament = ref({});
-// const athletes = ref([]);
 const newGroup = ref(clone(DEFAULT_GROUP));
 const newMatch = ref(clone(DEFAULT_MATCH));
 const matToEdit = ref();
@@ -211,6 +210,11 @@ async function createInvite() {
     tournament.value.invites = Object.assign({}, tournament.value.invites, newInviteCode);
   }
   view_invite_modal.showModal();
+}
+
+async function cloneT() {
+  const response = await $fetch(`/api/tournaments/${tournamentId.value}/clone`, { headers: headers.value });
+  await navigateTo(`/admin/t/${response.id}`, { replace: true });
 }
 
 async function showDeleteMat(matIndex) {
@@ -355,12 +359,6 @@ const { data: athletes, error: aError } = await useFetch(`/api/athletes`, { head
 watch(aError, (error) => {
   error.value = handleServerError(err);
 });
-// try {
-//   tournament.value = await $fetch(`/api/tournaments/${tournamentId.value}`, { headers: headers.value });
-//   athletes.value = await $fetch(`/api/athletes`, { headers: headers.value });
-// } catch (err) {
-//   error.value = handleServerError(err);
-// }
 
 function _tournamentToPayload(tournament) {
   return tournament;

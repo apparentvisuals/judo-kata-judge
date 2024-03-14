@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { pick } from 'lodash-es';
+import { pick, omit } from 'lodash-es';
 
 import { log } from './cosmos';
 import { shimCreate, shimDelete, shimGet, shimGetAll, shimUpdate, shimUpsert } from './dev-shim';
@@ -261,8 +261,20 @@ export default class Tournament {
     }
   }
 
-  replace(tournament) {
-    this.#tournament = tournament;
+  async clone() {
+    const thisTournament = this.#tournament;
+    const copiedTournament = omit(thisTournament, 'id', 'invites');
+    copiedTournament.id = nanoid(6);
+    (copiedTournament.mats || []).forEach(mat => {
+      (mat.groups || []).forEach(group => {
+        group.id = nanoid(4);
+        (group.matches || []).forEach(match => {
+          match.id = nanoid();
+        });
+      });
+    });
+    const newTournament = await shimCreate(KEY, copiedTournament);
+    return new Tournament(newTournament.id, newTournament, newTournament._etag);
   }
 
   #assignGroupValues(group, { name, kata, numberOfJudges, startTime, disableDivideByHalf, disableForgotten, disableMajor }) {
@@ -288,10 +300,6 @@ export default class Tournament {
       group.disableMajor = disableMajor;
     }
   }
-}
-
-function _defaultScores() {
-  return Array(5).fill({});
 }
 
 function _getAllQuery(options) {
