@@ -1,14 +1,15 @@
 <template>
-  <div class="navbar bg-base-100">
+  <Error :error-string="error" />
+  <div v-if="match" class="navbar bg-base-100">
     <div class="navbar-start gap-2">
-      <img :src="getOrganizationImage(match.tournament.org)" class="h-12" />
-      <div class="text-xl">{{ match.tournament.name }}</div>
+      <img :src="getOrganizationImage(tournament.org)" class="h-12" />
+      <div class="text-xl">{{ tournament.name }}</div>
     </div>
     <div class="navbar-end">
       <div class="text-xl">{{ getKataName(match.kata) }}</div>
     </div>
   </div>
-  <div class="p-2 flex justify-between">
+  <div v-if="match" class="p-2 flex justify-between">
     <div class="text-sm">
       <span>{{ match.tori }}</span>/<span class="text-blue-500">{{ match.uke }}</span>
     </div>
@@ -16,7 +17,7 @@
       Judge {{ index }}: {{ match.scores[index - 1].name }}
     </div>
   </div>
-  <table class="table w-full bg-base-100 print:border">
+  <table v-if="match" class="table w-full bg-base-100 print:border">
     <thead>
       <tr>
         <th>Technique</th>
@@ -48,7 +49,7 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 const error = ref('');
 const moves = computed(() => moveList(match.value.kata));
 const numberOfResults = computed(() => match.value.numberOfJudges);
-
+const tournament = computed(() => match || match.tournament || {});
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 
 const mat = route.params.mat;
