@@ -14,15 +14,26 @@ export default defineEventHandler(async (event) => {
   }
 
   const tournamentId = getRouterParam(event, 'tournament');
+  if (!tournamentId) {
+    return createError({ statusCode: 404, message: 'Tournament not found' });
+  }
+
   const matNumber = parseInt(getRouterParam(event, 'mat'));
   const groupNumber = parseInt(getRouterParam(event, 'group'));
   const matchNumber = parseInt(getRouterParam(event, 'match'));
 
   const tournament = await Tournament.get(tournamentId);
+  if (!tournament) {
+    return createError({ statusCode: 404, message: 'Tournament not found' });
+  }
+
   const group = tournament.getGroup(matNumber, groupNumber);
   const match = tournament.getMatch(matNumber, groupNumber, matchNumber);
 
   const matchData = await Match.get(match.id);
+  if (!matchData) {
+    return createError({ statusCode: 404, message: 'Match info not found' });
+  }
   const scores = matchDataToScores(matchData, group);
   const results = createReport(group, { ...match, scores });
   return {
