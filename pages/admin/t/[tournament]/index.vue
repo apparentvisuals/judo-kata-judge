@@ -103,7 +103,6 @@
                       <td>
                         <div class="join">
                           <NuxtLink class="btn btn-primary btn-square btn-sm join-item"
-                            :class="match.completed ? '' : 'btn-disabled'"
                             :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank">
                             <DocumentTextIcon class="w-5 h-5" />
                           </NuxtLink>

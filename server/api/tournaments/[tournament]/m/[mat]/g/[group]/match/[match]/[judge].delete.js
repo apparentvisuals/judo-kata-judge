@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
   const matNumber = parseInt(getRouterParam(event, 'mat'));
   const groupNumber = parseInt(getRouterParam(event, 'group'));
   const matchNumber = parseInt(getRouterParam(event, 'match'));
+  const judge = getRouterParam(event, 'judge');
 
   const tournament = await Tournament.get(tournamentId);
   if (!tournament) {
@@ -30,10 +31,16 @@ export default defineEventHandler(async (event) => {
   const group = tournament.getGroup(matNumber, groupNumber);
   const match = tournament.getMatch(matNumber, groupNumber, matchNumber);
 
-  const matchData = await Match.get(match.id);
+  let matchData = await Match.get(match.id);
   if (!matchData) {
     return createError({ statusCode: 404, message: 'Match info not found' });
   }
+  if (!matchData[judge]) {
+    return createError({ statusCode: 400, message: 'Judge has no submission' });
+  }
+  delete matchData[judge];
+  matchData = await Match.upsert(matchData.id, matchData, matchData);
+
   const scores = matchDataToScores(matchData, group);
   const results = createReport(group, { ...match, scores });
   return {
