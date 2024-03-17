@@ -484,3 +484,27 @@ export function calculateMoveScore(deductions) {
   }
   return Math.min(Math.max(0, total), 10);
 }
+
+export function getScoreCounts(scores) {
+  const totals = {
+    s: 0,
+    m: 0,
+    b: 0,
+  }
+  scores.forEach((score) => {
+    const deductions = score.deductions.split(':');
+    if (deductions[0] === '1') {
+      totals.s++;
+    }
+    if (deductions[1] === '1') {
+      totals.s++;
+    }
+    if (deductions[2] === '1') {
+      totals.m++;
+    }
+    if (deductions[3] === '1') {
+      totals.b++;
+    }
+  });
+  return totals;
+}

@@ -129,6 +129,7 @@ export async function shimUpsert(key, id, data, options) {
         accessCondition: { type: "IfMatch", condition: options._etag },
       });
       log(`upsert ${key} with id ${id}`, response);
+      return response.resource;
     }
   } else {
     const container = database.container(`${key}`);
@@ -136,6 +137,7 @@ export async function shimUpsert(key, id, data, options) {
       accessCondition: { type: "IfMatch", condition: options._etag },
     });
     log(`upsert ${key} with id ${id}`, response);
+    return response.resource;
   }
 }
 
