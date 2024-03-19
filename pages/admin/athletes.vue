@@ -4,16 +4,16 @@
   <Container>
     <ActionBar>
       <button class="btn btn-secondary" @click.prevent="showAdd" :disabled="inAction">
-        <span>Add Athlete</span>
+        <span>{{ $t('buttons.addAthlete') }}</span>
       </button>
     </ActionBar>
     <table class="admin-table">
       <thead>
         <tr>
-          <th class="w-12">ID</th>
-          <th>Name</th>
-          <th>Rank</th>
-          <th>Region</th>
+          <th class="w-12"></th>
+          <th>{{ $t('labels.name') }}</th>
+          <th>{{ $t('labels.rank') }}</th>
+          <th>{{ $t('labels.region') }}</th>
           <th class="w-16"></th>
         </tr>
       </thead>
@@ -46,7 +46,7 @@
     <AthleteInputs :athlete="toUpdate" />
   </Prompt>
   <Prompt name="delete_athlete_modal" @submit="remove" text="Yes">
-    <span>Delete this athlete?</span>
+    <span>{{ $t('prompts.deleteAthlete') }}</span>
   </Prompt>
 </template>
 
