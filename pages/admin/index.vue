@@ -1,6 +1,6 @@
 <template>
   <Error :error-string="error" />
-  <AdminNav name="Tournaments" />
+  <AdminNav :name="$t('titles.tournaments')" />
   <Container>
     <ActionBar>
       <button class="btn btn-secondary" @click.prevent="showAdd" title="Create Tournament">
@@ -10,8 +10,8 @@
     <table class="admin-table">
       <thead>
         <tr>
-          <th class="w-1/2">Name</th>
-          <th class="w-1/2">Region</th>
+          <th class="w-1/2">{{ $t('labels.name') }}</th>
+          <th class="w-1/2">{{ $t('labels.region') }}</th>
           <th class="w-16"></th>
         </tr>
       </thead>
@@ -46,7 +46,7 @@
     <TournamentInputs :tournament="toUpdate" />
   </Prompt>
   <Prompt name="delete_t_modal" @submit="remove" text="Yes">
-    <span>Delete this tournament?</span>
+    <span>{{ $t('prompts.deleteTournament') }}</span>
   </Prompt>
 </template>
 

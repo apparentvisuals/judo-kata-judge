@@ -232,6 +232,7 @@ export function isMatchComplete(match) {
 export function matchDataToScores(match, group) {
   // 0 if this match has no submissions
   // if match is completed then use array size instead of numberOfJudges
+  match = match || {};
   const numberOfJudges = match.numberOfJudges || group.numberOfJudges || 0;
   const scores = Array(numberOfJudges);
   for (let ii = 0; ii < numberOfJudges; ii++) {

@@ -4,16 +4,16 @@
   <Container>
     <ActionBar>
       <button class="btn btn-secondary" @click.prevent="showAdd" :disabled="inAction">
-        <span>Add Judge</span>
+        <span>{{ $t('buttons.addJudge') }}</span>
       </button>
     </ActionBar>
     <table class="admin-table">
       <thead>
         <tr>
-          <th class="w-12">ID</th>
-          <th>Name</th>
-          <th>Rank</th>
-          <th>Region</th>
+          <th class="w-12"></th>
+          <th>{{ $t('labels.name') }}</th>
+          <th>{{ $t('labels.rank') }}</th>
+          <th>{{ $t('labels.region') }}</th>
           <th class="w-16"></th>
         </tr>
       </thead>
@@ -46,7 +46,7 @@
     <JudgeInput :judge="toUpdate" />
   </Prompt>
   <Prompt name="delete_judge_modal" @submit="remove" text="Yes">
-    <span>Delete this judge?</span>
+    <span>{{ $t('prompts.deleteJudge' )}}</span>
   </Prompt>
 </template>
 
