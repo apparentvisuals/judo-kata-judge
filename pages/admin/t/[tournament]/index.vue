@@ -16,17 +16,17 @@
     <ActionBar>
       <button class="btn btn-secondary" @click.prevent="addMat" title="Add Mat">
         <PlusIcon class="w-5 h-5" />
-        <span>Add Mat</span>
+        <span>{{ $t('buttons.addMat') }}</span>
       </button>
       <button class="btn btn-secondary" @click.prevent="createInvite" title="Show Invite">
         <EnvelopeIcon class="w-5 h-5" />
-        <span>View Invite Link</span>
+        <span>{{ $t('buttons.inviteLink')}}</span>
       </button>
       <div class="flex-1"></div>
-      <button class="btn btn-secondary" title="make a copy" @click.prevent="cloneT">Make a copy</button>
-      <button v-if="isReordering" class="btn btn-error" @click.prevent="cancel" title="Cancel">Cancel</button>
-      <button class="btn btn-secondary" @click.prevent="save" :title="isReordering ? 'Save' : 'Reorder'">
-        {{ isReordering ? 'Save' : 'Reorder' }}
+      <button class="btn btn-secondary" :aria-label="$t('buttons.makeCopy')" @click.prevent="cloneT">{{ $t('buttons.makeCopy') }}</button>
+      <button v-if="isReordering" class="btn btn-error" @click.prevent="cancel" :aria-label="$t('buttons.cancel')">{{ $t('buttons.cancel') }}</button>
+      <button class="btn btn-secondary" @click.prevent="save" :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')">
+        {{ isReordering ? $t('buttons.save') : $t('buttons.reorder') }}
       </button>
     </ActionBar>
     <div class="flex flex-col gap-4">
@@ -34,12 +34,12 @@
         <div class="flex justify-between mb-2 p-2">
           <h2 class="text-lg font-semibold">Mat {{ matIndex + 1 }}</h2>
           <div class="join">
-            <button class="btn btn-square btn-sm btn-primary join-item" @click.prevent="showAddGroup(matIndex)"
-              aria-label="add group" title="Add Group">
+            <button class="btn btn-square btn-sm btn-success join-item" @click.prevent="showAddGroup(matIndex)"
+              aria-label="add group" :title="$t('buttons.addGroup')">
               <PlusIcon class="w-6 h-6" />
             </button>
             <button class="btn btn-square btn-sm btn-error join-item" @click.prevent="showDeleteMat(matIndex)"
-              aria-label="delete mat" title="Delete Mat">
+              aria-label="delete mat" :title="$t('buttons.deleteMat')">
               <XMarkIcon class="w-6 h-6" />
             </button>
           </div>
@@ -61,20 +61,20 @@
                 </div>
                 <div class="join">
                   <button class="btn btn-square btn-sm btn-success join-item"
-                    @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match" title="Add Match">
+                    @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match" :title="$t('buttons.addMatch')">
                     <PlusIcon class="w-5 h-5" />
                   </button>
                   <button class="btn btn-square btn-sm btn-success join-item"
                     :disabled="!canRandomize(matIndex, groupIndex)" @click.prevent="randomizeGroup(matIndex, groupIndex)"
-                    aria-label="randomize matches in group" title="Randomize Matches">
+                    aria-label="randomize matches in group" :title="$t('buttons.randomize')">
                     <ArrowPathIcon class="w-5 h-5" />
                   </button>
                   <button class="btn btn-primary btn-square btn-sm join-item"
-                    @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" title="Edit Group">
+                    @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" :title="$t('buttons.editGroup')">
                     <PencilIcon class="w-4 h-4" />
                   </button>
                   <button class="btn btn-square btn-sm btn-error join-item"
-                    @click.prevent="showDeleteGroup(matIndex, groupIndex)" aria-label="delete group" title="Delete Group">
+                    @click.prevent="showDeleteGroup(matIndex, groupIndex)" aria-label="delete group" :title="$t('buttons.deleteGroup')">
                     <XMarkIcon class="w-5 h-5" />
                   </button>
                 </div>
@@ -103,16 +103,16 @@
                       <td>
                         <div class="join">
                           <NuxtLink class="btn btn-primary btn-square btn-sm join-item"
-                            :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank">
+                            :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank" :title="$t('buttons.results')">
                             <DocumentTextIcon class="w-5 h-5" />
                           </NuxtLink>
                           <button class="btn btn-primary btn-square btn-sm join-item"
                             @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
-                            :disabled="match.completed || inAction" title="Edit Match">
+                            :disabled="match.completed || inAction" :title="$t('buttons.editMatch')">
                             <PencilIcon class="w-4 h-4" />
                           </button>
                           <button class="btn btn-square btn-sm btn-error join-item" alt="delete match"
-                            title="Delete Match">
+                          :title="$t('buttons.deleteMatch')">
                             <XMarkIcon class="w-5 h-5" @click.prevent="showDeleteMatch(matIndex, groupIndex, index)" />
                           </button>
                         </div>
@@ -151,7 +151,7 @@
   <Prompt name="view_invite_modal" text="Close" :cancellable="false">
     <div class="flex flex-col items-center">
       <ClientOnly>
-        <QR :path="invitePath" title="Invite Link" />
+        <QR :path="invitePath" :title="$t('buttons.inviteLink')" />
       </ClientOnly>
     </div>
   </Prompt>
