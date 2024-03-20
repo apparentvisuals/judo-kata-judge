@@ -1,4 +1,5 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
+import path from 'path';
 
 export default defineNuxtConfig({
   vite: {
@@ -8,7 +9,7 @@ export default defineNuxtConfig({
       }
     }
   },
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt', 'nuxt-primevue'],
   colorMode: {
     preference: 'corporate', // default theme
     dataValue: 'theme', // activate data-theme in <html> tag
@@ -16,6 +17,12 @@ export default defineNuxtConfig({
   },
   i18n: {
     vueI18n: './i18n.config.js',
+  },
+  primevue: {
+    options: {
+      unstyled: true
+    },
+    importPT: { from: path.resolve(__dirname, './presets/lara/') },
   },
   nitro: {
     storage: {

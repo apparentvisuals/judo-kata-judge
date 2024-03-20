@@ -1,11 +1,11 @@
 <template>
-  <div class="navbar fixed bg-primary top-0 z-10 text-primary-content text-xl">
+  <div class="navbar fixed bg-primary top-0 z-50 text-primary-content text-xl">
     <div class="navbar-start">
       <div class="dropdown">
         <label tabindex="0" class="btn btn-ghost btn-square">
           <Bars3Icon class="w=5 h-5" />
         </label>
-        <div tabindex="0" class="dropdown-content mt-3 p-2  z-50 shadow-xl bg-base-200 w-40">
+        <div tabindex="0" class="dropdown-content mt-3 p-2 shadow-xl bg-base-200 w-40">
           <ul class="menu text-base-content">
             <li><nuxt-link to="/admin">{{ $t('titles.tournaments') }}</nuxt-link></li>
             <li><nuxt-link to="/admin/judges">{{ $t('titles.judges') }}</nuxt-link></li>

@@ -2,13 +2,42 @@
   <Error :error-string="error" />
   <AdminNav name="Judges" />
   <Container>
-    <ActionBar>
-      <button class="btn btn-secondary" @click.prevent="showAdd" :disabled="inAction">
-        <span>{{ $t('buttons.addJudge') }}</span>
-      </button>
-    </ActionBar>
-    <table class="admin-table">
-      <thead>
+    <DataTable show-gridlines scrollable scroll-height="flex" sort-field="name" :sort-order="1" :value="judges">
+      <template #header>
+        <ActionBar>
+          <button class="btn btn-secondary" @click.prevent="showAdd" :disabled="inAction">
+            <span>{{ $t('buttons.addJudge') }}</span>
+          </button>
+        </ActionBar>
+      </template>
+      <Column field="id" :header="$t('labels.id')"></Column>
+      <Column sortable field="name" :header="$t('labels.name')"></Column>
+      <Column sortable field="rank" :header="$t('labels.rank')">
+        <template #body="{ data }">
+          {{ getLevelName(data.rank) }}
+        </template>
+      </Column>
+      <Column :header="$t('labels.region')">
+        <template #body="{ data }">
+          {{ getProvinceName(data.region) }}
+        </template>
+      </Column>
+      <Column frozen alignFrozen="right" :header="$t('labels.actions')">
+        <template #body="{ index }">
+          <div class="join">
+            <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
+              :disabled="inAction">
+              <PencilIcon class="w-4 h-4" />
+            </button>
+            <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
+              :disabled="inAction">
+              <XMarkIcon class="w-5 h-5" />
+            </button>
+          </div>
+        </template>
+      </Column>
+
+      <!-- <thead>
         <tr>
           <th class="w-12"></th>
           <th>{{ $t('labels.name') }}</th>
@@ -36,8 +65,8 @@
             </div>
           </td>
         </tr>
-      </tbody>
-    </table>
+      </tbody> -->
+    </DataTable>
   </Container>
   <Prompt name="add_judge_modal" @submit="add" :disabled="inAction" text="Add">
     <JudgeInput :judge="newJudge" />
@@ -54,6 +83,9 @@
 import { clone, pickBy } from 'lodash-es';
 import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
 import { getLevelName, getProvinceName, handleServerError } from '~/src/utils';
+
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
 
 useHead({
   title: 'Judges - Kata Admin',

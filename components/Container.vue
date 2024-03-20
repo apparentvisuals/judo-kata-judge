@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-16 p-4">
+  <div class="p-4 pt-20 h-full w-full">
     <slot />
   </div>
 </template>

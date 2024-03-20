@@ -2,42 +2,41 @@
   <Error :error-string="error" />
   <AdminNav name="Athletes" />
   <Container>
-    <ActionBar>
-      <button class="btn btn-secondary" @click.prevent="showAdd" :disabled="inAction">
-        <span>{{ $t('buttons.addAthlete') }}</span>
-      </button>
-    </ActionBar>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th class="w-12"></th>
-          <th>{{ $t('labels.name') }}</th>
-          <th>{{ $t('labels.rank') }}</th>
-          <th>{{ $t('labels.region') }}</th>
-          <th class="w-16"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(a, index) in athletes">
-          <td>{{ a.id }}</td>
-          <td>{{ a.name }}</td>
-          <td>{{ getRankName(a.rank) }}</td>
-          <td>{{ getProvinceName(a.region) }}</td>
-          <td>
-            <div class="join">
-              <button class="btn btn-secondary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
-                :disabled="inAction">
-                <PencilIcon class="w-4 h-4" />
-              </button>
-              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
-                :disabled="inAction">
-                <XMarkIcon class="w-5 h-5" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <DataTable show-gridlines scrollable scroll-height="flex" sort-field="name" :sort-order="1" :value="athletes">
+      <template #header>
+        <ActionBar>
+          <button class="btn btn-secondary" @click.prevent="showAdd" :disabled="inAction">
+            <span>{{ $t('buttons.addAthlete') }}</span>
+          </button>
+        </ActionBar>
+      </template>
+      <Column sortable field="name" :header="$t('labels.name')">
+      </Column>
+      <Column :header="$t('labels.rank')">
+        <template #body="{ data }">
+          {{ getRankName(data.rank) }}
+        </template>
+      </Column>
+      <Column :header="$t('labels.region')">
+        <template #body="{ data }">
+          {{ getProvinceName(data.region) }}
+        </template>
+      </Column>
+      <Column frozen alignFrozen="right" :header="$t('labels.actions')">
+        <template #body="{ index }">
+          <div class="join">
+            <button class="btn btn-secondary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
+              :disabled="inAction">
+              <PencilIcon class="w-4 h-4" />
+            </button>
+            <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
+              :disabled="inAction">
+              <XMarkIcon class="w-5 h-5" />
+            </button>
+          </div>
+        </template>
+      </Column>
+    </DataTable>
   </Container>
   <Prompt name="add_athlete_modal" @submit="add" :disabled="inAction" text="Add">
     <AthleteInputs :athlete="newAthlete" />
@@ -53,6 +52,10 @@
 <script setup>
 import { clone, pickBy } from 'lodash-es';
 import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
+
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+
 import { getProvinceName, getRankName, handleServerError } from '~/src/utils';
 
 useHead({
