@@ -2,42 +2,39 @@
   <Error :error-string="error" />
   <AdminNav :name="$t('titles.tournaments')" />
   <Container>
-    <ActionBar>
-      <button class="btn btn-secondary" @click.prevent="showAdd" title="Create Tournament">
-        <span>Create Tournament</span>
-      </button>
-    </ActionBar>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th class="w-1/2">{{ $t('labels.name') }}</th>
-          <th class="w-1/2">{{ $t('labels.region') }}</th>
-          <th class="w-16"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(t, index) in tournaments">
-          <td>
-            <NuxtLink class="link" :to="`/admin/t/${t.id}`">{{ t.name }}</NuxtLink>
-          </td>
-          <td>
-            {{ getOrganization(t.org) }}
-          </td>
-          <td>
-            <div class="join">
-              <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
-                :disabled="inAction" title="Edit Tournament">
-                <PencilIcon class="w-4 h-4" />
-              </button>
-              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
-                :disabled="inAction" title="Delete Tournament">
-                <XMarkIcon class="w-5 h-5" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <DataTable show-gridlines scrollable scroll-height="flex" sort-field="name" :sort-order="1" :value="tournaments">
+      <template #header>
+        <ActionBar>
+          <button class="btn btn-secondary" @click.prevent="showAdd" title="Create Tournament">
+            <span>{{ $t('buttons.createTournament') }}</span>
+          </button>
+        </ActionBar>
+      </template>
+      <Column sortable field="name" :header="$t('labels.name')">
+        <template #body="{ data }">
+          <NuxtLink class="link" :to="`/admin/t/${data.id}`">{{ data.name }}</NuxtLink>
+        </template>
+      </Column>
+      <Column :header="$t('labels.region')">
+        <template #body="{ data }">
+          {{ getOrganization(data.org) }}
+        </template>
+      </Column>
+      <Column frozen alignFrozen="right" :header="$t('labels.actions')">
+        <template #body="{ index }">
+          <div class="join">
+            <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
+              :disabled="inAction" title="Edit Tournament">
+              <PencilIcon class="w-4 h-4" />
+            </button>
+            <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
+              :disabled="inAction" title="Delete Tournament">
+              <XMarkIcon class="w-5 h-5" />
+            </button>
+          </div>
+        </template>
+      </Column>
+    </DataTable>
   </Container>
   <Prompt name="add_t_modal" @submit="add" :disabled="inAction" text="Add">
     <TournamentInputs :tournament="newTournament" />
@@ -53,6 +50,10 @@
 <script setup>
 import { clone, pickBy } from 'lodash-es';
 import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
+
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+
 import { getOrganization, handleServerError } from '~/src/utils';
 
 useHead({

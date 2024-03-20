@@ -3,9 +3,11 @@ export default defineI18nConfig(() => ({
   messages: {
     en: {
       labels: {
+        id: 'ID',
         name: 'Name',
         region: 'Region',
         rank: 'Rank',
+        actions: 'Actions',
         adminCode: 'Admin Code',
       },
       titles: {
