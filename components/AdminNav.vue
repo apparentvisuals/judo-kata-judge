@@ -18,10 +18,8 @@
       <h1>{{ props.name }}</h1>
     </div>
     <div class="navbar-end gap-2">
-      <select @change.prevent.stop="changeLang($event)">
-        <option value="en">EN</option>
-        <option value="fr">FR</option>
-      </select>
+      <SelectButton v-model="currentLocale" :options="locales"></SelectButton>
+      <SelectButton v-model="textSize" :options="[100, 120, 140]"></SelectButton>
       <label class="swap swap-rotate btn btn-square btn-ghost">
         <input type="checkbox" class="theme-controller" v-model="theme" />
         <SunIcon class="h-6 w-6 swap-off" />
@@ -38,10 +36,25 @@
 <script setup>
 import { ArrowLeftOnRectangleIcon, Bars3Icon, SunIcon, MoonIcon } from '@heroicons/vue/24/outline';
 
-const { setLocale } = useI18n()
+import SelectButton from 'primevue/selectbutton';
+
+const { locale, setLocale } = useI18n();
+const locales = ref(['en', 'fr']);
 const colorMode = useColorMode();
 const props = defineProps(['name']);
 const cookie = useCookie('jkj', { default: () => ({}) });
+const textSize = ref(100);
+
+const currentLocale = computed({
+  get() {
+    return locale.value;
+  },
+  async set(value) {
+    if (value) {
+      await setLocale(value);
+    }
+  }
+});
 
 const theme = computed({
   get() {
@@ -56,9 +69,13 @@ const theme = computed({
   }
 });
 
-function changeLang(event) {
-  setLocale(event.target.value);
-}
+watch(textSize, (newSize) => {
+  const el = document.getElementsByTagName('html');
+  el[0].style.fontSize = `${newSize}%`;
+});
+// function changeLang(event) {
+//   setLocale(event.target.value);
+// }
 
 function logout() {
   cookie.value.adminCode = '';
