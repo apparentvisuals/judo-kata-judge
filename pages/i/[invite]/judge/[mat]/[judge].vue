@@ -1,6 +1,6 @@
 <template>
   <Error :error-string="error" />
-  <div class="navbar fixed top-0 z-10 bg-base-100">
+  <div class="navbar fixed top-0 z-50 bg-base-100">
     <div class="navbar-start gap-2">
       <div class="dropdown">
         <label tabindex="0" class="btn btn-ghost btn-square drawer-button print:hidden">
@@ -39,38 +39,40 @@
   <div v-else-if="match && !judge" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
     <CodeForm v-model="judgeCode" title="Judge Code" @submit="submitCode" :error="codeError" />
   </div>
-  <div v-else-if="match" class="pt-16 pb-8">
-    <div class="navbar p-2 justify-between">
-      <div class="text-xl hidden md:block">
-        {{ judge.name }} ({{ judgeNumber }})
-      </div>
-      <div class="flex flex-col items-start">
-        <div class="text-xl md:hidden">
-          <span>{{ match.tori }}</span>
-          /
-          <span class="text-blue-500">{{ match.uke }}</span>
+  <Container v-else-if="match">
+    <ScoreTable :match="match" :group="group" :scores="scores">
+      <div class="flex justify-between">
+        <div class="text-xl hidden md:block">
+          {{ judge.name }} ({{ judgeNumber }})
         </div>
-        <div class="text-xl">{{ match ? getGroupName(group) : '' }}</div>
+        <div class="flex flex-col items-start">
+          <div class="text-xl md:hidden">
+            <span>{{ match.tori }}</span>
+            /
+            <span class="text-blue-500">{{ match.uke }}</span>
+          </div>
+          <div class="text-xl">{{ match ? getGroupName(group) : '' }}</div>
+        </div>
       </div>
-    </div>
-    <ScoreTable :match="match" :group="group" :scores="scores" />
-  </div>
+    </ScoreTable>
+  </Container>
   <Prompt name="submit_score_modal" @submit="submitScore" text="Yes">
     <span>Submit final scores? (it can not be undone.)</span>
   </Prompt>
 </template>
 
 <script setup>
-definePageMeta({
-  colorMode: 'corporate',
-});
-
 import { clone } from 'lodash-es';
 import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 import { ArrowPathIcon, Bars3Icon } from '@heroicons/vue/24/outline';
+
 import { getGroupName, getKataName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
+
+definePageMeta({
+  colorMode: 'corporate',
+});
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 

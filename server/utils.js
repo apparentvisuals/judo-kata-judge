@@ -175,19 +175,20 @@ export function createReport(group, match) {
     total: 0,
     values: new Array(numberOfJudges),
   }
+  let divideByHalf = true;
   for (let ii = 0; ii < numberOfJudges; ii++) {
     const judgeScores = scores[ii];
     if (judgeScores.scores) {
       let total = 0;
       const hasMajor = calculateHasMajor(judgeScores.scores);
+      divideByHalf = divideByHalf && hasMajor;
       for (let jj = 0; jj < techniquesCount; jj++) {
         const deductions = (judgeScores.scores[jj] && judgeScores.scores[jj].deductions ? judgeScores.scores[jj].deductions : ':::::').split(':');
         let value = calculateMoveScore(deductions);
-        value = hasMajor && !group.disableDivideByHalf ? value / 2 : value;
         report[jj].values[ii] = value;
         total += value;
       }
-      summary.values[ii] = total;
+      summary.values[ii] = hasMajor && !group.disableDivideByHalf ? total / 2 : total;
     }
   }
 
@@ -211,7 +212,7 @@ export function createReport(group, match) {
     technique.total = subTotal;
     total += subTotal;
   });
-  summary.total = total;
+  summary.total = divideByHalf && !group.disableDivideByHalf ? total / 2 : total;
 
   return { report, summary };
 }
