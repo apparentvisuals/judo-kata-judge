@@ -4,7 +4,7 @@
       <form valid="isValid" @submit.prevent="submit">
         <div class="form-control w-full max-w-xs">
           <label class="label" for="code">
-            <span class="label-text">Admin Code</span>
+            <span class="label-text">{{ $t('labels.adminCode') }}</span>
           </label>
           <input id="code" name="code" type="text" class="input input-bordered" v-model="code" :disabled="inAction" />
           <label class="label">
@@ -12,7 +12,7 @@
           </label>
         </div>
         <button type="submit" class="btn btn-primary mt-4" :disabled="inAction">
-          Submit
+          {{ $t('buttons.submit') }}
           <i v-show="inAction" class="loading loading-spinner loading-xs"></i>
         </button>
       </form>

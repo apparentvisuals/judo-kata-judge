@@ -96,7 +96,7 @@ export const KATA_MAP = {
 }
 
 const NNK3_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'te-waza:Uki-otoshi',
   'te-waza:Seoi-nage',
   'te-waza:Kata-guruma',
@@ -106,11 +106,11 @@ const NNK3_MOVE_LIST = [
   'ashi-waza:Okuri-ashi-harai',
   'ashi-waza:Sasae-tsurikomi-ashi',
   'ashi-waza:Uchi-mata',
-  'ceremony:Closing Ceremony'
+  ':Closing Ceremony',
 ];
 
 const NNK_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'te-waza:Uki-otoshi',
   'te-waza:Seoi-nage',
   'te-waza:Kata-guruma',
@@ -126,11 +126,11 @@ const NNK_MOVE_LIST = [
   'yoko-sutemi-waza:Yoko-gake',
   'yoko-sutemi-waza:Yoko-guruma',
   'yoko-sutemi-waza:Uki-waza',
-  'ceremony:Closing Ceremony'
+  ':Closing Ceremony'
 ];
 
 const KNK_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'osaekomi-waza:Kesa-gatame',
   'osaekomi-waza:Kata-gatame',
   'osaekomi-waza:Kami-shiho-gatame',
@@ -146,11 +146,11 @@ const KNK_MOVE_LIST = [
   'kansetsu-waza:Ude-hishigi-ude-gatame',
   'kansetsu-waza:Ude-hishigi-hiza-hatame',
   'kansetsu-waza:Ashi-garami',
-  'ceremony:Closing Ceremony'
+  ':Closing Ceremony'
 ];
 
 const JNK_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'ikkyo:Tsuki-dashi',
   'ikkyo:Kata-oshi',
   'ikkyo:Ryote-dori',
@@ -166,11 +166,11 @@ const JNK_MOVE_LIST = [
   'sankyo:Tsuki-age',
   'sankyo:Uchi-oroshi',
   'sankyo:Ryogan-tsuki',
-  'ceremony:Closing Ceremony'
+  ':Closing Ceremony'
 ];
 
 const KGJ_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'unarmed-held:Ryote-dori',
   'unarmed-held:Hidari-eri-dori',
   'unarmed-held:Migi-eri-dori',
@@ -192,11 +192,11 @@ const KGJ_MOVE_LIST = [
   'armed-pistol:Shomen-zuke',
   'armed-pistol:Koshi-gamae',
   'armed-pistol:Haimen-zuke',
-  'ceremony:Closing Ceremony'
+  ':Closing Ceremony'
 ];
 
 const KINK_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'idori-waza-unarmed:Ryote-dori',
   'idori-waza-unarmed:Tsukkake',
   'idori-waza-unarmed:Suri-age',
@@ -217,11 +217,11 @@ const KINK_MOVE_LIST = [
   'tachi-waza-armed:Kiri-komi',
   'tachi-waza-armed:Nuki-gake',
   'tachi-waza-armed:Kiri-oroshi',
-  'ceremony:Closing Ceremony'
+  ':Closing Ceremony'
 ];
 
 const KO1_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'ukemi:Mae-mawari-ukemi Horse To Feet',
   'ashi-waza:Uchi-mata Fixed',
   'ashi-waza:Uchi-mata Dynamic',
@@ -232,10 +232,10 @@ const KO1_MOVE_LIST = [
   'osaekomi-waza:Ushiro-kesa-gatame Transition',
   'osaekomi-waza:Yoko-shiho-gatame Transition',
   'osaekomi-waza:Kami-shiho-gatame Transition',
-  'ceremony:Closing Ceremony',
+  ':Closing Ceremony',
 ];
 const KO2_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'ukemi:Mae-ukemi Stand',
   'ukemi:Mae-mawari-ukemi Walk To Feet',
   'ashi-waza:O-uchi-gari Fixed & Dynamic',
@@ -246,10 +246,10 @@ const KO2_MOVE_LIST = [
   'osaekomi-waza:O-soto-gari to Yoko-shiho-gatame Transition',
   'osaekomi-waza:Tate-shiho-gatame Transition',
   'osaekomi-waza:Kata-gatame Transition',
-  'ceremony:Closing Ceremony',
+  ':Closing Ceremony',
 ];
 const KO3_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'ukemi:Mae-ukemi Knees to Feet',
   'ukemi:Mae-mawari-ukemi Walk To Feet',
   'tai-sabaki:Mae-mawari-sabaki & Ushiro-mawari-sabaki',
@@ -258,10 +258,10 @@ const KO3_MOVE_LIST = [
   'te-waza:Ippon-seionage Lift/Step-Over',
   'koshi-waza:Tsuri-komi-goshi Lift/Step-Over',
   'osaekomi-waza:Sasae-tsurikomi-ashi to Kesa Transition',
-  'ceremony:Closing Ceremony',
+  ':Closing Ceremony',
 ];
 const KO4_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'ukemi:Ushiro-ukemi Walking',
   'ukemi:Yoko-ukemi Sliding',
   'ukemi:Mae-mawari-ukemi Stand to Flat',
@@ -271,10 +271,10 @@ const KO4_MOVE_LIST = [
   'ashi-waza:Hiza-guruma Stand',
   'te-waza:Tai-otoshi Step-Over',
   'koshi-waza:O-goshi Lift/Step-Over',
-  'ceremony:Closing Ceremony',
+  ':Closing Ceremony',
 ];
 const KO5_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'ukemi:Ushiro-ukemi Stand to Feet',
   'ukemi:Yoko-ukemi Stand to Feet',
   'ukemi:Mae-mawari-ukemi Knees to Flat',
@@ -283,10 +283,10 @@ const KO5_MOVE_LIST = [
   'ashi-waza:De-ashi-harai Stand',
   'te-waza:Uki-otoshi Side-Roll',
   'koshi-waza:Uki-goshi Step-Over',
-  'ceremony:Closing Ceremony',
+  ':Closing Ceremony',
 ];
 const KO6_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'ukemi:Ushiro-ukemi Sit to Sit',
   'ukemi:Ushiro-ukemi Grip to Squat',
   'ukemi:Yoko-ukemi Squat',
@@ -297,10 +297,10 @@ const KO6_MOVE_LIST = [
   'shintai-dosa:Tsugi-ashi Side & Circle',
   'ashi-waza:Hiza-guruma Knee',
   'te-waza:Tai-otoshi Knee',
-  'ceremony:Closing Ceremony',
+  ':Closing Ceremony',
 ];
 const KO7_MOVE_LIST = [
-  'ceremony:Opening Ceremony',
+  ':Opening Ceremony',
   'ukemi:Ushiro-ukemi Flat',
   'ukemi:Ushiro-ukemi Sit to Sit',
   'ukemi:Yoko-ukemi Side to Flat',
@@ -311,7 +311,7 @@ const KO7_MOVE_LIST = [
   'shintai-dosa:Tsugi-ashi Side',
   'te-waza:Mae-sabaki Knees Throwing',
   'te-waza:Ushiro-sabaki Knee Throwing',
-  'ceremony:Closing Ceremony',
+  ':Closing Ceremony',
 ];
 
 export function getOrganization(org) {
@@ -328,6 +328,13 @@ export function getOrganizationImage(org) {
   return '';
 }
 
+export function groupedMoveList(kata) {
+  return legacyMoveList(kata).map((move) => {
+    const parts = move.split(':');
+    return { g: parts[0], t: parts[1] };
+  });
+}
+
 export function moveList(kata) {
   return legacyMoveList(kata).map((move) => {
     const parts = move.split(':');
@@ -342,7 +349,7 @@ export function moveList(kata) {
 function legacyMoveList(kata) {
   switch (kata) {
     case 'nnk3':
-      return NNK3_MOVE_LIST.map((move) => move);
+      return NNK3_MOVE_LIST;
     case 'nnk':
       return NNK_MOVE_LIST;
     case 'knk':

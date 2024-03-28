@@ -1,53 +1,75 @@
 <template>
-  <table class="table w-full bg-base-100">
-    <thead>
-      <tr>
-        <th class="p-0 w-0 md:w-auto md:p-2 text-right"><span class="hidden md:inline">Technique</span></th>
-        <th class="w-[50px] lg:w-12 score">S(1)</th>
-        <th class="w-[50px] lg:w-12 score">S(1)</th>
-        <th class="w-[50px] lg:w-12 score">M(3)</th>
-        <th class="w-[50px] lg:w-12 score" v-show="!group.disableMajor">B(5)</th>
-        <th class="w-[50px] lg:w-12 score" v-show="!group.disableForgotten">F(0)</th>
-        <th class="w-[50px] lg:w-12 score">C</th>
-        <th class="w-20 text-center">Score</th>
-      </tr>
-    </thead>
-    <tbody class="bg-base-100">
-      <template v-for="(score, index) in scores.points">
-        <tr :class="techniqueColour(score)" class="md:hidden">
-          <td :colspan="totalSpan + 1">{{ moves[index] }}</td>
-        </tr>
-        <tr :class="techniqueColour(score)">
-          <td class="p-0 md:p-2 text-right"><span class="hidden md:inline">{{ moves[index] }}</span></td>
-          <ScoreTableCell class="score" :binary="true" v-model="score.deductions[0]"
-            @click.prevent="toggleScore(score, 0)" hint="S" />
-          <ScoreTableCell class="score" :binary="true" v-model="score.deductions[1]"
-            @click.prevent="toggleScore(score, 1)" hint="S" />
-          <ScoreTableCell class="score" :binary="true" v-model="score.deductions[2]"
-            @click.prevent="toggleScore(score, 2)" hint="M" />
-          <ScoreTableCell class="score" :binary="true" :hidden="group.disableMajor" v-model="score.deductions[3]"
-            @click.prevent="toggleScore(score, 3)" hint="B" />
-          <ScoreTableCell class="score" :binary="true" :hidden="group.disableForgotten" v-model="score.deductions[4]"
-            @click.prevent="toggleScore(score, 4)" hint="F" />
-          <ScoreTableCell class="score" :binary="false" v-model="score.deductions[5]"
-            @click.prevent="toggleScore(score, 5)" hint="C" />
-          <td class="text-center">{{ score.value }}</td>
-        </tr>
+  <DataTable show-gridlines scrollable scroll-height="flex" row-group-mode="rowspan" group-rows-by="g" size="small" :value="moves">
+    <template #header>
+      <slot/>
+    </template>
+    <Column header="" class="w-12 text-center">
+      <template #body="{ index }">{{ index + 1 }}</template>
+    </Column>
+    <Column field="g" header="" class="w-12">
+      <template #body="{ data }">
+        <span style="writing-mode: vertical-lr;">{{ data.g }}</span>
       </template>
-      <tr>
-        <td :colspan="totalSpan" class="md:text-right">Total</td>
-        <td class="text-center">{{ total }}</td>
-      </tr>
-    </tbody>
-  </table>
+    </Column>
+    <Column field="t" header="Technique"></Column>
+    <Column header="S" class="w-10 text-center">
+      <template #body="{ index }">
+        <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[0]"
+            @click.prevent="toggleScore(scores.points[index], 0)" hint="S" />
+      </template>
+    </Column>
+    <Column header="S" class="w-10 text-center">
+      <template #body="{ index }">
+        <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[1]"
+            @click.prevent="toggleScore(scores.points[index], 1)" hint="S" />
+      </template>
+    </Column>
+    <Column header="M" class="w-10 text-center">
+      <template #body="{ index }">
+        <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[2]"
+            @click.prevent="toggleScore(scores.points[index], 2)" hint="M" />
+      </template>
+    </Column>
+    <Column v-show="!group.disableMajor" header="B" class="w-10 text-center">
+      <template #body="{ index }">
+        <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[3]"
+            @click.prevent="toggleScore(scores.points[index], 3)" hint="B" />
+      </template>
+    </Column>
+    <Column header="C" class="w-10 text-center">
+      <template #body="{ index }">
+        <ScoreTableCell :binary="false" v-model="scores.points[index].deductions[5]" @click.prevent="toggleScore(scores.points[index], 5)" hint="C" />
+      </template>
+    </Column>
+    <Column v-show="!group.disableForgotten" header="F" class="w-10 text-center">
+      <template #body="{ index }">
+        <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[4]"
+            @click.prevent="toggleScore(scores.points[index], 4)" hint="F" />
+      </template>
+    </Column>
+    <Column header="Score" class="w-16">
+      <template #body="{ index }">
+        {{ scores.points[index].value }}
+      </template>
+    </Column>
+    <template #footer>
+      <div class="text-right">
+        <span>Total: </span>
+        <span class="text-center">{{ total }}</span>
+      </div>
+    </template>
+  </DataTable>
 </template>
 
 <script setup>
-import { calculateHasMajor, calculateMoveScore, moveList } from '~/src/utils';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+
+import { calculateHasMajor, calculateMoveScore, moveList, groupedMoveList } from '~/src/utils';
 
 const props = defineProps(['match', 'group', 'scores', 'disabled']);
 
-const moves = computed(() => moveList(props.group.kata));
+const moves = computed(() => groupedMoveList(props.group.kata));
 const hasMajor = computed(() => calculateHasMajor(props.scores.points));
 const total = computed(() => {
   const total = props.scores.points.reduce((acc, score) => {
