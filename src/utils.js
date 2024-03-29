@@ -467,6 +467,11 @@ export function calculateHasMajor(scores) {
   return hasMajor;
 }
 
+/**
+ * 
+ * @param {Array<string>} deductions array of empty, 1 or + or - for deductions
+ * @returns {number} total
+ */
 export function calculateMoveScore(deductions) {
   let total = 10;
   if (deductions[0] === '1') {
@@ -490,6 +495,30 @@ export function calculateMoveScore(deductions) {
     total -= 0.5;
   }
   return Math.min(Math.max(0, total), 10);
+}
+
+/**
+ * 
+ * @param {Array<number>} totals array of judge total up to 5
+ * @returns {number} total after removing min max if needed
+ */
+export function calculateMoveTotal(totals) {
+  let subTotal = 0;
+  let min = 11;
+  let max = -1;
+  for (let ii = 0; ii < totals.length; ii++) {
+    const value = totals[ii];
+    subTotal += value;
+    min = Math.min(min, value);
+    max = Math.max(max, value);
+  }
+  if (totals.length > 3) {
+    subTotal -= min;
+  }
+  if (totals.length > 4) {
+    subTotal -= max;
+  }
+  return subTotal;
 }
 
 export function getScoreCounts(scores) {

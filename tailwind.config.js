@@ -1,6 +1,7 @@
 const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
+  mode: 'jit',
   plugins: [require('@tailwindcss/typography'), require('daisyui')],
   daisyui: {
     themes: ['corporate', 'business']

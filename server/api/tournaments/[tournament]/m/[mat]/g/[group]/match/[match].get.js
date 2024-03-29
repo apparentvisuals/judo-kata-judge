@@ -34,12 +34,11 @@ export default defineEventHandler(async (event) => {
   if (!matchData) {
     return createError({ statusCode: 404, message: 'Match info not found' });
   }
+
   const scores = matchDataToScores(matchData, group);
-  const results = createReport(group, { ...match, scores });
   return {
     ...match,
     scores,
-    results,
     tournament: pick(tournament.data, ['name', 'org']),
     kata: group.kata,
     numberOfJudges: match.completed ? scores.length : group.numberOfJudges,

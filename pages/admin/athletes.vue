@@ -2,37 +2,33 @@
   <Error :error-string="error" />
   <AdminNav name="Athletes" />
   <Container>
-    <DataTable show-gridlines scrollable scroll-height="flex" sort-field="name" :sort-order="1" :value="athletes">
+    <DataTable show-gridlines striped-rows scrollable scroll-height="flex" size="small" sort-field="name"
+      :sort-order="1" :value="athletes">
       <template #header>
         <ActionBar>
-          <button class="btn btn-secondary" @click.prevent="showAdd" :disabled="inAction">
-            <span>{{ $t('buttons.addAthlete') }}</span>
-          </button>
+          <Button :label="$t('buttons.addAthlete')" :title="$t('buttons.addAthlete')" icon="pi pi-plus"
+            @click.prevent="showAdd" :disabled="inAction" />
         </ActionBar>
       </template>
       <Column sortable field="name" :header="$t('labels.name')">
       </Column>
-      <Column :header="$t('labels.rank')">
+      <Column :header="$t('labels.rank')" class="w-40">
         <template #body="{ data }">
           {{ getRankName(data.rank) }}
         </template>
       </Column>
-      <Column :header="$t('labels.region')">
+      <Column :header="$t('labels.region')" class="w-48">
         <template #body="{ data }">
           {{ getProvinceName(data.region) }}
         </template>
       </Column>
-      <Column frozen alignFrozen="right" :header="$t('labels.actions')">
+      <Column frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
         <template #body="{ index }">
-          <div class="join">
-            <button class="btn btn-secondary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
-              :disabled="inAction">
-              <PencilIcon class="w-4 h-4" />
-            </button>
-            <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
-              :disabled="inAction">
-              <XMarkIcon class="w-5 h-5" />
-            </button>
+          <div class="flex justify-center gap-1">
+            <Button icon="pi pi-pencil" severity="secondary" class="w-9 h-9" @click.prevent="showUpdate(index)"
+              :disabled="inAction" />
+            <Button icon="pi pi-times" severity="danger" class="w-9 h-9" @click.prevent="showRemove(index)"
+              :disabled="inAction" />
           </div>
         </template>
       </Column>

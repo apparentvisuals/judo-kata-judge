@@ -1,55 +1,64 @@
 <template>
-  <DataTable show-gridlines scrollable scroll-height="flex" row-group-mode="rowspan" group-rows-by="g" size="small" :value="moves">
+  <DataTable show-gridlines scrollable scroll-height="flex" row-group-mode="rowspan" group-rows-by="g" size="small"
+    :value="display" :row-class="techniqueColour">
     <template #header>
-      <slot/>
+      <slot />
     </template>
     <Column header="" class="w-12 text-center">
       <template #body="{ index }">{{ index + 1 }}</template>
     </Column>
     <Column field="g" header="" class="w-12">
-      <template #body="{ data }">
-        <span style="writing-mode: vertical-lr;">{{ data.g }}</span>
+      <template #body="{ index }">
+        <span style="writing-mode: vertical-lr;">{{ moves[index].g }}</span>
       </template>
     </Column>
-    <Column field="t" header="Technique"></Column>
-    <Column header="S" class="w-10 text-center">
+    <Column header="Technique">
+      <template #body="{ index }">
+        <span>{{ moves[index].t }}</span>
+      </template>
+    </Column>
+    <Column bodyClass="w-10 !p-0" headerClass="!text-center">
+      <template #header>
+        <div class="text-center">S</div>
+      </template>
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[0]"
-            @click.prevent="toggleScore(scores.points[index], 0)" hint="S" />
+          @click.prevent="toggleScore(scores.points[index], 0)" hint="S" />
       </template>
     </Column>
-    <Column header="S" class="w-10 text-center">
+    <Column header="S" bodyClass="w-10 !p-0">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[1]"
-            @click.prevent="toggleScore(scores.points[index], 1)" hint="S" />
+          @click.prevent="toggleScore(scores.points[index], 1)" hint="S" />
       </template>
     </Column>
-    <Column header="M" class="w-10 text-center">
+    <Column header="M" bodyClass="w-10 !p-0">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[2]"
-            @click.prevent="toggleScore(scores.points[index], 2)" hint="M" />
+          @click.prevent="toggleScore(scores.points[index], 2)" hint="M" />
       </template>
     </Column>
-    <Column v-show="!group.disableMajor" header="B" class="w-10 text-center">
+    <Column v-show="!group.disableMajor" header="B" bodyClass="w-10 !p-0">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[3]"
-            @click.prevent="toggleScore(scores.points[index], 3)" hint="B" />
+          @click.prevent="toggleScore(scores.points[index], 3)" hint="B" />
       </template>
     </Column>
-    <Column header="C" class="w-10 text-center">
+    <Column header="C" bodyClass="w-10 !p-0">
       <template #body="{ index }">
-        <ScoreTableCell :binary="false" v-model="scores.points[index].deductions[5]" @click.prevent="toggleScore(scores.points[index], 5)" hint="C" />
+        <ScoreTableCell :binary="false" v-model="scores.points[index].deductions[5]"
+          @click.prevent="toggleScore(scores.points[index], 5)" hint="C" />
       </template>
     </Column>
-    <Column v-show="!group.disableForgotten" header="F" class="w-10 text-center">
+    <Column v-show="!group.disableForgotten" header="F" bodyClass="w-10 !p-0">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[4]"
-            @click.prevent="toggleScore(scores.points[index], 4)" hint="F" />
+          @click.prevent="toggleScore(scores.points[index], 4)" hint="F" />
       </template>
     </Column>
     <Column header="Score" class="w-16">
-      <template #body="{ index }">
-        {{ scores.points[index].value }}
+      <template #body="{ data }">
+        {{ data.value }}
       </template>
     </Column>
     <template #footer>
@@ -65,11 +74,20 @@
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 
-import { calculateHasMajor, calculateMoveScore, moveList, groupedMoveList } from '~/src/utils';
+import { calculateHasMajor, calculateMoveScore, groupedMoveList } from '~/src/utils';
 
 const props = defineProps(['match', 'group', 'scores', 'disabled']);
 
 const moves = computed(() => groupedMoveList(props.group.kata));
+const display = computed(() => {
+  if (props.scores && props.scores.points) {
+    return props.scores.points.map((point, index) => {
+      return { ...point, ...moves.value[index] };
+    })
+  }
+  return [];
+});
+
 const hasMajor = computed(() => calculateHasMajor(props.scores.points));
 const total = computed(() => {
   const total = props.scores.points.reduce((acc, score) => {
@@ -83,17 +101,6 @@ const total = computed(() => {
     return total / 2;
   }
   return total;
-});
-
-const totalSpan = computed(() => {
-  let span = 7;
-  if (props.group.disableMajor) {
-    span -= 1;
-  }
-  if (props.group.disableForgotten) {
-    span -= 1;
-  }
-  return span;
 });
 
 function techniqueColour(score) {
