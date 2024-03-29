@@ -33,7 +33,7 @@
       <div class="flex justify-between print:hidden">
         <div>Small/Petit: {{ scoreCounts.s }}</div>
         <div>Medium/Moyen: {{ scoreCounts.m }}</div>
-        <div>Big/Grand: {{  scoreCounts.b }}</div>
+        <div>Big/Grand: {{ scoreCounts.b }}</div>
       </div>
       <ActionBar v-if="!match.completed" class="pt-4 print:hidden">
         <button class="btn btn-error" v-for="index of numberOfResults" @click.prevent="showDelete(index)">
@@ -49,21 +49,21 @@
           </tr>
         </thead>
         <tbody class="bg-base-100">
-          <tr v-for="(score, index) in match.results.report">
-            <td>{{ moves[index] }}</td>
-            <td class="text-center" v-for="value of score.values">{{ value }}</td>
-            <td class="text-center">{{ score.total }}</td>
+          <tr v-for="(move, index) in moves">
+            <td>{{ move }}</td>
+            <td class="text-center" v-for="value of scores.length">{{ scores[value - 1].points[index].value }}</td>
+            <td class="text-center">{{ scoreTotals[index] }}</td>
           </tr>
           <tr>
             <td>Total</td>
-            <td class="text-center" v-for="value of match.results.summary.values">{{ value }}</td>
-            <td class="text-center">{{ match.results.summary.total }}</td>
+            <td class="text-center" v-for="value of match.summary.scores">{{ value }}</td>
+            <td class="text-center">{{ match.summary.total }}</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div v-if="view === 'judge'">
-      <ScoreTable :match="match" :group="match" :scores="scores[judgeIndex - 1]" :disabled="true"/>
+      <ScoreTable :match="match" :group="match" :scores="scores[judgeIndex - 1]" :disabled="true" />
     </div>
   </div>
   <Prompt name="delete_j_modal" @submit="remove" text="Yes">
@@ -73,7 +73,7 @@
 <script setup>
 import { ref } from 'vue';
 import { Bars3Icon } from '@heroicons/vue/24/outline';
-import { calculateMoveScore, getKataName, moveList, handleServerError, getScoreCounts } from '~/src/utils';
+import { calculateMoveScore, getKataName, moveList, handleServerError, getScoreCounts, calculateMoveTotal } from '~/src/utils';
 
 const route = useRoute();
 const cookie = useCookie('jkj', { default: () => ({}) });
@@ -91,7 +91,7 @@ const scores = computed(() => {
       return {
         points: (score.scores || []).map((score) => {
           const deductions = score.deductions.split(':');
-          return { 
+          return {
             deductions,
             value: calculateMoveScore(deductions),
           };
@@ -102,6 +102,18 @@ const scores = computed(() => {
   }
   return [];
 });
+
+const scoreTotals = computed(() => {
+  const totals = [];
+  const judgeCount = scores.value.length;
+  for (let ii = 0; ii < moves.value.length; ii++) {
+    totals[ii] = calculateMoveTotal(Array(judgeCount).fill(0).map((value, index) => {
+      return scores.value[index].points[ii].value;
+    }));
+  }
+  return totals;
+});
+
 const scoreCounts = computed(() => {
   const counts = { b: 0, m: 0, s: 0 };
   if (match.value) {

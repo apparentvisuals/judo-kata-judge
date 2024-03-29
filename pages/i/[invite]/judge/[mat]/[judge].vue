@@ -20,8 +20,9 @@
       <div class="text-xl text-center font-bold hidden xl:block">{{ title }}</div>
     </div>
     <div class="navbar-center gap-2">
-      <!-- <div class="text-xl font-bold" v-if="judge">{{ judge.name }} ({{ judgeNumber }})</div> -->
-      <div class="text-xl font-bold" v-if="match && group">{{ match.tori }} / {{ match.uke }} ({{ getGroupName(group) }})</div>
+      <div class="text-xl font-bold" v-if="match && group">
+        {{ match.tori }} / {{ match.uke }} ({{ getGroupName(group) }})
+      </div>
     </div>
     <div class="navbar-end">
       <button v-if="match && judge" class="btn btn-sm btn-success print:hidden" @click.prevent="showSubmitScore"
@@ -67,7 +68,7 @@ import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 import { ArrowPathIcon, Bars3Icon } from '@heroicons/vue/24/outline';
 
-import { getGroupName, getKataName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
+import { getGroupName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
 
 definePageMeta({
@@ -179,6 +180,11 @@ if (judgeCode.value) {
   await submitCode();
 }
 
+watch(moves, () => {
+  console.log('re-assign points');
+  scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
+});
+
 /**
  * @type UpdateEvents
  */
@@ -206,10 +212,7 @@ onMounted(async () => {
     match.value = data.match;
     state.value = data.state;
 
-    if (data.matchIndex === -1) {
-      // scores.value = clone(DEFAULT_SCORES);
-    } else if (data.matchIndex !== scores.value.matchIndex || data.groupIndex !== scores.value.groupIndex) {
-      // scores.value = clone(DEFAULT_SCORES);
+    if (data.matchIndex !== scores.value.matchIndex || data.groupIndex !== scores.value.groupIndex) {
       scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
     }
 

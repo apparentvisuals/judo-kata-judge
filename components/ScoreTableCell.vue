@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center min-w-6 min-h-6">
+  <div class="flex min-h-10 min-w-10 items-center justify-center">
     <XMarkIcon class="h-6 w-6" v-if="binary && modelValue === '1'" />
     <!-- <div class="md:hidden h-6 w-6 text-base-300 flex items-center justify-center" v-if="modelValue === ''">
       {{ hint }}
