@@ -1,58 +1,54 @@
 <template>
   <Error :error-string="error" />
-  <AdminNav name="Tournaments" />
+  <AdminNav :name="$t('titles.tournaments')" />
   <Container>
-    <ActionBar>
-      <button class="btn btn-secondary" @click.prevent="showAdd" title="Create Tournament">
-        <span>Create Tournament</span>
-      </button>
-    </ActionBar>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th class="w-1/2">Name</th>
-          <th class="w-1/2">Region</th>
-          <th class="w-16"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(t, index) in tournaments">
-          <td>
-            <NuxtLink class="link" :to="`/admin/t/${t.id}`">{{ t.name }}</NuxtLink>
-          </td>
-          <td>
-            {{ getOrganization(t.org) }}
-          </td>
-          <td>
-            <div class="join">
-              <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
-                :disabled="inAction" title="Edit Tournament">
-                <PencilIcon class="w-4 h-4" />
-              </button>
-              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
-                :disabled="inAction" title="Delete Tournament">
-                <XMarkIcon class="w-5 h-5" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <DataTable show-gridlines striped-rows scrollable scroll-height="flex" size="small" sort-field="name"
+      :sort-order="1" :value="tournaments">
+      <template #header>
+        <ActionBar>
+          <Button :label="$t('buttons.createTournament')" :title="$t('buttons.createTournament')" icon="pi pi-plus"
+            @click.prevent="showAdd" :disabled="inAction" />
+        </ActionBar>
+      </template>
+      <Column sortable field="name" :header="$t('labels.name')">
+        <template #body="{ data }">
+          <NuxtLink class="link" :to="`/admin/t/${data.id}`">{{ data.name }}</NuxtLink>
+        </template>
+      </Column>
+      <Column :header="$t('labels.region')" class="w-48">
+        <template #body="{ data }">
+          {{ getOrganization(data.org) }}
+        </template>
+      </Column>
+      <Column frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
+        <template #body="{ index }">
+          <div class="flex justify-center gap-1">
+            <Button icon="pi pi-pencil" severity="secondary" class="w-9 h-9" @click.prevent="showUpdate(index)"
+              :disabled="inAction" title="Edit Tournament" />
+            <Button icon="pi pi-times" severity="danger" class="w-9 h-9" @click.prevent="remove2($event, index)"
+              :disabled="inAction" title="Delete Tournament" />
+          </div>
+        </template>
+      </Column>
+    </DataTable>
   </Container>
+  <ConfirmPopup></ConfirmPopup>
   <Prompt name="add_t_modal" @submit="add" :disabled="inAction" text="Add">
     <TournamentInputs :tournament="newTournament" />
   </Prompt>
   <Prompt name="edit_t_modal" @submit="update" :disabled="inAction" text="Update">
     <TournamentInputs :tournament="toUpdate" />
   </Prompt>
-  <Prompt name="delete_t_modal" @submit="remove" text="Yes">
-    <span>Delete this tournament?</span>
-  </Prompt>
 </template>
 
 <script setup>
 import { clone, pickBy } from 'lodash-es';
-import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
+
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
+import ConfirmPopup from 'primevue/confirmpopup';
+
 import { getOrganization, handleServerError } from '~/src/utils';
 
 useHead({
@@ -62,11 +58,12 @@ useHead({
 const DEFAULT = { name: '', org: 'jc', showJudgeTotals: true };
 
 const cookie = useCookie('jkj', { default: () => ({}) });
+const confirm = useConfirm();
+const { t } = useI18n();
 
 const error = ref('');
 const inAction = ref(false);
 const newTournament = ref(clone(DEFAULT));
-const deleteIndex = ref(-1);
 const updateIndex = ref(-1);
 const toUpdate = ref(clone(DEFAULT));
 
@@ -119,18 +116,27 @@ async function update() {
   }
 }
 
-async function showRemove(index) {
-  deleteIndex.value = index;
-  delete_t_modal.showModal();
+async function remove2(event, index) {
+  confirm.require({
+    target: event.currentTarget,
+    message: t('prompts.deleteTournament'),
+    acceptClass: '!bg-red-500 dark:!bg-red-40 !border-red-500 dark:!border-red-400 !ring-red-500 dark:!ring-red-400 hover:!bg-red-600 dark:hover:!bg-red-300 hover:!border-red-600 dark:hover:!border-red-300 focus:!ring-red-400/50 dark:!focus:ring-red-300/50',
+    accept: () => {
+      remove(index);
+    },
+    reject: () => {
+
+    },
+  })
 }
 
-async function remove() {
-  if (deleteIndex.value > -1) {
-    const id = tournaments.value[deleteIndex.value].id;
+async function remove(index) {
+  if (index && index > -1) {
+    const id = tournaments.value[index].id;
     try {
       inAction.value = true;
       await $fetch(`/api/tournaments/${id}`, { method: 'DELETE', headers });
-      tournaments.value.splice(deleteIndex.value, 1);
+      tournaments.value.splice(index, 1);
       error.value = '';
     } catch (err) {
       error.value = handleServerError(err);

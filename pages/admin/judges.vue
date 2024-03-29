@@ -2,42 +2,37 @@
   <Error :error-string="error" />
   <AdminNav name="Judges" />
   <Container>
-    <ActionBar>
-      <button class="btn btn-secondary" @click.prevent="showAdd" :disabled="inAction">
-        <span>Add Judge</span>
-      </button>
-    </ActionBar>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th class="w-12">ID</th>
-          <th>Name</th>
-          <th>Rank</th>
-          <th>Region</th>
-          <th class="w-16"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(j, index) in judges">
-          <td>{{ j.id }}</td>
-          <td>{{ j.name }}</td>
-          <td>{{ getLevelName(j.rank) }}</td>
-          <td>{{ getProvinceName(j.region) }}</td>
-          <td>
-            <div class="join">
-              <button class="btn btn-primary btn-square btn-sm join-item" @click.prevent="showUpdate(index)"
-                :disabled="inAction">
-                <PencilIcon class="w-4 h-4" />
-              </button>
-              <button class="btn btn-error btn-square btn-sm join-item" @click.prevent="showRemove(index)"
-                :disabled="inAction">
-                <XMarkIcon class="w-5 h-5" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <DataTable show-gridlines striped-rows scrollable scroll-height="flex" size="small" sort-field="name"
+      :sort-order="1" :value="judges">
+      <template #header>
+        <ActionBar>
+          <Button :label="$t('buttons.addJudge')" :title="$t('buttons.addJudge')" icon="pi pi-plus"
+            @click.prevent="showAdd" :disabled="inAction" />
+        </ActionBar>
+      </template>
+      <Column field="id" :header="$t('labels.id')" class="w-10"></Column>
+      <Column sortable field="name" :header="$t('labels.name')"></Column>
+      <Column sortable field="rank" :header="$t('labels.rank')" class="w-40">
+        <template #body="{ data }">
+          {{ getLevelName(data.rank) }}
+        </template>
+      </Column>
+      <Column :header="$t('labels.region')" class="w-48">
+        <template #body="{ data }">
+          {{ getProvinceName(data.region) }}
+        </template>
+      </Column>
+      <Column frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
+        <template #body="{ index }">
+          <div class="flex justify-center gap-1">
+            <Button icon="pi pi-pencil" severity="secondary" class="w-9 h-9" @click.prevent="showUpdate(index)"
+              :disabled="inAction" />
+            <Button icon="pi pi-times" severity="danger" class="w-9 h-9" @click.prevent="showRemove(index)"
+              :disabled="inAction" />
+          </div>
+        </template>
+      </Column>
+    </DataTable>
   </Container>
   <Prompt name="add_judge_modal" @submit="add" :disabled="inAction" text="Add">
     <JudgeInput :judge="newJudge" />
@@ -46,13 +41,16 @@
     <JudgeInput :judge="toUpdate" />
   </Prompt>
   <Prompt name="delete_judge_modal" @submit="remove" text="Yes">
-    <span>Delete this judge?</span>
+    <span>{{ $t('prompts.deleteJudge') }}</span>
   </Prompt>
 </template>
 
 <script setup>
 import { clone, pickBy } from 'lodash-es';
-import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
+
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+
 import { getLevelName, getProvinceName, handleServerError } from '~/src/utils';
 
 useHead({

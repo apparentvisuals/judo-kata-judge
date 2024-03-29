@@ -1,6 +1,6 @@
 <template>
   <Error :error-string="error" />
-  <div class="navbar fixed top-0 z-10 bg-base-100">
+  <div class="navbar fixed top-0 z-50 bg-base-100">
     <div class="navbar-start gap-2">
       <div class="dropdown">
         <label tabindex="0" class="btn btn-ghost btn-square drawer-button print:hidden">
@@ -20,8 +20,9 @@
       <div class="text-xl text-center font-bold hidden xl:block">{{ title }}</div>
     </div>
     <div class="navbar-center gap-2">
-      <!-- <div class="text-xl font-bold" v-if="judge">{{ judge.name }} ({{ judgeNumber }})</div> -->
-      <div class="text-xl font-bold" v-if="match && group">{{ match.tori }} / {{ match.uke }} ({{ getGroupName(group) }})</div>
+      <div class="text-xl font-bold" v-if="match && group">
+        {{ match.tori }} / {{ match.uke }} ({{ getGroupName(group) }})
+      </div>
     </div>
     <div class="navbar-end">
       <button v-if="match && judge" class="btn btn-sm btn-success print:hidden" @click.prevent="showSubmitScore"
@@ -39,38 +40,40 @@
   <div v-else-if="match && !judge" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
     <CodeForm v-model="judgeCode" title="Judge Code" @submit="submitCode" :error="codeError" />
   </div>
-  <div v-else-if="match" class="pt-16 pb-8">
-    <div class="navbar p-2 justify-between">
-      <div class="text-xl hidden md:block">
-        {{ judge.name }} ({{ judgeNumber }})
-      </div>
-      <div class="flex flex-col items-start">
-        <div class="text-xl md:hidden">
-          <span>{{ match.tori }}</span>
-          /
-          <span class="text-blue-500">{{ match.uke }}</span>
+  <Container v-else-if="match">
+    <ScoreTable :match="match" :group="group" :scores="scores">
+      <div class="flex justify-between">
+        <div class="text-xl hidden md:block">
+          {{ judge.name }} ({{ judgeNumber }})
         </div>
-        <div class="text-xl">{{ match ? getGroupName(group) : '' }}</div>
+        <div class="flex flex-col items-start">
+          <div class="text-xl md:hidden">
+            <span>{{ match.tori }}</span>
+            /
+            <span class="text-blue-500">{{ match.uke }}</span>
+          </div>
+          <div class="text-xl">{{ match ? getGroupName(group) : '' }}</div>
+        </div>
       </div>
-    </div>
-    <ScoreTable :match="match" :group="group" :scores="scores" />
-  </div>
+    </ScoreTable>
+  </Container>
   <Prompt name="submit_score_modal" @submit="submitScore" text="Yes">
     <span>Submit final scores? (it can not be undone.)</span>
   </Prompt>
 </template>
 
 <script setup>
-definePageMeta({
-  colorMode: 'corporate',
-});
-
 import { clone } from 'lodash-es';
 import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 import { ArrowPathIcon, Bars3Icon } from '@heroicons/vue/24/outline';
-import { getGroupName, getKataName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
+
+import { getGroupName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
+
+definePageMeta({
+  colorMode: 'corporate',
+});
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 
@@ -177,6 +180,11 @@ if (judgeCode.value) {
   await submitCode();
 }
 
+watch(moves, () => {
+  console.log('re-assign points');
+  scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
+});
+
 /**
  * @type UpdateEvents
  */
@@ -204,10 +212,7 @@ onMounted(async () => {
     match.value = data.match;
     state.value = data.state;
 
-    if (data.matchIndex === -1) {
-      // scores.value = clone(DEFAULT_SCORES);
-    } else if (data.matchIndex !== scores.value.matchIndex || data.groupIndex !== scores.value.groupIndex) {
-      // scores.value = clone(DEFAULT_SCORES);
+    if (data.matchIndex !== scores.value.matchIndex || data.groupIndex !== scores.value.groupIndex) {
       scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
     }
 
