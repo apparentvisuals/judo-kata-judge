@@ -17,40 +17,43 @@
         <span>{{ moves[index].t }}</span>
       </template>
     </Column>
-    <Column bodyClass="w-10 !p-0" headerClass="!text-center">
-      <template #header>
-        <div class="text-center">S</div>
-      </template>
+    <Column header="S" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
+      :pt-options="{ mergeProps: true }">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[0]"
           @click.prevent="toggleScore(scores.points[index], 0)" hint="S" />
       </template>
     </Column>
-    <Column header="S" bodyClass="w-10 !p-0">
+    <Column header="S" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
+      :pt-options="{ mergeProps: true }">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[1]"
           @click.prevent="toggleScore(scores.points[index], 1)" hint="S" />
       </template>
     </Column>
-    <Column header="M" bodyClass="w-10 !p-0">
+    <Column header="M" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
+      :pt-options="{ mergeProps: true }">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[2]"
           @click.prevent="toggleScore(scores.points[index], 2)" hint="M" />
       </template>
     </Column>
-    <Column v-show="!group.disableMajor" header="B" bodyClass="w-10 !p-0">
+    <Column v-show="!group.disableMajor" header="B" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
+      :pt-options="{ mergeProps: true }">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[3]"
           @click.prevent="toggleScore(scores.points[index], 3)" hint="B" />
       </template>
     </Column>
-    <Column header="C" bodyClass="w-10 !p-0">
+    <Column header="C" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
+      :pt-options="{ mergeProps: true }">
       <template #body="{ index }">
         <ScoreTableCell :binary="false" v-model="scores.points[index].deductions[5]"
           @click.prevent="toggleScore(scores.points[index], 5)" hint="C" />
       </template>
     </Column>
-    <Column v-show="!group.disableForgotten" header="F" bodyClass="w-10 !p-0">
+    <Column v-show="!group.disableForgotten" header="F" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
+      :pt-options="{ mergeProps: true }">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[4]"
           @click.prevent="toggleScore(scores.points[index], 4)" hint="F" />
