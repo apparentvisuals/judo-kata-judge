@@ -1,34 +1,47 @@
 <template>
   <div class="navbar fixed bg-primary top-0 z-50 text-primary-content text-xl">
     <div class="navbar-start">
-      <div class="dropdown">
-        <label tabindex="0" class="btn btn-ghost btn-square">
-          <Bars3Icon class="w=5 h-5" />
-        </label>
-        <div tabindex="0" class="dropdown-content mt-3 p-2 shadow-xl bg-base-200 w-40">
-          <ul class="menu text-base-content">
-            <li><nuxt-link to="/admin">{{ $t('titles.tournaments') }}</nuxt-link></li>
-            <li><nuxt-link to="/admin/judges">{{ $t('titles.judges') }}</nuxt-link></li>
-            <li><nuxt-link to="/admin/athletes">{{ $t('titles.athletes') }}</nuxt-link></li>
-          </ul>
-        </div>
-      </div>
+      <Button icon="pi pi-bars" @click.prevent="toggleMain" aira-haspopup="true" aria-controls="main_menu" />
+      <Menu ref="mainMenu" id="main_menu" :popup="true" :model="mainMenuItems">
+        <template #item="{ item, props }">
+          <nuxt-link :to="item.path" class="flex items-center" v-bind="props.action">
+            <span class="pi pi-user" />
+            <span class="pl-2">{{ item.label }}</span>
+          </nuxt-link>
+        </template>
+      </Menu>
     </div>
     <div class="navbar-center">
       <h1>{{ props.name }}</h1>
     </div>
     <div class="navbar-end gap-2">
-      <SelectButton v-model="currentLocale" :options="locales"></SelectButton>
-      <SelectButton v-model="textSize" :options="[100, 120, 140]"></SelectButton>
-      <label class="swap swap-rotate btn btn-square btn-ghost">
-        <input type="checkbox" class="theme-controller" v-model="theme" />
-        <SunIcon class="h-6 w-6 swap-off" />
-        <MoonIcon class="h-6 w-6 swap-on" />
-      </label>
-      <button class="btn btn-error" @click.prevent="logout" title="Logout">
-        <ArrowLeftOnRectangleIcon class="w-5 h-5" />
-        {{ $t('buttons.logout') }}
-      </button>
+      <Button icon="pi pi-sign-out" :label="$t('buttons.logout')" :title="$t('buttons.logout')" severity="danger"
+        @click.prevent="logout" />
+      <div>
+        <Button icon="pi pi-cog" @click.prevent="toggleSetting" aria-haspopup="true" aria-controls="setting_menu" />
+        <Menu ref="settingMenu" id="setting_menu" :popup="true" :model="settingMenuItems" :pt="{ content: '' }">
+          <template #submenuheader="{ item }">
+            <span class="text-primary-500 dark:text-primary-400 font-bold leading-none">{{ item.label }}</span>
+          </template>
+          <template #item="{ item, props }">
+            <div v-if="item.type === 'language'" class="flex justify-between">
+              <SelectButton v-model="currentLocale" :options="localeOptions" option-label="label" option-value="value">
+              </SelectButton>
+              <SelectButton v-model="currentTheme" :options="colorModeOptions" option-label="value" option-value="value"
+                data-key="value">
+                <template #option="{ option }">
+                  <span :class="option.icon" />
+                </template>
+              </SelectButton>
+            </div>
+            <div v-if="item.type === 'size'">
+              <InputNumber v-model="textSize" showButtons buttonLayout="horizontal" suffix="%"
+                incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" inputClass="w-20 text-center"
+                :step="10" :min="80" :max="120" />
+            </div>
+          </template>
+        </Menu>
+      </div>
     </div>
   </div>
 </template>
@@ -36,14 +49,33 @@
 <script setup>
 import { ArrowLeftOnRectangleIcon, Bars3Icon, SunIcon, MoonIcon } from '@heroicons/vue/24/outline';
 
-import SelectButton from 'primevue/selectbutton';
-
-const { locale, setLocale } = useI18n();
-const locales = ref(['en', 'fr']);
-const colorMode = useColorMode();
-const props = defineProps(['name']);
 const cookie = useCookie('jkj', { default: () => ({}) });
+const { locale, setLocale, t } = useI18n();
+const colorMode = useColorMode();
+
+const props = defineProps(['name']);
+
+const localeOptions = ref([{ label: 'EN', value: 'en' }, { label: 'FR', value: 'fr' }]);
+const colorModeOptions = ref([{ icon: 'pi pi-sun', value: 'light' }, { icon: 'pi pi-moon', value: 'dark' }])
 const textSize = ref(100);
+const settingMenu = ref();
+const settingMenuItems = ref([{
+  label: t('labels.language'),
+  items: [{
+    label: 'Language',
+    type: 'language',
+    disabled: true
+  }],
+}, {
+  label: t('labels.fontSize'),
+  items: [{
+    label: 'Font Size',
+    type: 'size',
+    disabled: true
+  }],
+}]);
+const mainMenu = ref();
+const mainMenuItems = ref([{ label: t('titles.tournaments'), path: '/admin' }, { label: t('titles.judges'), path: '/admin/judges' }, { label: t('titles.athletes'), path: '/admin/athletes' }])
 
 const currentLocale = computed({
   get() {
@@ -56,16 +88,12 @@ const currentLocale = computed({
   }
 });
 
-const theme = computed({
+const currentTheme = computed({
   get() {
-    return colorMode.preference === 'corporate';
+    return colorMode.preference;
   },
   set(value) {
-    if (value) {
-      colorMode.preference = 'corporate';
-    } else {
-      colorMode.preference = 'business';
-    }
+    colorMode.preference = value;
   }
 });
 
@@ -73,12 +101,17 @@ watch(textSize, (newSize) => {
   const el = document.getElementsByTagName('html');
   el[0].style.fontSize = `${newSize}%`;
 });
-// function changeLang(event) {
-//   setLocale(event.target.value);
-// }
 
 function logout() {
   cookie.value.adminCode = '';
   navigateTo('/admin/code');
+}
+
+const toggleSetting = (event) => {
+  settingMenu.value.toggle(event);
+}
+
+const toggleMain = (event) => {
+  mainMenu.value.toggle(event);
 }
 </script>

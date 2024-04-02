@@ -1,9 +1,9 @@
 <template>
   <Error :error-string="error" />
   <AdminNav name="Judges" />
-  <Container>
-    <DataTable show-gridlines striped-rows scrollable scroll-height="flex" size="small" sort-field="name"
-      :sort-order="1" :value="judges">
+  <Container
+    class="font-bold border p-4 bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-700 dark:text-white/80">
+    <DataTable show-gridlines striped-rows scrollable scroll-height="flex" size="small" :value="judges">
       <template #header>
         <ActionBar>
           <Button :label="$t('buttons.addJudge')" :title="$t('buttons.addJudge')" icon="pi pi-plus"
@@ -11,8 +11,8 @@
         </ActionBar>
       </template>
       <Column field="id" :header="$t('labels.id')" class="w-10"></Column>
-      <Column sortable field="name" :header="$t('labels.name')"></Column>
-      <Column sortable field="rank" :header="$t('labels.rank')" class="w-40">
+      <Column field="name" :header="$t('labels.name')"></Column>
+      <Column field="rank" :header="$t('labels.rank')" class="w-40">
         <template #body="{ data }">
           {{ getLevelName(data.rank) }}
         </template>

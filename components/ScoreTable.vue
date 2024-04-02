@@ -38,7 +38,7 @@
           @click.prevent="toggleScore(scores.points[index], 2)" hint="M" />
       </template>
     </Column>
-    <Column v-show="!group.disableMajor" header="B" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
+    <Column v-if="!group.disableMajor" header="B" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
       :pt-options="{ mergeProps: true }">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[3]"
@@ -52,24 +52,24 @@
           @click.prevent="toggleScore(scores.points[index], 5)" hint="C" />
       </template>
     </Column>
-    <Column v-show="!group.disableForgotten" header="F" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
+    <Column v-if="!group.disableForgotten" header="F" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
       :pt-options="{ mergeProps: true }">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[4]"
           @click.prevent="toggleScore(scores.points[index], 4)" hint="F" />
       </template>
     </Column>
-    <Column header="Score" class="w-16">
+    <Column header="Score" class="w-16 text-right">
       <template #body="{ data }">
         {{ data.value }}
       </template>
     </Column>
-    <template #footer>
-      <div class="text-right">
-        <span>Total: </span>
-        <span class="text-center">{{ total }}</span>
-      </div>
-    </template>
+    <ColumnGroup type="footer">
+      <Row>
+        <Column footer="Total" :colspan="totalSpan" footer-class="text-right" />
+        <Column :footer="total" footer-class="text-right" />
+      </Row>
+    </ColumnGroup>
   </DataTable>
 </template>
 
@@ -104,6 +104,17 @@ const total = computed(() => {
     return total / 2;
   }
   return total;
+});
+
+const totalSpan = computed(() => {
+  let span = 9;
+  if (props.group.disableMajor) {
+    span -= 1;
+  }
+  if (props.group.disableForgotten) {
+    span -= 1;
+  }
+  return span;
 });
 
 function techniqueColour(score) {
