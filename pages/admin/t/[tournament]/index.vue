@@ -13,7 +13,8 @@
     </div>
   </div>
   <Container>
-    <div class="font-bold border p-4 bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-700 dark:text-white/80">
+    <div
+      class="font-bold border p-4 bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-700 dark:text-white/80">
       <ActionBar>
         <button class="btn btn-secondary" @click.prevent="addMat" title="Add Mat">
           <PlusIcon class="w-5 h-5" />
@@ -21,17 +22,21 @@
         </button>
         <button class="btn btn-secondary" @click.prevent="createInvite" title="Show Invite">
           <EnvelopeIcon class="w-5 h-5" />
-          <span>{{ $t('buttons.inviteLink')}}</span>
+          <span>{{ $t('buttons.inviteLink') }}</span>
         </button>
         <div class="flex-1"></div>
-        <button class="btn btn-secondary" :aria-label="$t('buttons.makeCopy')" @click.prevent="cloneT">{{ $t('buttons.makeCopy') }}</button>
-        <button v-if="isReordering" class="btn btn-error" @click.prevent="cancel" :aria-label="$t('buttons.cancel')">{{ $t('buttons.cancel') }}</button>
-        <button class="btn btn-secondary" @click.prevent="save" :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')">
+        <button class="btn btn-secondary" :aria-label="$t('buttons.makeCopy')" @click.prevent="cloneT">{{
+    $t('buttons.makeCopy') }}</button>
+        <button v-if="isReordering" class="btn btn-error" @click.prevent="cancel" :aria-label="$t('buttons.cancel')">{{
+    $t('buttons.cancel') }}</button>
+        <button class="btn btn-secondary" @click.prevent="save"
+          :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')">
           {{ isReordering ? $t('buttons.save') : $t('buttons.reorder') }}
         </button>
       </ActionBar>
     </div>
-    <Panel v-for="(mat, matIndex) in tournament.mats" toggleable :pt="{ content: '!p-2 !rounded-none', header: '!rounded-none' }" :pt-options="{ mergeProps: true }" class="mt-2">
+    <Panel v-for="(mat, matIndex) in tournament.mats" toggleable
+      :pt="{ content: '!p-2 !rounded-none', header: '!rounded-none' }" :pt-options="{ mergeProps: true }" class="mt-2">
       <template #header>
         <span class="flex items-center gap-2 w-full">
           <h2 class="text-lg font-semibold">Mat {{ matIndex + 1 }}</h2>
@@ -47,9 +52,11 @@
           </div>
         </span>
       </template>
-      <draggable v-model="mat.groups" tag="div" group="groups" item-key="name" handle=".handle" :disabled="!isReordering">
+      <draggable v-model="mat.groups" tag="div" group="groups" item-key="name" handle=".handle"
+        :disabled="!isReordering">
         <template #item="{ element: group, index: groupIndex }">
-          <Panel toggleable :pt="{ content: '!p-2 !rounded-none', header: '!rounded-none' }" :pt-options="{ mergeProps: true }" class="mb-2 last:mb-0">
+          <Panel toggleable :pt="{ content: '!p-2 !rounded-none', header: '!rounded-none' }"
+            :pt-options="{ mergeProps: true }" class="mb-2 last:mb-0">
             <template #header>
               <span class="flex items-center gap-2 w-full">
                 <ArrowsUpDownIcon v-show="isReordering" class="handle w-6 h-6" />
@@ -60,12 +67,14 @@
                 </Chip>
                 <div class="join ml-auto">
                   <button class="btn btn-square btn-sm btn-success join-item"
-                    @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match" :title="$t('buttons.addMatch')">
+                    @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match"
+                    :title="$t('buttons.addMatch')">
                     <PlusIcon class="w-5 h-5" />
                   </button>
                   <button class="btn btn-square btn-sm btn-success join-item"
-                    :disabled="!canRandomize(matIndex, groupIndex)" @click.prevent="randomizeGroup(matIndex, groupIndex)"
-                    aria-label="randomize matches in group" :title="$t('buttons.randomize')">
+                    :disabled="!canRandomize(matIndex, groupIndex)"
+                    @click.prevent="randomizeGroup(matIndex, groupIndex)" aria-label="randomize matches in group"
+                    :title="$t('buttons.randomize')">
                     <ArrowPathIcon class="w-5 h-5" />
                   </button>
                   <button class="btn btn-primary btn-square btn-sm join-item"
@@ -73,7 +82,8 @@
                     <PencilIcon class="w-4 h-4" />
                   </button>
                   <button class="btn btn-square btn-sm btn-error join-item"
-                    @click.prevent="showDeleteGroup(matIndex, groupIndex)" aria-label="delete group" :title="$t('buttons.deleteGroup')">
+                    @click.prevent="showDeleteGroup(matIndex, groupIndex)" aria-label="delete group"
+                    :title="$t('buttons.deleteGroup')">
                     <XMarkIcon class="w-5 h-5" />
                   </button>
                 </div>
@@ -82,28 +92,42 @@
             <table class="w-full border-spacing-0 border-separate" role="table">
               <thead>
                 <tr>
-                  <th class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-12" v-if="isReordering"></th>
-                  <th class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-1/2">Tori</th>
-                  <th class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-1/2">Uke</th>
-                  <th class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-20"></th>
+                  <th
+                    class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-12"
+                    v-if="isReordering"></th>
+                  <th
+                    class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-1/2">
+                    Tori</th>
+                  <th
+                    class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-1/2">
+                    Uke</th>
+                  <th
+                    class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-20">
+                  </th>
                 </tr>
               </thead>
               <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori" handle=".handle"
                 :disabled="!isReordering">
                 <template #item="{ element: match, index }">
                   <tr class="dark:text-white/80 bg-surface-0 text-surface-600 dark:bg-surface-800">
-                    <td v-if="isReordering" class="text-left border-0 border-b border-solid first:border-l border-r p-4 border-surface-200 dark:border-surface-700">
+                    <td v-if="isReordering"
+                      class="text-left border-0 border-b border-solid first:border-l border-r p-4 border-surface-200 dark:border-surface-700">
                       <ArrowsUpDownIcon class="handle w-6 h-6" />
                     </td>
-                    <td class="text-left border-0 border-b border-solid first:border-l border-r border-b p-4 border-surface-200 dark:border-surface-700">
+                    <td
+                      class="text-left border-0 border-b border-solid first:border-l border-r border-b p-4 border-surface-200 dark:border-surface-700">
                       <div>{{ match.tori }}</div>
                       <div class="sm:hidden">{{ match.uke }}</div>
                     </td>
-                    <td class="text-left border-0 border-b border-solid first:border-l border-r border-b p-4 border-surface-200 dark:border-surface-700">{{ match.uke }}</td>
-                    <td class="text-left border-0 border-b border-solid first:border-l border-r border-b p-4 border-surface-200 dark:border-surface-700">
+                    <td
+                      class="text-left border-0 border-b border-solid first:border-l border-r border-b p-4 border-surface-200 dark:border-surface-700">
+                      {{ match.uke }}</td>
+                    <td
+                      class="text-left border-0 border-b border-solid first:border-l border-r border-b p-4 border-surface-200 dark:border-surface-700">
                       <div class="join">
                         <NuxtLink class="btn btn-primary btn-square btn-sm join-item"
-                          :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank" :title="$t('buttons.results')">
+                          :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank"
+                          :title="$t('buttons.results')">
                           <DocumentTextIcon class="w-5 h-5" />
                         </NuxtLink>
                         <button class="btn btn-primary btn-square btn-sm join-item"
@@ -112,7 +136,7 @@
                           <PencilIcon class="w-4 h-4" />
                         </button>
                         <button class="btn btn-square btn-sm btn-error join-item" alt="delete match"
-                        :title="$t('buttons.deleteMatch')">
+                          :title="$t('buttons.deleteMatch')">
                           <XMarkIcon class="w-5 h-5" @click.prevent="showDeleteMatch(matIndex, groupIndex, index)" />
                         </button>
                       </div>
@@ -159,9 +183,6 @@
 <script setup>
 import { clone, omit } from 'lodash-es';
 import { ArrowsUpDownIcon, XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, ArrowPathIcon, DocumentTextIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
-
-import Panel from 'primevue/panel';
-import Chip from 'primevue/chip';
 
 import { getGroupName, handleServerError, shuffle } from '~/src/utils';
 

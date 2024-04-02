@@ -9,6 +9,11 @@ export default defineI18nConfig(() => ({
         rank: 'Rank',
         actions: 'Actions',
         adminCode: 'Admin Code',
+        techniques: 'Techniques',
+        scores: 'Scores',
+        total: 'Total',
+        language: 'Language',
+        fontSize: 'Font Size',
       },
       titles: {
         tournaments: 'Tournaments',

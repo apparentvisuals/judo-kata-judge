@@ -1,16 +1,16 @@
 <template>
   <Error :error-string="error" />
   <AdminNav :name="$t('titles.tournaments')" />
-  <Container>
-    <DataTable show-gridlines striped-rows scrollable scroll-height="flex" size="small" sort-field="name"
-      :sort-order="1" :value="tournaments">
+  <Container
+    class="font-bold border p-4 bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-700 dark:text-white/80">
+    <DataTable show-gridlines striped-rows scrollable scroll-height="flex" size="small" :value="tournaments">
       <template #header>
         <ActionBar>
           <Button :label="$t('buttons.createTournament')" :title="$t('buttons.createTournament')" icon="pi pi-plus"
             @click.prevent="showAdd" :disabled="inAction" />
         </ActionBar>
       </template>
-      <Column sortable field="name" :header="$t('labels.name')">
+      <Column field="name" :header="$t('labels.name')">
         <template #body="{ data }">
           <NuxtLink class="link" :to="`/admin/t/${data.id}`">{{ data.name }}</NuxtLink>
         </template>

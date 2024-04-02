@@ -31,29 +31,8 @@ body,
   height: 100%;
 }
 
-.bg {
-  background-image: radial-gradient(hsla(var(--bc)/.2) 0.5px, hsla(var(--b2)/1) 0.5px);
-  background-size: 5px 5px;
-}
-
-.table>thead>tr>th.custom {
-  @apply bg-base-100 z-40 top-0 sticky;
-}
-
 .truncate {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.admin-table {
-  @apply table text-base-content border-b-secondary border-b;
-}
-
-.admin-table thead {
-  @apply bg-base-300 h-full;
-}
-
-.admin-table tr {
-  @apply border-secondary;
 }
