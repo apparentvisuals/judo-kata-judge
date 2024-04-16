@@ -1,32 +1,29 @@
 <template>
   <Error :error-string="error" />
-  <AdminNav :name="$t('titles.tournaments')" />
-  <Container
-    class="font-bold border p-4 bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-700 dark:text-white/80">
-    <DataTable show-gridlines striped-rows scrollable scroll-height="flex" size="small" :value="tournaments">
+  <AdminNav />
+  <Container>
+    <DataTable show-gridlines size="small" :value="tournaments">
       <template #header>
-        <ActionBar>
-          <Button :label="$t('buttons.createTournament')" :title="$t('buttons.createTournament')" icon="pi pi-plus"
-            @click.prevent="showAdd" :disabled="inAction" />
-        </ActionBar>
+        <Button icon="pi pi-plus" :label="$t('buttons.createTournament')" :title="$t('buttons.createTournament')"
+          @click.prevent="showAdd" :disabled="inAction" />
       </template>
       <Column field="name" :header="$t('labels.name')">
         <template #body="{ data }">
           <NuxtLink class="link" :to="`/admin/t/${data.id}`">{{ data.name }}</NuxtLink>
         </template>
       </Column>
-      <Column :header="$t('labels.region')" class="w-48">
+      <Column :header="$t('labels.region')" class="w-52 hidden lg:table-cell">
         <template #body="{ data }">
           {{ getOrganization(data.org) }}
         </template>
       </Column>
       <Column frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
         <template #body="{ index }">
-          <div class="flex justify-center gap-1">
-            <Button icon="pi pi-pencil" severity="secondary" class="w-9 h-9" @click.prevent="showUpdate(index)"
-              :disabled="inAction" title="Edit Tournament" />
-            <Button icon="pi pi-times" severity="danger" class="w-9 h-9" @click.prevent="remove2($event, index)"
-              :disabled="inAction" title="Delete Tournament" />
+          <div class="flex justify-center gap-2">
+            <Button icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(index)" :disabled="inAction"
+              title="Edit Tournament" />
+            <Button icon="pi pi-times" severity="danger" @click.prevent="remove2($event, index)" :disabled="inAction"
+              title="Delete Tournament" />
           </div>
         </template>
       </Column>

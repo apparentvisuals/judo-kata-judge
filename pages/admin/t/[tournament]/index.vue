@@ -1,183 +1,143 @@
 <template>
   <Error :error-string="error" />
-  <div class="navbar fixed bg-primary shadow-xl">
-    <div class="navbar-start text-primary-content">
-      <NuxtLink class="btn btn-square btn-ghost" to="/admin">
-        <ArrowLeftIcon class="w-6 h-6" />
+  <NavBar :menu="false">
+    <template #left>
+      <NuxtLink to="/admin">
+        <Button text icon="pi pi-angle-left text-lg" />
       </NuxtLink>
-    </div>
-    <div class="navbar-center text-primary-content">
-      <div class="normal-case text-xl pl-4">{{ `${tournament.name} (${tournament.id})` }}</div>
-    </div>
-    <div class="navbar-end">
-    </div>
-  </div>
-  <Container>
-    <div
-      class="font-bold border p-4 bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-700 dark:text-white/80">
-      <ActionBar>
-        <button class="btn btn-secondary" @click.prevent="addMat" title="Add Mat">
-          <PlusIcon class="w-5 h-5" />
-          <span>{{ $t('buttons.addMat') }}</span>
-        </button>
-        <button class="btn btn-secondary" @click.prevent="createInvite" title="Show Invite">
-          <EnvelopeIcon class="w-5 h-5" />
-          <span>{{ $t('buttons.inviteLink') }}</span>
-        </button>
-        <div class="flex-1"></div>
-        <button class="btn btn-secondary" :aria-label="$t('buttons.makeCopy')" @click.prevent="cloneT">{{
-    $t('buttons.makeCopy') }}</button>
-        <button v-if="isReordering" class="btn btn-error" @click.prevent="cancel" :aria-label="$t('buttons.cancel')">{{
-    $t('buttons.cancel') }}</button>
-        <button class="btn btn-secondary" @click.prevent="save"
-          :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')">
-          {{ isReordering ? $t('buttons.save') : $t('buttons.reorder') }}
-        </button>
-      </ActionBar>
-    </div>
-    <Panel v-for="(mat, matIndex) in tournament.mats" toggleable
-      :pt="{ content: '!p-2 !rounded-none', header: '!rounded-none' }" :pt-options="{ mergeProps: true }" class="mt-2">
-      <template #header>
-        <span class="flex items-center gap-2 w-full">
-          <h2 class="text-lg font-semibold">Mat {{ matIndex + 1 }}</h2>
-          <div class="join ml-auto">
-            <button class="btn btn-square btn-sm btn-success join-item" @click.prevent="showAddGroup(matIndex)"
-              aria-label="add group" :title="$t('buttons.addGroup')">
-              <PlusIcon class="w-6 h-6" />
-            </button>
-            <button class="btn btn-square btn-sm btn-error join-item" @click.prevent="showDeleteMat(matIndex)"
-              aria-label="delete mat" :title="$t('buttons.deleteMat')">
-              <XMarkIcon class="w-6 h-6" />
-            </button>
-          </div>
-        </span>
-      </template>
-      <draggable v-model="mat.groups" tag="div" group="groups" item-key="name" handle=".handle"
-        :disabled="!isReordering">
-        <template #item="{ element: group, index: groupIndex }">
-          <Panel toggleable :pt="{ content: '!p-2 !rounded-none', header: '!rounded-none' }"
-            :pt-options="{ mergeProps: true }" class="mb-2 last:mb-0">
-            <template #header>
-              <span class="flex items-center gap-2 w-full">
-                <ArrowsUpDownIcon v-show="isReordering" class="handle w-6 h-6" />
-                <span class="text-lg font-semibold">{{ getGroupName(group, groupIndex) }}</span>
-                <Chip>Judges: {{ group.numberOfJudges }}</Chip>
-                <Chip v-if="group.startTime">
-                  Start Time: {{ group.startTime }}
-                </Chip>
-                <div class="join ml-auto">
-                  <button class="btn btn-square btn-sm btn-success join-item"
-                    @click.prevent="showAddMatch(matIndex, groupIndex)" aria-label="add match"
-                    :title="$t('buttons.addMatch')">
-                    <PlusIcon class="w-5 h-5" />
-                  </button>
-                  <button class="btn btn-square btn-sm btn-success join-item"
-                    :disabled="!canRandomize(matIndex, groupIndex)"
-                    @click.prevent="randomizeGroup(matIndex, groupIndex)" aria-label="randomize matches in group"
-                    :title="$t('buttons.randomize')">
-                    <ArrowPathIcon class="w-5 h-5" />
-                  </button>
-                  <button class="btn btn-primary btn-square btn-sm join-item"
-                    @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" :title="$t('buttons.editGroup')">
-                    <PencilIcon class="w-4 h-4" />
-                  </button>
-                  <button class="btn btn-square btn-sm btn-error join-item"
-                    @click.prevent="showDeleteGroup(matIndex, groupIndex)" aria-label="delete group"
-                    :title="$t('buttons.deleteGroup')">
-                    <XMarkIcon class="w-5 h-5" />
-                  </button>
-                </div>
-              </span>
-            </template>
-            <table class="w-full border-spacing-0 border-separate" role="table">
-              <thead>
-                <tr>
-                  <th
-                    class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-12"
-                    v-if="isReordering"></th>
-                  <th
-                    class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-1/2">
-                    Tori</th>
-                  <th
-                    class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-1/2">
-                    Uke</th>
-                  <th
-                    class="font-bold text-left first:border-l border-y border-r border-0 border-b border-solid p-4 bg-surface-50 text-surface-700 dark:text-white/80 dark:bg-surface-800 border-surface-200 dark:border-surface-700 focus-visible:outline-none focus-visible:outline-offset-0 focus-visible:ring focus-visible:ring-inset focus-visible:ring-primary-400/50 dark:focus-visible:ring-primary-300/50 w-20">
-                  </th>
-                </tr>
-              </thead>
-              <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori" handle=".handle"
-                :disabled="!isReordering">
-                <template #item="{ element: match, index }">
-                  <tr class="dark:text-white/80 bg-surface-0 text-surface-600 dark:bg-surface-800">
-                    <td v-if="isReordering"
-                      class="text-left border-0 border-b border-solid first:border-l border-r p-4 border-surface-200 dark:border-surface-700">
-                      <ArrowsUpDownIcon class="handle w-6 h-6" />
-                    </td>
-                    <td
-                      class="text-left border-0 border-b border-solid first:border-l border-r border-b p-4 border-surface-200 dark:border-surface-700">
-                      <div>{{ match.tori }}</div>
-                      <div class="sm:hidden">{{ match.uke }}</div>
-                    </td>
-                    <td
-                      class="text-left border-0 border-b border-solid first:border-l border-r border-b p-4 border-surface-200 dark:border-surface-700">
-                      {{ match.uke }}</td>
-                    <td
-                      class="text-left border-0 border-b border-solid first:border-l border-r border-b p-4 border-surface-200 dark:border-surface-700">
-                      <div class="join">
-                        <NuxtLink class="btn btn-primary btn-square btn-sm join-item"
-                          :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank"
-                          :title="$t('buttons.results')">
-                          <DocumentTextIcon class="w-5 h-5" />
-                        </NuxtLink>
-                        <button class="btn btn-primary btn-square btn-sm join-item"
-                          @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
-                          :disabled="match.completed || inAction" :title="$t('buttons.editMatch')">
-                          <PencilIcon class="w-4 h-4" />
-                        </button>
-                        <button class="btn btn-square btn-sm btn-error join-item" alt="delete match"
-                          :title="$t('buttons.deleteMatch')">
-                          <XMarkIcon class="w-5 h-5" @click.prevent="showDeleteMatch(matIndex, groupIndex, index)" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </template>
-              </draggable>
-            </table>
-          </Panel>
+      <span class="pl-2">{{ `${tournament.name}` }}</span>
+    </template>
+  </NavBar>
+  <ClientOnly>
+    <Container class="pt-4">
+      <Toolbar>
+        <template #start>
+          <Button icon="pi pi-plus" :label="$t('buttons.addMat')" @click.prevent="addMat" title="Add Mat" class="mr-2">
+          </Button>
+          <Button icon="pi pi-envelope" :label="$t('buttons.inviteLink')" @click.prevent="createInvite"
+            title="Show Invite">
+          </Button>
         </template>
-      </draggable>
-    </Panel>
-  </Container>
-  <Prompt name="delete_mat_modal" @submit="deleteMat" text="Yes">
-    <span>Delete this mat?</span>
-  </Prompt>
-  <Prompt name="add_group_modal" @submit="addGroup" :disabled="inAction" text="Add">
-    <GroupInput :group="newGroup" />
-  </Prompt>
-  <Prompt name="edit_group_modal" @submit="updateGroup" :disabled="inAction" text="update">
-    <GroupInput :group="groupToUpdate" />
-  </Prompt>
-  <Prompt name="delete_group_modal" @submit="deleteGroup" text="Yes">
-    <span>Delete this group?</span>
-  </Prompt>
-  <Prompt name="add_match_modal" @submit="addMatch" :disabled="inAction" text="Add">
-    <MatchInput :match="newMatch" :athletes="athletes" />
-  </Prompt>
-  <Prompt name="edit_match_modal" @submit="updateMatch" :disabled="inAction" text="Update">
-    <MatchInput :match="matchToUpdate" :athletes="athletes" />
-  </Prompt>
-  <Prompt name="delete_match_modal" @submit="deleteMatch" text="Yes">
-    <span>Delete this match?</span>
-  </Prompt>
-  <Prompt name="view_invite_modal" text="Close" :cancellable="false">
-    <div class="flex flex-col items-center">
-      <ClientOnly>
+        <template #end>
+          <Button icon="pi pi-copy" :label="$t('buttons.makeCopy')" :title="$t('buttons.makeCopy')"
+            @click.prevent="cloneT" class="mr-2"></Button>
+          <Button severity="danger" v-if="isReordering" :label="$t('buttons.cancel')" @click.prevent="cancel"
+            :aria-label="$t('buttons.cancel')" class="mr-2"></Button>
+          <Button icon="pi pi-sort" :label="isReordering ? $t('buttons.save') : $t('buttons.reorder')"
+            @click.prevent="save" :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')">
+          </Button>
+        </template>
+      </Toolbar>
+      <Panel v-for="(mat, matIndex) in tournament.mats" toggleable :pt="{ content: '!p-2' }"
+        :pt-options="{ mergeProps: true }" class="mt-2 ring-1 ring-surface-100 dark:ring-surface-700">
+        <template #header>
+          <span class="flex items-center gap-2 w-full">
+            <h2 class="font-medium">Mat {{ matIndex + 1 }}</h2>
+            <Button icon="pi pi-plus" @click.prevent="showAddGroup(matIndex)" :title="$t('buttons.addGroup')">
+            </Button>
+            <Button severity="danger" icon="pi pi-times" @click.prevent="showDeleteMat(matIndex)"
+              :title="$t('buttons.deleteMat')">
+            </Button>
+          </span>
+        </template>
+        <draggable v-model="mat.groups" tag="div" group="groups" item-key="name" handle=".handle"
+          :disabled="!isReordering">
+          <template #item="{ element: group, index: groupIndex }">
+            <Panel toggleable :pt="{ content: '!p-2' }" :pt-options="{ mergeProps: true }"
+              class="mb-2 last:mb-0 ring-1 ring-surface-100 dark:ring-surface-700">
+              <template #header>
+                <div class="flex flex-wrap items-center gap-2 w-full">
+                  <span v-if="isReordering" class="handle w-6 h-6 pi pi-sort" />
+                  <span class="font-medium">{{ getGroupName(group, groupIndex) }}</span>
+                  <Chip icon="pi pi-user" :label="group.numberOfJudges.toString()" />
+                  <Chip v-if="group.day" icon="pi pi-calendar" :label="group.day" />
+                  <Chip v-if="group.startTime" icon="pi pi-calendar-clock" :label="group.startTime" />
+                  <div class="flex gap-2">
+                    <Button icon="pi pi-plus" @click.prevent="showAddMatch(matIndex, groupIndex)"
+                      :aria-label="$t('buttons.addMatch')" :title="$t('buttons.addMatch')" />
+                    <Button v-if="isReordering" icon="pi pi-sync" :disabled="!canRandomize(matIndex, groupIndex)"
+                      @click.prevent="randomizeGroup(matIndex, groupIndex)" :aria-label="$t('buttons.randomize')"
+                      :title="$t('buttons.randomize')" />
+                    <Button icon="pi pi-pencil" severity="secondary"
+                      @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" :aria-label="$t('buttons.editGroup')"
+                      :title="$t('buttons.editGroup')" />
+                    <Button icon="pi pi-times" severity="danger" @click.prevent="showDeleteGroup(matIndex, groupIndex)"
+                      :aria-label="$t('buttons.deleteGroup')" :title="$t('buttons.deleteGroup')" />
+                  </div>
+                </div>
+              </template>
+              <table class="w-full border-spacing-0 border-separate text-sm" role="table">
+                <thead>
+                  <tr>
+                    <CustomTh v-if="isReordering"></CustomTh>
+                    <CustomTh>{{ $t('labels.tori') }}</CustomTh>
+                    <CustomTh>{{ $t('labels.uke') }}</CustomTh>
+                    <CustomTh class="w-12">{{ $t('labels.actions') }}</CustomTh>
+                  </tr>
+                </thead>
+                <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori" handle=".handle"
+                  :disabled="!isReordering">
+                  <template #item="{ element: match, index }">
+                    <tr class="dark:text-white/80 bg-surface-0 text-surface-600 dark:bg-surface-800">
+                      <CustomTd v-if="isReordering">
+                        <ArrowsUpDownIcon class="handle w-6 h-6" />
+                      </CustomTd>
+                      <CustomTd>
+                        <div>{{ match.tori }}</div>
+                        <div class="sm:hidden">{{ match.uke }}</div>
+                      </CustomTd>
+                      <CustomTd>
+                        {{ match.uke }}</CustomTd>
+                      <CustomTd>
+                        <div class="flex justify-center gap-2">
+                          <NuxtLink :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank"
+                            :title="$t('buttons.results')">
+                            <Button icon="pi pi-book" />
+                          </NuxtLink>
+                          <Button icon="pi pi-pencil" severity="secondary"
+                            @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
+                            :disabled="match.completed || inAction" :title="$t('buttons.editMatch')" />
+                          <Button icon="pi pi-times" severity="danger"
+                            @click.prevent="showDeleteMatch(matIndex, groupIndex, index)" :disabled="inAction"
+                            :title="$t('buttons.deleteMatch')" />
+                        </div>
+                      </CustomTd>
+                    </tr>
+                  </template>
+                </draggable>
+              </table>
+            </Panel>
+          </template>
+        </draggable>
+      </Panel>
+    </Container>
+    <Prompt name="delete_mat_modal" @submit="deleteMat" text="Yes">
+      <span>Delete this mat?</span>
+    </Prompt>
+    <Prompt name="add_group_modal" @submit="addGroup" :disabled="inAction" text="Add">
+      <GroupInput :group="newGroup" />
+    </Prompt>
+    <Prompt name="edit_group_modal" @submit="updateGroup" :disabled="inAction" text="update">
+      <GroupInput :group="groupToUpdate" />
+    </Prompt>
+    <Prompt name="delete_group_modal" @submit="deleteGroup" text="Yes">
+      <span>Delete this group?</span>
+    </Prompt>
+    <Prompt name="add_match_modal" @submit="addMatch" :disabled="inAction" text="Add">
+      <MatchInput :match="newMatch" :athletes="athletes" />
+    </Prompt>
+    <Prompt name="edit_match_modal" @submit="updateMatch" :disabled="inAction" text="Update">
+      <MatchInput :match="matchToUpdate" :athletes="athletes" />
+    </Prompt>
+    <Prompt name="delete_match_modal" @submit="deleteMatch" text="Yes">
+      <span>Delete this match?</span>
+    </Prompt>
+    <Prompt name="view_invite_modal" text="Close" :cancellable="false">
+      <div class="flex flex-col items-center">
         <QR :path="invitePath" :title="$t('buttons.inviteLink')" />
-      </ClientOnly>
-    </div>
-  </Prompt>
+      </div>
+    </Prompt>
+  </ClientOnly>
 </template>
 
 <script setup>

@@ -8,7 +8,13 @@ module.exports = {
   },
   darkMode: 'class',
   content: [
-    "presets/**/*.{js,vue,ts}"
+    "presets/**/*.{js,vue,ts}",
+    "./components/**/*.{js,vue}",
+    "./layouts/**/*.vue",
+    "./pages/**/*.vue",
+    "./plugins/**/*.js",
+    "./app.vue",
+    "./error.vue",
   ],
   theme: {
     screens: {
