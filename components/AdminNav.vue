@@ -1,81 +1,36 @@
 <template>
-  <div class="navbar fixed bg-primary top-0 z-50 text-primary-content text-xl">
-    <div class="navbar-start">
-      <div class="dropdown">
-        <label tabindex="0" class="btn btn-ghost btn-square">
-          <Bars3Icon class="w=5 h-5" />
-        </label>
-        <div tabindex="0" class="dropdown-content mt-3 p-2 shadow-xl bg-base-200 w-40">
-          <ul class="menu text-base-content">
-            <li><nuxt-link to="/admin">{{ $t('titles.tournaments') }}</nuxt-link></li>
-            <li><nuxt-link to="/admin/judges">{{ $t('titles.judges') }}</nuxt-link></li>
-            <li><nuxt-link to="/admin/athletes">{{ $t('titles.athletes') }}</nuxt-link></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="navbar-center">
-      <h1>{{ props.name }}</h1>
-    </div>
-    <div class="navbar-end gap-2">
-      <SelectButton v-model="currentLocale" :options="locales"></SelectButton>
-      <SelectButton v-model="textSize" :options="[100, 120, 140]"></SelectButton>
-      <label class="swap swap-rotate btn btn-square btn-ghost">
-        <input type="checkbox" class="theme-controller" v-model="theme" />
-        <SunIcon class="h-6 w-6 swap-off" />
-        <MoonIcon class="h-6 w-6 swap-on" />
-      </label>
-      <button class="btn btn-error" @click.prevent="logout" title="Logout">
-        <ArrowLeftOnRectangleIcon class="w-5 h-5" />
-        {{ $t('buttons.logout') }}
-      </button>
-    </div>
-  </div>
+  <NavBar :menu="true">
+    <template #left>
+      <span class="pi pi-crown p-2 text-lg" />
+    </template>
+    <template #menu>
+      <nuxt-link v-for="item in navigation" :key="item.name" :to="item.href"
+        :class="[item.current ? 'bg-surface-400 dark:bg-surface-700' : 'hover:bg-surface-400 dark:hover:bg-surface-700', 'text-surface-800 dark:text-white/80 block rounded-md p-2 text-sm font-medium']"
+        :aria-current="item.current ? 'page' : undefined">{{ item.name }}</nuxt-link>
+    </template>
+    <template #right>
+      <Button icon="pi pi-sign-out" :label="$t('buttons.logout')" :title="$t('buttons.logout')" severity="danger"
+        @click.prevent="logout" class="mr-2 hidden sm:block" />
+    </template>
+  </NavBar>
 </template>
 
 <script setup>
-import { ArrowLeftOnRectangleIcon, Bars3Icon, SunIcon, MoonIcon } from '@heroicons/vue/24/outline';
-
-import SelectButton from 'primevue/selectbutton';
-
-const { locale, setLocale } = useI18n();
-const locales = ref(['en', 'fr']);
-const colorMode = useColorMode();
-const props = defineProps(['name']);
+const { t } = useI18n();
+const { path } = useRoute();
 const cookie = useCookie('jkj', { default: () => ({}) });
-const textSize = ref(100);
 
-const currentLocale = computed({
-  get() {
-    return locale.value;
-  },
-  async set(value) {
-    if (value) {
-      await setLocale(value);
-    }
-  }
+const navigation = computed(() => {
+  const menu = [
+    { name: t('titles.tournaments'), href: '/admin' },
+    { name: t('titles.judges'), href: '/admin/judges' },
+    { name: t('titles.athletes'), href: '/admin/athletes' },
+  ];
+  menu.forEach((item) => {
+    item.current = path === item.href;
+  });
+  return menu;
 });
-
-const theme = computed({
-  get() {
-    return colorMode.preference === 'corporate';
-  },
-  set(value) {
-    if (value) {
-      colorMode.preference = 'corporate';
-    } else {
-      colorMode.preference = 'business';
-    }
-  }
-});
-
-watch(textSize, (newSize) => {
-  const el = document.getElementsByTagName('html');
-  el[0].style.fontSize = `${newSize}%`;
-});
-// function changeLang(event) {
-//   setLocale(event.target.value);
-// }
 
 function logout() {
   cookie.value.adminCode = '';

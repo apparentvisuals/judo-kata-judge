@@ -1,23 +1,22 @@
 <template>
   <Error :error-string="error" />
   <AdminNav name="Athletes" />
-  <Container>
-    <DataTable show-gridlines striped-rows scrollable scroll-height="flex" size="small" sort-field="name"
-      :sort-order="1" :value="athletes">
+  <Container class="text-surface-700 dark:text-white/80">
+    <DataTable show-gridlines size="small" sort-field="name" :sort-order="1" :value="athletes">
       <template #header>
         <ActionBar>
           <Button :label="$t('buttons.addAthlete')" :title="$t('buttons.addAthlete')" icon="pi pi-plus"
             @click.prevent="showAdd" :disabled="inAction" />
         </ActionBar>
       </template>
-      <Column sortable field="name" :header="$t('labels.name')">
+      <Column field="name" :header="$t('labels.name')">
       </Column>
-      <Column :header="$t('labels.rank')" class="w-40">
+      <Column :header="$t('labels.rank')" class="w-40 hidden md:table-cell">
         <template #body="{ data }">
           {{ getRankName(data.rank) }}
         </template>
       </Column>
-      <Column :header="$t('labels.region')" class="w-48">
+      <Column :header="$t('labels.region')" class="w-48 hidden lg:table-cell">
         <template #body="{ data }">
           {{ getProvinceName(data.region) }}
         </template>
@@ -25,10 +24,8 @@
       <Column frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
         <template #body="{ index }">
           <div class="flex justify-center gap-1">
-            <Button icon="pi pi-pencil" severity="secondary" class="w-9 h-9" @click.prevent="showUpdate(index)"
-              :disabled="inAction" />
-            <Button icon="pi pi-times" severity="danger" class="w-9 h-9" @click.prevent="showRemove(index)"
-              :disabled="inAction" />
+            <Button icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(index)" :disabled="inAction" />
+            <Button icon="pi pi-times" severity="danger" @click.prevent="showRemove(index)" :disabled="inAction" />
           </div>
         </template>
       </Column>
