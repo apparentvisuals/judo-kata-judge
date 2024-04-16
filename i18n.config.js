@@ -1,5 +1,6 @@
 export default defineI18nConfig(() => ({
   legacy: false,
+  locale: 'en',
   messages: {
     en: {
       labels: {
@@ -12,8 +13,11 @@ export default defineI18nConfig(() => ({
         techniques: 'Techniques',
         scores: 'Scores',
         total: 'Total',
+        colour: 'Colour',
         language: 'Language',
         fontSize: 'Font Size',
+        uke: 'Uke',
+        tori: 'Tori',
       },
       titles: {
         tournaments: 'Tournaments',
@@ -23,7 +27,7 @@ export default defineI18nConfig(() => ({
       buttons: {
         logout: 'Logout',
         changeJudge: 'Change Judges',
-        createTournament: 'Create Tournament',
+        createTournament: 'Add Tournament',
         addJudge: 'Add Judge',
         addAthlete: 'Add Athlete',
         submit: 'Submit',
