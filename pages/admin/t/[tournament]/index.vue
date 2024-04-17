@@ -87,7 +87,8 @@
                         <div class="sm:hidden">{{ match.uke }}</div>
                       </CustomTd>
                       <CustomTd>
-                        {{ match.uke }}</CustomTd>
+                        {{ match.uke }}
+                      </CustomTd>
                       <CustomTd>
                         <div class="flex justify-center gap-2">
                           <NuxtLink :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank"

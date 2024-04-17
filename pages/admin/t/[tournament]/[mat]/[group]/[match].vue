@@ -70,17 +70,6 @@ const scores = computed(() => {
   return [];
 });
 
-const scoreTotals = computed(() => {
-  const totals = [];
-  const judgeCount = scores.value.length;
-  for (let ii = 0; ii < moves.value.length; ii++) {
-    totals[ii] = calculateMoveTotal(Array(judgeCount).fill(0).map((_value, index) => {
-      return scores.value[index].points[ii].value;
-    }));
-  }
-  return totals;
-});
-
 if (err) {
   error.value = handleServerError(err);
 }

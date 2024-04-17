@@ -1,5 +1,5 @@
 <template>
-  <NavBar :menu="true">
+  <NavBar :menu="true" class="bg-surface-100 dark:bg-surface-900 border-b border-surface-300 dark:border-surface-600">
     <template #left>
       <span class="pi pi-crown p-2 text-lg" />
     </template>

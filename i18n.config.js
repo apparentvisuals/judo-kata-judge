@@ -15,7 +15,7 @@ export default defineI18nConfig(() => ({
         total: 'Total',
         colour: 'Colour',
         language: 'Language',
-        fontSize: 'Font Size',
+        fontSize: 'Zoom',
         uke: 'Uke',
         tori: 'Tori',
       },
