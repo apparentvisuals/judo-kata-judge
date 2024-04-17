@@ -1,27 +1,28 @@
 <template>
-  <div class="fixed top-0 bottom-0 w-full flex items-center justify-center">
-    <div class="max-w-xs max-h-96">
-      <form valid="isValid" @submit.prevent="submit">
-        <div class="form-control w-full max-w-xs">
-          <label class="label" for="code">
-            <span class="label-text">{{ $t('labels.adminCode') }}</span>
-          </label>
-          <input id="code" name="code" type="text" class="input input-bordered" v-model="code" :disabled="inAction" />
-          <label class="label">
-            <span for="code" class="label-text-alt text-error" v-show="error">{{ error }}</span>
-          </label>
-        </div>
-        <button type="submit" class="btn btn-primary mt-4" :disabled="inAction">
-          {{ $t('buttons.submit') }}
-          <i v-show="inAction" class="loading loading-spinner loading-xs"></i>
-        </button>
-      </form>
-    </div>
+  <NavBar :menu="false"></NavBar>
+  <div class="fixed top-20 bottom-0 w-full flex items-center justify-center">
+    <form valid="isValid" @submit.prevent="submit">
+      <div class="flex flex-col gap-1">
+        <label for="code" class="dark:text-surface-200 text-sm">
+          <span>{{ $t('labels.adminCode') }}</span>
+        </label>
+        <Password input-id="code" v-model="code" :disabled="inAction" :feedback="false" toggle-mask />
+        <small class="text-red-500 dark:text-red-400 inline-block">
+          <span for="code" v-show="error">{{ error }}</span>
+        </small>
+      </div>
+      <div class="mt-4 flex content-start items-center">
+        <Button type="submit" :disabled="inAction">
+          <span v-if="!inAction">{{ $t('buttons.submit') }}</span>
+          <ProgressSpinner v-else stroke-width="4" class="h-6 w-6 fill-surface-0 dark:fill-surface-700"
+            aria-label="loading" />
+        </Button>
+      </div>
+    </form>
   </div>
 </template>
 
 <script setup>
-import { ka } from 'date-fns/locale';
 import { handleServerError } from '~/src/utils';
 
 useHead({
@@ -37,11 +38,11 @@ const error = ref('');
 
 async function submit() {
   try {
-    error.value = '';
     if (code.value.length === 0) {
       error.value = 'Password can not be empty';
       return;
     }
+    error.value = '';
     inAction.value = true;
     await $fetch('/api/login', { headers: { authorization: `Bearer ${code.value}` } });
     cookie.value.adminCode = code.value;

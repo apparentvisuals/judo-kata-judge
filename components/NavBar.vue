@@ -1,6 +1,5 @@
 <template>
-  <HlDisclosure as="nav" class="bg-surface-100 dark:bg-surface-900 border-b border-surface-300 dark:border-surface-600"
-    v-slot="{ open }">
+  <HlDisclosure as="nav" v-slot="{ open }">
     <div class="mx-auto px-2 sm:px-4">
       <div class="relative flex h-16 items-center justify-between">
         <div v-if="menu" class="absolute inset-y-0 left-0 flex items-center sm:hidden">

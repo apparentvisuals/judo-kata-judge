@@ -62,6 +62,7 @@ const props = defineProps(['match', 'group', 'scores', 'disabled']);
 
 const moves = computed(() => groupedMoveList(props.match.kata));
 const numberOfResults = computed(() => props.match.numberOfJudges);
+
 const scoreCounts = computed(() => {
   const counts = { b: 0, m: 0, s: 0 };
   if (props.match) {
@@ -74,6 +75,7 @@ const scoreCounts = computed(() => {
   }
   return counts;
 });
+
 const scoreTotals = computed(() => {
   const totals = [];
   const judgeCount = props.scores.length;

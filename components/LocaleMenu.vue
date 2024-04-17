@@ -21,9 +21,8 @@
           </SelectButton>
         </div>
         <div v-if="item.type === 'size'" v-bind="props.action">
-          <InputNumber v-model="textSize" showButtons buttonLayout="horizontal" suffix="%"
-            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" inputClass="w-24 text-center" :step="10"
-            :min="80" :max="120" />
+          <InputNumber v-model="zoom" showButtons buttonLayout="horizontal" suffix="%" incrementButtonIcon="pi pi-plus"
+            decrementButtonIcon="pi pi-minus" inputClass="w-24 text-center" :step="10" :min="80" :max="120" />
         </div>
       </template>
     </Menu>
@@ -31,12 +30,15 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
+
 const { locale, setLocale, t } = useI18n();
 const colorMode = useColorMode();
+const zoom = useCookie('zoom', { default: () => 100 });
 
 const localeOptions = ref([{ label: 'EN', value: 'en' }, { label: 'FR', value: 'fr' }]);
 const colorModeOptions = ref([{ icon: 'pi pi-cog', value: 'system' }, { icon: 'pi pi-sun', value: 'light' }, { icon: 'pi pi-moon', value: 'dark' }])
-const textSize = ref(100);
+
 const settingMenu = ref();
 const settingMenuItems = ref([{
   label: t('labels.colour'),
@@ -60,7 +62,6 @@ const settingMenuItems = ref([{
 
 const currentLocale = computed({
   get() {
-    console.log(locale.value);
     return locale.value;
   },
   async set(value) {
@@ -70,7 +71,12 @@ const currentLocale = computed({
   }
 });
 
-watch(textSize, (newSize) => {
+onMounted(() => {
+  const el = document.getElementsByTagName('html');
+  el[0].style.fontSize = `${zoom.value}%`;
+});
+
+watch(zoom, (newSize) => {
   const el = document.getElementsByTagName('html');
   el[0].style.fontSize = `${newSize}%`;
 });
