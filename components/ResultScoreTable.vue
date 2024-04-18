@@ -4,56 +4,65 @@
     <template #header>
       <slot />
     </template>
-    <Column header="" class="w-12 text-center">
+    <ColumnGroup type="header">
+      <Row>
+        <Column :header="$t('labels.techniques')" :colspan="3" />
+        <Column header="S" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <Column header="S" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <Column v-if="!group.disableMajor" header="M" :pt="{ headercontent: 'justify-center' }"
+          :pt-options="{ mergeProps: true }" />
+        <Column header="B" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <Column header="C" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <Column v-if="!group.disableForgotten" header="F" :pt="{ headercontent: 'justify-center' }"
+          :pt-options="{ mergeProps: true }" />
+        <Column :header="$t('labels.scores')" :pt="{ headercontent: 'justify-end' }"
+          :pt-options="{ mergeProps: true }" />
+      </Row>
+    </ColumnGroup>
+    <Column class="w-10 text-center">
       <template #body="{ index }">{{ index + 1 }}</template>
     </Column>
-    <Column field="g" header="" class="w-12">
+    <Column field="g" class="w-8">
       <template #body="{ index }">
         <span style="writing-mode: vertical-lr;">{{ moves[index].g }}</span>
       </template>
     </Column>
-    <Column header="Technique">
+    <Column field="t">
       <template #body="{ index }">
         <span>{{ moves[index].t }}</span>
       </template>
     </Column>
-    <Column header="S" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    <Column bodyClass="w-10 !p-0">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[0]"
           @click.prevent="toggleScore(scores.points[index], 0)" hint="S" />
       </template>
     </Column>
-    <Column header="S" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    <Column bodyClass="w-10 !p-0">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[1]"
           @click.prevent="toggleScore(scores.points[index], 1)" hint="S" />
       </template>
     </Column>
-    <Column header="M" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    <Column bodyClass="w-10 !p-0">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[2]"
           @click.prevent="toggleScore(scores.points[index], 2)" hint="M" />
       </template>
     </Column>
-    <Column v-if="!group.disableMajor" header="B" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    <Column v-if="!group.disableMajor" bodyClass="w-10 !p-0">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[3]"
           @click.prevent="toggleScore(scores.points[index], 3)" hint="B" />
       </template>
     </Column>
-    <Column header="C" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    <Column header="C" bodyClass="w-10 !p-0" :pt-options="{ mergeProps: true }">
       <template #body="{ index }">
         <ScoreTableCell :binary="false" v-model="scores.points[index].deductions[5]"
           @click.prevent="toggleScore(scores.points[index], 5)" hint="C" />
       </template>
     </Column>
-    <Column v-if="!group.disableForgotten" header="F" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    <Column v-if="!group.disableForgotten" header="F" bodyClass="w-10 !p-0">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[4]"
           @click.prevent="toggleScore(scores.points[index], 4)" hint="F" />
