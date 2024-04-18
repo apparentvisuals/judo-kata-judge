@@ -1,9 +1,9 @@
 <template>
   <Error :error-string="error" />
-  <NavBar :menu="true">
+  <NavBar :menu="true" class="bg-surface-100 dark:bg-surface-900 border-b border-surface-300 dark:border-surface-600">
     <template #menu>
       <a v-for="item in navigation" href="#" @click.prevent="changeView(...item.payload)"
-        :class="[item.current ? 'bg-surface-400 dark:bg-surface-700' : 'hover:bg-surface-400 dark:hover:bg-surface-700', 'text-surface-800 dark:text-white/80 block rounded-md p-2 text-sm font-medium']">
+        :class="[isCurrent(item) ? 'bg-surface-400 dark:bg-surface-700' : 'hover:bg-surface-400 dark:hover:bg-surface-700', 'text-surface-800 dark:text-white/80 block rounded-md p-2 text-sm font-medium']">
         {{ item.name }}
       </a>
     </template>
@@ -18,14 +18,11 @@
       </div>
     </ResultScoreTable>
   </Container>
-  <Prompt name="delete_j_modal" @submit="remove" text="Yes">
-    <span>Delete judge {{ deleteIndex }} scores?</span>
-  </Prompt>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { calculateMoveScore, getKataName, handleServerError, calculateMoveTotal, groupedMoveList } from '~/src/utils';
+import { calculateMoveScore, getKataName, handleServerError } from '~/src/utils';
 
 const navigation = computed(() => {
   const menu = [
@@ -48,8 +45,6 @@ const { data: match, error: err } = await useFetch(`/api/tournaments/${route.par
 const error = ref('');
 const view = ref('summary');
 const judgeIndex = ref(-1);
-const deleteIndex = ref(-1);
-const moves = computed(() => groupedMoveList(match.value.kata));
 const numberOfResults = computed(() => match.value.numberOfJudges);
 
 const scores = computed(() => {
@@ -81,13 +76,15 @@ function changeView(newView, newJudgeIndex) {
   }
 }
 
-function showDelete(index) {
-  deleteIndex.value = index;
-  delete_j_modal.showModal();
-}
-
-async function remove() {
-  match.value = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}/match/${matchNumber}/${deleteIndex.value}`, { method: 'DELETE', headers: headers.value });
+function isCurrent(item) {
+  if (item.payload[0] !== view.value) {
+    return false;
+  };
+  if (item.payload[0] === 'judge') {
+    return item.payload[1] === judgeIndex.value;
+  } else {
+    return true;
+  }
 }
 
 </script>

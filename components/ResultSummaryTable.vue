@@ -1,5 +1,6 @@
 <template>
-  <DataTable striped-rows scrollable scroll-height="flex" size="small" :value="moves">
+  <DataTable show-gridlines crollable scroll-height="flex" size="small" :value="moves" row-group-mode="rowspan"
+    group-rows-by="g">
     <template #header>
       <div class="flex flex-wrap justify-between">
         <span>{{ match.tori }} / {{ match.uke }}</span>
@@ -25,9 +26,26 @@
         </div>
       </div>
     </template>
+    <ColumnGroup type="header">
+      <Row>
+        <Column :header="$t('labels.techniques')" :colspan="3" />
+        <Column header="1" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <Column header="2" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <Column header="3" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <Column header="4" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <Column header="5" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <Column :header="$t('labels.scores')" :pt="{ headercontent: 'justify-end' }"
+          :pt-options="{ mergeProps: true }" />
+      </Row>
+    </ColumnGroup>
     <Column header="" class="w-12 text-center">
       <template #body="{ index }">
         {{ index + 1 }}
+      </template>
+    </Column>
+    <Column field="g" class="w-8">
+      <template #body="{ data }">
+        <span style="writing-mode: vertical-lr;">{{ data.g }}</span>
       </template>
     </Column>
     <Column :header="$t('labels.techniques')">
@@ -47,12 +65,15 @@
     </Column>
     <ColumnGroup v-if="match.completed" type="footer">
       <Row>
-        <Column :footer="$t('labels.total')" colspan="2" />
+        <Column :footer="$t('labels.total')" colspan="3" />
         <Column v-for="judge of numberOfResults" :footer="match.summary.scores[judge - 1]" footer-class="text-right" />
         <Column :footer="match.summary.total" footer-class="text-right" />
       </Row>
     </ColumnGroup>
   </DataTable>
+  <Prompt name="delete_j_modal" @submit="remove" text="Yes">
+    <span>Delete judge {{ deleteIndex }} scores?</span>
+  </Prompt>
 </template>
 
 <script setup>
@@ -60,6 +81,7 @@ import { calculateMoveTotal, getKataName, getScoreCounts, groupedMoveList } from
 
 const props = defineProps(['match', 'group', 'scores', 'disabled']);
 
+const deleteIndex = ref(-1);
 const moves = computed(() => groupedMoveList(props.match.kata));
 const numberOfResults = computed(() => props.match.numberOfJudges);
 
@@ -86,4 +108,14 @@ const scoreTotals = computed(() => {
   }
   return totals;
 });
+
+function showDelete(index) {
+  deleteIndex.value = index;
+  delete_j_modal.showModal();
+}
+
+async function remove() {
+  match.value = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}/match/${matchNumber}/${deleteIndex.value}`, { method: 'DELETE', headers: headers.value });
+}
+
 </script>

@@ -1,6 +1,6 @@
 <template>
   <Error :error-string="error" />
-  <NavBar :menu="false">
+  <NavBar :menu="false" class="bg-surface-100 dark:bg-surface-900 border-b border-surface-300 dark:border-surface-600">
     <template #left>
       <NuxtLink to="/admin">
         <Button text icon="pi pi-angle-left text-lg" />
