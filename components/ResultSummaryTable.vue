@@ -1,5 +1,5 @@
 <template>
-  <DataTable show-gridlines crollable scroll-height="flex" size="small" :value="moves" row-group-mode="rowspan"
+  <PrimeDataTable show-gridlines crollable scroll-height="flex" size="small" :value="moves" row-group-mode="rowspan"
     group-rows-by="g">
     <template #header>
       <div class="flex flex-wrap justify-between">
@@ -7,9 +7,9 @@
         <span>{{ getKataName(match.kata) }}</span>
       </div>
       <div v-if="!match.completed" class="flex justify-between pt-2 print:hidden">
-        <Button size="small" severity="danger" v-for="index of numberOfResults" @click.prevent="showDelete(index)">
+        <PrimeButton size="small" severity="danger" v-for="index of numberOfResults" @click.prevent="showDelete(index)">
           <span>Remove Judge {{ index }} Scores</span>
-        </Button>
+        </PrimeButton>
       </div>
     </template>
     <template #footer>
@@ -26,51 +26,49 @@
         </div>
       </div>
     </template>
-    <ColumnGroup type="header">
-      <Row>
-        <Column :header="$t('labels.techniques')" :colspan="3" />
-        <Column header="1" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
-        <Column header="2" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
-        <Column header="3" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
-        <Column header="4" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
-        <Column header="5" :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
-        <Column :header="$t('labels.scores')" :pt="{ headercontent: 'justify-end' }"
+    <PrimeColumnGroup type="header">
+      <PrimeRow>
+        <PrimeColumn :header="$t('labels.techniques')" :colspan="3" />
+        <PrimeColumn v-for="judge of numberOfResults" :header="judge" :pt="{ headercontent: 'justify-center' }"
           :pt-options="{ mergeProps: true }" />
-      </Row>
-    </ColumnGroup>
-    <Column header="" class="w-12 text-center">
+        <PrimeColumn :header="$t('labels.scores')" :pt="{ headercontent: 'justify-end' }"
+          :pt-options="{ mergeProps: true }" />
+      </PrimeRow>
+    </PrimeColumnGroup>
+    <PrimeColumn header="" class="w-12 text-center">
       <template #body="{ index }">
         {{ index + 1 }}
       </template>
-    </Column>
-    <Column field="g" class="w-8">
+    </PrimeColumn>
+    <PrimeColumn field="g" class="w-8">
       <template #body="{ data }">
         <span style="writing-mode: vertical-lr;">{{ data.g }}</span>
       </template>
-    </Column>
-    <Column :header="$t('labels.techniques')">
+    </PrimeColumn>
+    <PrimeColumn :header="$t('labels.techniques')">
       <template #body="{ data }">
         {{ data.t }}
       </template>
-    </Column>
-    <Column v-for="judge of numberOfResults" :key="judge" :header="judge" :field="judge.toString()" data-type="numeric"
+    </PrimeColumn>
+    <PrimeColumn v-for="judge of numberOfResults" :key="judge" :field="judge.toString()" data-type="numeric"
       bodyClass="w-10 text-right">
       <template #body="{ field, index }">
         {{ index < scores[field - 1].points.length ? scores[field - 1].points[index].value : '' }} </template>
-    </Column>
-    <Column v-if="match.completed" :header="$t('labels.scores')" class="w-20 text-right">
+    </PrimeColumn>
+    <PrimeColumn :header="$t('labels.scores')" class="w-20 text-right">
       <template #body="{ index }">
-        {{ scoreTotals[index] }}
+        <span v-if="match.completed">{{ scoreTotals[index] }}</span>
       </template>
-    </Column>
-    <ColumnGroup v-if="match.completed" type="footer">
-      <Row>
-        <Column :footer="$t('labels.total')" colspan="3" />
-        <Column v-for="judge of numberOfResults" :footer="match.summary.scores[judge - 1]" footer-class="text-right" />
-        <Column :footer="match.summary.total" footer-class="text-right" />
-      </Row>
-    </ColumnGroup>
-  </DataTable>
+    </PrimeColumn>
+    <PrimeColumnGroup type="footer">
+      <PrimeRow>
+        <PrimeColumn :footer="$t('labels.total')" colspan="3" class="text-right" />
+        <PrimeColumn v-for="judge of numberOfResults" :footer="match.completed ? match.summary.scores[judge - 1] : ''"
+          footer-class="text-right" />
+        <PrimeColumn :footer="match.completed ? match.summary.total : ''" footer-class="text-right" />
+      </PrimeRow>
+    </PrimeColumnGroup>
+  </PrimeDataTable>
   <Prompt name="delete_j_modal" @submit="remove" text="Yes">
     <span>Delete judge {{ deleteIndex }} scores?</span>
   </Prompt>
@@ -80,6 +78,7 @@
 import { calculateMoveTotal, getKataName, getScoreCounts, groupedMoveList } from '~/src/utils';
 
 const props = defineProps(['match', 'group', 'scores', 'disabled']);
+const emit = defineEmits(['remove']);
 
 const deleteIndex = ref(-1);
 const moves = computed(() => groupedMoveList(props.match.kata));
@@ -115,7 +114,7 @@ function showDelete(index) {
 }
 
 async function remove() {
-  match.value = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}/match/${matchNumber}/${deleteIndex.value}`, { method: 'DELETE', headers: headers.value });
+  emit('remove', deleteIndex.value);
 }
 
 </script>

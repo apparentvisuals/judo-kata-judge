@@ -1,34 +1,4 @@
 <template>
-  <Error :error-string="error" />
-  <div class="navbar fixed top-0 z-50 bg-base-100">
-    <div class="navbar-start gap-2">
-      <div class="dropdown">
-        <label tabindex="0" class="btn btn-ghost btn-square drawer-button print:hidden">
-          <Bars3Icon class="w-6 h-6" />
-        </label>
-        <div tabindex="0"
-          class="dropdown-content flex flex-col gap-2 items-center w-80 bg-secondary mt-3 p-2 z-50 shadow">
-          <img class="h-12 md:hidden" :src="getOrganizationImage(tournament || {}.org)" />
-          <div class="text-xl font-bold text-center xl:hidden">{{ title }}</div>
-          <button v-if="judgeCode" class="btn btn-sm btn-error w-full" @click.prevent.stop="changeJudge">
-            <ArrowPathIcon class="w-5 h-5" />
-            Change Judge
-          </button>
-        </div>
-      </div>
-      <img class="h-12 hidden md:inline" :src="getOrganizationImage(tournament || {}.org)" />
-      <div class="text-xl text-center font-bold hidden xl:block">{{ title }}</div>
-    </div>
-    <div class="navbar-center gap-2">
-      <div class="text-xl font-bold" v-if="match && group">
-        {{ match.tori }} / {{ match.uke }} ({{ getGroupName(group) }})
-      </div>
-    </div>
-    <div class="navbar-end">
-      <button v-if="match && judge" class="btn btn-sm btn-success print:hidden" @click.prevent="showSubmitScore"
-        :disabled="!canSubmit">Submit</button>
-    </div>
-  </div>
   <div v-if="status" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
     <div class="text-center">
       <span class="text-3xl font-bold">{{ status }}</span>
@@ -40,23 +10,37 @@
   <div v-else-if="match && !judge" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
     <CodeForm v-model="judgeCode" title="Judge Code" @submit="submitCode" :error="codeError" />
   </div>
-  <Container v-else-if="match">
-    <ScoreTable :match="match" :group="group" :scores="scores">
-      <div class="flex justify-between">
-        <div class="text-xl hidden md:block">
-          {{ judge.name }} ({{ judgeNumber }})
-        </div>
-        <div class="flex flex-col items-start">
-          <div class="text-xl md:hidden">
-            <span>{{ match.tori }}</span>
-            /
-            <span class="text-blue-500">{{ match.uke }}</span>
+  <PublicContainer v-else-if="match">
+    <div class="grow" style="height: 300px">
+      <ScoreTable :match="match" :group="group" :scores="scores">
+        <div class="flex justify-between">
+          <div class="text-xl hidden md:block">
+            {{ judge.name }} ({{ judgeNumber }})
           </div>
-          <div class="text-xl">{{ match ? getGroupName(group) : '' }}</div>
+          <div class="flex flex-col items-start">
+            <div class="text-xl md:hidden">
+              <span>{{ match.tori }}</span>
+              /
+              <span class="text-blue-500">{{ match.uke }}</span>
+            </div>
+            <div class="text-xl">{{ match ? getGroupName(group) : '' }}</div>
+          </div>
+          <div class="text-xl font-bold" v-if="match && group">
+            {{ match.tori }} / {{ match.uke }}
+          </div>
         </div>
+      </ScoreTable>
+    </div>
+    <div class="flex justify-between">
+      <div class="flex gap-2">
+        <PrimeButton v-if="judgeCode" severity="danger" icon="pi pi-sign-out" label="Change Judge"
+          @click.prevent.stop="changeJudge" />
+        <LocaleMenu />
       </div>
-    </ScoreTable>
-  </Container>
+      <PrimeButton v-if="match && judge" @click.prevent="showSubmitScore" :disabled="!canSubmit">
+        Submit</PrimeButton>
+    </div>
+  </PublicContainer>
   <Prompt name="submit_score_modal" @submit="submitScore" text="Yes">
     <span>Submit final scores? (it can not be undone.)</span>
   </Prompt>
@@ -66,23 +50,24 @@
 import { clone } from 'lodash-es';
 import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
-import { ArrowPathIcon, Bars3Icon } from '@heroicons/vue/24/outline';
 
-import { getGroupName, getOrganizationImage, handleServerError, moveList } from '~/src/utils';
+import { getGroupName, handleServerError, moveList } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
 
 definePageMeta({
-  colorMode: 'corporate',
+  layout: 'public'
 });
 
-const cookie = useCookie('jkj', { default: () => ({}) });
+const DEFAULT_SCORES = { id: '', points: [] };
 
+const cookie = useCookie('jkj', { default: () => ({}) });
 const route = useRoute();
+const scores = useLocalStorage(`scores`, clone(DEFAULT_SCORES));
+const toast = useToast();
+
 const inviteCode = computed(() => route.params.invite);
 const matNumber = computed(() => route.params.mat);
 const judgeNumber = computed(() => route.params.judge);
-
-const DEFAULT_SCORES = { id: '', points: [] };
 
 const error = ref('');
 const tournament = ref(undefined);
@@ -93,7 +78,6 @@ const codeError = ref('');
 const loading = ref(true);
 const judge = ref(undefined);
 const inAction = ref(false);
-const scores = useLocalStorage(`scores`, clone(DEFAULT_SCORES));
 
 const moves = computed(() => group.value ? moveList(group.value.kata) : []);
 
@@ -138,7 +122,6 @@ const canSubmit = computed(() => {
 async function submitCode() {
   try {
     inAction.value = true;
-    error.value = '';
     codeError.value = '';
     judge.value = await $fetch(`/api/invites/${inviteCode.value}/${matNumber.value}/${judgeCode.value}`);
   } catch (err) {
@@ -164,13 +147,12 @@ function showSubmitScore() {
 async function submitScore() {
   try {
     inAction.value = true;
-    error.value = '';
     const body = _scoreToPayload();
     const response = await $fetch(`/api/invites/${inviteCode.value}/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body });
     state.value = response;
-    scores.value.points = [];
+    scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
   } catch (err) {
-    error.value = handleServerError(err);
+    toast.add({ severity: 'error', summary: 'Error', detail: handleServerError(err), life: 5000 });
   } finally {
     inAction.value = false;
   }
@@ -180,10 +162,9 @@ if (judgeCode.value) {
   await submitCode();
 }
 
-watch(moves, () => {
-  console.log('re-assign points');
-  scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
-});
+// watch(moves, () => {
+//   scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
+// });
 
 /**
  * @type UpdateEvents
@@ -195,12 +176,10 @@ onMounted(async () => {
     scores.value.mat = matNumber.value;
     scores.value.judge = judgeNumber.value;
   }
-
   event.connect((data) => {
-    error.value = '';
     loading.value = false;
     if (data.error) {
-      error.value = data.error;
+      toast.add({ severity: 'error', summary: 'Error', detail: data.error, life: 5000 });
       event.close();
       return;
     }

@@ -1,10 +1,6 @@
 <template>
   <div class="flex min-h-10 min-w-10 items-center justify-center">
     <XMarkIcon class="h-6 w-6" v-if="binary && modelValue === '1'" />
-    <!-- <div class="md:hidden h-6 w-6 text-base-300 flex items-center justify-center" v-if="modelValue === ''">
-      {{ hint }}
-    </div> -->
-    <!-- <div class="hidden h-6 w-6 md:block" v-if="modelValue === ''" /> -->
     <PlusIcon class="h-6 w-6" v-if="!binary && modelValue === '+'" />
     <MinusIcon class="h-6 w-6" v-if="!binary && modelValue === '-'" />
   </div>

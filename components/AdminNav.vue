@@ -9,7 +9,7 @@
         :aria-current="item.current ? 'page' : undefined">{{ item.name }}</nuxt-link>
     </template>
     <template #right>
-      <Button icon="pi pi-sign-out" :label="$t('buttons.logout')" :title="$t('buttons.logout')" severity="danger"
+      <PrimeButton icon="pi pi-sign-out" :label="$t('buttons.logout')" :title="$t('buttons.logout')" severity="danger"
         @click.prevent="logout" class="mr-2 hidden sm:block" />
     </template>
   </NavBar>
