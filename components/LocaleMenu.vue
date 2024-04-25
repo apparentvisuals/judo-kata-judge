@@ -1,31 +1,32 @@
 <template>
   <div>
-    <Button icon="pi pi-cog" @click.prevent="toggleSetting" aria-haspopup="true" aria-controls="setting_menu" />
-    <Menu ref="settingMenu" id="setting_menu" :popup="true" :model="settingMenuItems" :pt="{ content: '' }">
+    <PrimeButton icon="pi pi-cog" @click.prevent="toggleSetting" aria-haspopup="true" aria-controls="setting_menu" />
+    <PrimeMenu ref="settingMenu" id="setting_menu" :popup="true" :model="settingMenuItems" :pt="{ content: '' }">
       <template #submenuheader="{ item }">
         <span class="text-primary-500 dark:text-primary-400 font-bold leading-none">{{ item.label }}</span>
       </template>
       <template #item="{ item, props }">
         <div v-if="item.type === 'language'" v-bind="props.action">
-          <SelectButton v-model="currentLocale" :options="localeOptions" option-label="label" option-value="value"
+          <PrimeSelectButton v-model="currentLocale" :options="localeOptions" option-label="label" option-value="value"
             data-key="value" :allow-empty="false">
-          </SelectButton>
+          </PrimeSelectButton>
         </div>
         <div v-if="item.type === 'colour'" v-bind="props.action">
-          <SelectButton v-model="colorMode.preference" :options="colorModeOptions" option-label="value"
+          <PrimeSelectButton v-model="colorMode.preference" :options="colorModeOptions" option-label="value"
             option-value="value" data-key="value" :allow-empty="false"
             class="border-surface-200 dark:border-surface-900">
             <template #option="{ option }">
               <span :class="option.icon" />
             </template>
-          </SelectButton>
+          </PrimeSelectButton>
         </div>
         <div v-if="item.type === 'size'" v-bind="props.action">
-          <InputNumber v-model="zoom" showButtons buttonLayout="horizontal" suffix="%" incrementButtonIcon="pi pi-plus"
-            decrementButtonIcon="pi pi-minus" inputClass="w-24 text-center" :step="10" :min="80" :max="120" />
+          <PrimeInputNumber v-model="zoom" showButtons buttonLayout="horizontal" suffix="%"
+            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" inputClass="w-24 text-center" :step="10"
+            :min="80" :max="120" />
         </div>
       </template>
-    </Menu>
+    </PrimeMenu>
   </div>
 </template>
 

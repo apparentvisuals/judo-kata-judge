@@ -1,76 +1,97 @@
 <template>
-  <DataTable show-gridlines scrollable scroll-height="flex" row-group-mode="rowspan" group-rows-by="g" size="small"
-    :value="display" :row-class="techniqueColour">
+  <PrimeDataTable show-gridlines scrollable scroll-height="flex" row-group-mode="rowspan" group-rows-by="g" size="small"
+    :value="display">
     <template #header>
       <slot />
     </template>
-    <Column header="" class="w-12 text-center">
+    <PrimeColumnGroup type="header">
+      <PrimeRow>
+        <PrimeColumn :header="$t('labels.techniques')" :colspan="3" />
+        <PrimeColumn header="S" headerClass="!bg-yellow-300/25" :pt="{ headercontent: 'justify-center' }"
+          :pt-options="{ mergeProps: true }" />
+        <PrimeColumn header="S" headerClass="!bg-yellow-300/25" :pt="{ headercontent: 'justify-center' }"
+          :pt-options="{ mergeProps: true }" />
+        <PrimeColumn v-if="!group.disableMajor" header="M" headerClass="!bg-green-300/25"
+          :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <PrimeColumn header="B" headerClass="!bg-orange-300/25" :pt="{ headercontent: 'justify-center' }"
+          :pt-options="{ mergeProps: true }" />
+        <PrimeColumn header="+" headerClass="!bg-blue-300/25" :pt="{ headercontent: 'justify-center' }"
+          :pt-options="{ mergeProps: true }" />
+        <PrimeColumn header="-" headerClass="!bg-blue-300/25" :pt="{ headercontent: 'justify-center' }"
+          :pt-options="{ mergeProps: true }" />
+        <PrimeColumn v-if="!group.disableForgotten" header="F" headerClass="!bg-red-300/25"
+          :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }" />
+        <PrimeColumn header="" :pt="{ headercontent: 'justify-end' }" :pt-options="{ mergeProps: true }" />
+      </PrimeRow>
+    </PrimeColumnGroup>
+    <PrimeColumn header="" class="w-12 text-center">
       <template #body="{ index }">{{ index + 1 }}</template>
-    </Column>
-    <Column field="g" header="" class="w-12">
+    </PrimeColumn>
+    <PrimeColumn field="g" header="" class="w-12">
       <template #body="{ index }">
         <span style="writing-mode: vertical-lr;">{{ moves[index].g }}</span>
       </template>
-    </Column>
-    <Column header="Technique">
+    </PrimeColumn>
+    <PrimeColumn header="Technique">
       <template #body="{ index }">
         <span>{{ moves[index].t }}</span>
       </template>
-    </Column>
-    <Column header="S" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    </PrimeColumn>
+    <PrimeColumn header="S" bodyClass="w-10 !p-0 bg-yellow-300/25">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[0]"
           @click.prevent="toggleScore(scores.points[index], 0)" hint="S" />
       </template>
-    </Column>
-    <Column header="S" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    </PrimeColumn>
+    <PrimeColumn header="S" bodyClass="w-10 !p-0 bg-yellow-300/25">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[1]"
           @click.prevent="toggleScore(scores.points[index], 1)" hint="S" />
       </template>
-    </Column>
-    <Column header="M" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    </PrimeColumn>
+    <PrimeColumn header="M" bodyClass="w-10 !p-0 bg-green-300/25">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[2]"
           @click.prevent="toggleScore(scores.points[index], 2)" hint="M" />
       </template>
-    </Column>
-    <Column v-if="!group.disableMajor" header="B" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    </PrimeColumn>
+    <PrimeColumn v-if="!group.disableMajor" header="B" bodyClass="w-10 !p-0 bg-orange-300/25">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[3]"
           @click.prevent="toggleScore(scores.points[index], 3)" hint="B" />
       </template>
-    </Column>
-    <Column header="C" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    </PrimeColumn>
+    <PrimeColumn header="+" bodyClass="w-10 !p-0 bg-blue-300/25" headerClass="!bg-blue-300/25"
+      :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }">
       <template #body="{ index }">
-        <ScoreTableCell :binary="false" v-model="scores.points[index].deductions[5]"
-          @click.prevent="toggleScore(scores.points[index], 5)" hint="C" />
+        <ScoreTableCell :binary="scores.points[index].deductions[5] !== '+'"
+          v-model="scores.points[index].deductions[5]" @click.prevent="toggleScore(scores.points[index], 5)" hint="+" />
       </template>
-    </Column>
-    <Column v-if="!group.disableForgotten" header="F" bodyClass="w-10 !p-0" :pt="{ headercontent: 'justify-center' }"
-      :pt-options="{ mergeProps: true }">
+    </PrimeColumn>
+    <PrimeColumn header="-" bodyClass="w-10 !p-0 bg-blue-300/25">
+      <template #body="{ index }">
+        <ScoreTableCell :binary="scores.points[index].deductions[5] !== '-'"
+          v-model="scores.points[index].deductions[5]" @click.prevent="toggleScore(scores.points[index], 6)" hint="-" />
+      </template>
+    </PrimeColumn>
+    <PrimeColumn v-if="!group.disableForgotten" header="F" bodyClass="w-10 !p-0 bg-red-300/25">
       <template #body="{ index }">
         <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[4]"
-          @click.prevent="toggleScore(scores.points[index], 4)" hint="F" />
+          @click.prevent="toggleScore(scores.points[index], 4)" />
       </template>
-    </Column>
-    <Column header="Score" class="w-16 text-right">
+    </PrimeColumn>
+    <PrimeColumn header="Score" class="w-16 text-right">
       <template #body="{ data }">
         {{ data.value }}
       </template>
-    </Column>
-    <ColumnGroup type="footer">
-      <Row>
-        <Column footer="Total" :colspan="totalSpan" footer-class="text-right" />
-        <Column :footer="total" footer-class="text-right" />
-      </Row>
-    </ColumnGroup>
-  </DataTable>
+    </PrimeColumn>
+    <PrimeColumnGroup type="footer">
+      <PrimeRow>
+        <PrimeColumn footer="Total" :colspan="totalSpan" footer-class="text-right" />
+        <PrimeColumn :footer="total" footer-class="text-right" />
+      </PrimeRow>
+    </PrimeColumnGroup>
+  </PrimeDataTable>
 </template>
 
 <script setup>
@@ -104,7 +125,7 @@ const total = computed(() => {
 });
 
 const totalSpan = computed(() => {
-  let span = 9;
+  let span = 10;
   if (props.group.disableMajor) {
     span -= 1;
   }
@@ -130,12 +151,16 @@ async function toggleScore(score, index) {
   if (!props.disabled) {
     const deductions = score.deductions || Array(6).fill('');
     if (index === 5) {
-      if (deductions[index] === '+') {
-        deductions[index] = '-';
-      } else if (deductions[index] === '-') {
-        deductions[index] = '';
+      if (deductions[5] === '+') {
+        deductions[5] = '';
       } else {
-        deductions[index] = '+';
+        deductions[5] = '+';
+      }
+    } else if (index === 6) {
+      if (deductions[5] === '-') {
+        deductions[5] = '';
+      } else {
+        deductions[5] = '-';
       }
     } else {
       if (deductions[index] === '1') {

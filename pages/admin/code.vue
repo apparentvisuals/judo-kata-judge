@@ -6,17 +6,17 @@
         <label for="code" class="dark:text-surface-200 text-sm">
           <span>{{ $t('labels.adminCode') }}</span>
         </label>
-        <Password input-id="code" v-model="code" :disabled="inAction" :feedback="false" toggle-mask />
+        <PrimePassword input-id="code" v-model="code" :disabled="inAction" :feedback="false" toggle-mask />
         <small class="text-red-500 dark:text-red-400 inline-block">
           <span for="code" v-show="error">{{ error }}</span>
         </small>
       </div>
       <div class="mt-4 flex content-start items-center">
-        <Button type="submit" :disabled="inAction">
+        <PrimeButton type="submit" :disabled="inAction">
           <span v-if="!inAction">{{ $t('buttons.submit') }}</span>
-          <ProgressSpinner v-else stroke-width="4" class="h-6 w-6 fill-surface-0 dark:fill-surface-700"
+          <PrimeProgressSpinner v-else stroke-width="4" class="h-6 w-6 fill-surface-0 dark:fill-surface-700"
             aria-label="loading" />
-        </Button>
+        </PrimeButton>
       </div>
     </form>
   </div>

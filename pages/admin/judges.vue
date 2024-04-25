@@ -2,34 +2,35 @@
   <Error :error-string="error" />
   <AdminNav name="Judges" />
   <Container>
-    <DataTable show-gridlines size="small" :value="judges">
+    <PrimeDataTable show-gridlines size="small" :value="judges">
       <template #header>
         <ActionBar>
           <Button :label="$t('buttons.addJudge')" :title="$t('buttons.addJudge')" icon="pi pi-plus"
             @click.prevent="showAdd" :disabled="inAction" />
         </ActionBar>
       </template>
-      <Column field="id" :header="$t('labels.id')" class="w-10"></Column>
-      <Column field="name" :header="$t('labels.name')"></Column>
-      <Column field="rank" :header="$t('labels.rank')" class="w-32 hidden md:table-cell">
+      <PrimeColumn field="id" :header="$t('labels.id')" class="w-10"></PrimeColumn>
+      <PrimeColumn field="name" :header="$t('labels.name')"></PrimeColumn>
+      <PrimeColumn field="rank" :header="$t('labels.rank')" class="w-32 hidden md:table-cell">
         <template #body="{ data }">
           {{ getLevelName(data.rank) }}
         </template>
-      </Column>
-      <Column :header="$t('labels.region')" class="w-48 hidden lg:table-cell">
+      </PrimeColumn>
+      <PrimeColumn :header="$t('labels.region')" class="w-48 hidden lg:table-cell">
         <template #body="{ data }">
           {{ getProvinceName(data.region) }}
         </template>
-      </Column>
-      <Column frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
+      </PrimeColumn>
+      <PrimeColumn frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
         <template #body="{ index }">
           <div class="flex justify-center gap-2">
-            <Button icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(index)" :disabled="inAction" />
-            <Button icon="pi pi-times" severity="danger" @click.prevent="showRemove(index)" :disabled="inAction" />
+            <PrimeButton icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(index)"
+              :disabled="inAction" />
+            <PrimeButton icon="pi pi-times" severity="danger" @click.prevent="showRemove(index)" :disabled="inAction" />
           </div>
         </template>
-      </Column>
-    </DataTable>
+      </PrimeColumn>
+    </PrimeDataTable>
   </Container>
   <Prompt name="add_judge_modal" @submit="add" :disabled="inAction" text="Add">
     <JudgeInput :judge="newJudge" />

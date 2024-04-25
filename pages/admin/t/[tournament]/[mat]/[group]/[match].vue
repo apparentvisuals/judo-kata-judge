@@ -9,7 +9,7 @@
     </template>
   </NavBar>
   <Container v-if="match" class="p-2">
-    <ResultSummaryTable v-if="view === 'summary'" :match="match" :group="match" :scores="scores" />
+    <ResultSummaryTable v-if="view === 'summary'" :match="match" :group="match" :scores="scores" @remove="remove" />
     <ResultScoreTable :match="match" :group="match" :scores="scores[judgeIndex - 1]" :disabled="true"
       v-if="view === 'judge'">
       <div class="flex flex-wrap justify-between">
@@ -85,6 +85,10 @@ function isCurrent(item) {
   } else {
     return true;
   }
+}
+
+async function remove(index) {
+  match.value = await $fetch(`/api/tournaments/${route.params.tournament}/m/${mat}/g/${group}/match/${matchNumber}/${index}`, { method: 'DELETE', headers: headers.value });
 }
 
 </script>

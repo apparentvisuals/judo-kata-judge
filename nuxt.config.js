@@ -20,7 +20,11 @@ export default defineNuxtConfig({
   },
   primevue: {
     options: {
-      unstyled: true
+      unstyled: true,
+      ripple: true
+    },
+    components: {
+      prefix: 'Prime'
     },
     importPT: { from: path.resolve(__dirname, './presets/wind/') },
   },

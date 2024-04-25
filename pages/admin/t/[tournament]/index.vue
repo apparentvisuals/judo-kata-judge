@@ -3,66 +3,68 @@
   <NavBar :menu="false" class="bg-surface-100 dark:bg-surface-900 border-b border-surface-300 dark:border-surface-600">
     <template #left>
       <NuxtLink to="/admin">
-        <Button text icon="pi pi-angle-left text-lg" />
+        <PrimeButton text icon="pi pi-angle-left text-lg" />
       </NuxtLink>
       <span class="pl-2">{{ `${tournament.name}` }}</span>
     </template>
   </NavBar>
   <ClientOnly>
     <Container class="pt-4">
-      <Toolbar>
+      <PrimeToolbar>
         <template #start>
-          <Button icon="pi pi-plus" :label="$t('buttons.addMat')" @click.prevent="addMat" title="Add Mat" class="mr-2">
-          </Button>
-          <Button icon="pi pi-envelope" :label="$t('buttons.inviteLink')" @click.prevent="createInvite"
+          <PrimeButton icon="pi pi-plus" :label="$t('buttons.addMat')" @click.prevent="addMat" title="Add Mat"
+            class="mr-2">
+          </PrimeButton>
+          <PrimeButton icon="pi pi-envelope" :label="$t('buttons.inviteLink')" @click.prevent="createInvite"
             title="Show Invite">
-          </Button>
+          </PrimeButton>
         </template>
         <template #end>
-          <Button icon="pi pi-copy" :label="$t('buttons.makeCopy')" :title="$t('buttons.makeCopy')"
-            @click.prevent="cloneT" class="mr-2"></Button>
-          <Button severity="danger" v-if="isReordering" :label="$t('buttons.cancel')" @click.prevent="cancel"
-            :aria-label="$t('buttons.cancel')" class="mr-2"></Button>
-          <Button icon="pi pi-sort" :label="isReordering ? $t('buttons.save') : $t('buttons.reorder')"
+          <PrimeButton icon="pi pi-copy" :label="$t('buttons.makeCopy')" :title="$t('buttons.makeCopy')"
+            @click.prevent="cloneT" class="mr-2"></PrimeButton>
+          <PrimeButton severity="danger" v-if="isReordering" :label="$t('buttons.cancel')" @click.prevent="cancel"
+            :aria-label="$t('buttons.cancel')" class="mr-2"></PrimeButton>
+          <PrimeButton icon="pi pi-sort" :label="isReordering ? $t('buttons.save') : $t('buttons.reorder')"
             @click.prevent="save" :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')">
-          </Button>
+          </PrimeButton>
         </template>
-      </Toolbar>
-      <Panel v-for="(mat, matIndex) in tournament.mats" toggleable :pt="{ content: '!p-2' }"
+      </PrimeToolbar>
+      <PrimePanel v-for="(mat, matIndex) in tournament.mats" toggleable :pt="{ content: '!p-2' }"
         :pt-options="{ mergeProps: true }" class="mt-2 ring-1 ring-surface-100 dark:ring-surface-700">
         <template #header>
           <span class="flex items-center gap-2 w-full">
             <h2 class="font-medium">Mat {{ matIndex + 1 }}</h2>
-            <Button icon="pi pi-plus" @click.prevent="showAddGroup(matIndex)" :title="$t('buttons.addGroup')">
-            </Button>
-            <Button severity="danger" icon="pi pi-times" @click.prevent="showDeleteMat(matIndex)"
+            <PrimeButton icon="pi pi-plus" @click.prevent="showAddGroup(matIndex)" :title="$t('buttons.addGroup')">
+            </PrimeButton>
+            <PrimeButton severity="danger" icon="pi pi-times" @click.prevent="showDeleteMat(matIndex)"
               :title="$t('buttons.deleteMat')">
-            </Button>
+            </PrimeButton>
           </span>
         </template>
         <draggable v-model="mat.groups" tag="div" group="groups" item-key="name" handle=".handle"
           :disabled="!isReordering">
           <template #item="{ element: group, index: groupIndex }">
-            <Panel toggleable :pt="{ content: '!p-2' }" :pt-options="{ mergeProps: true }"
+            <PrimePanel toggleable :pt="{ content: '!p-2' }" :pt-options="{ mergeProps: true }"
               class="mb-2 last:mb-0 ring-1 ring-surface-100 dark:ring-surface-700">
               <template #header>
                 <div class="flex flex-wrap items-center gap-2 w-full">
                   <span v-if="isReordering" class="handle w-6 h-6 pi pi-sort" />
                   <span class="font-medium">{{ getGroupName(group, groupIndex) }}</span>
-                  <Chip icon="pi pi-user" :label="group.numberOfJudges.toString()" />
-                  <Chip v-if="group.day" icon="pi pi-calendar" :label="group.day" />
-                  <Chip v-if="group.startTime" icon="pi pi-calendar-clock" :label="group.startTime" />
+                  <PrimeChip icon="pi pi-user" :label="group.numberOfJudges.toString()" />
+                  <PrimeChip v-if="group.day" icon="pi pi-calendar" :label="group.day" />
+                  <PrimeChip v-if="group.startTime" icon="pi pi-calendar-clock" :label="group.startTime" />
                   <div class="flex gap-2">
-                    <Button icon="pi pi-plus" @click.prevent="showAddMatch(matIndex, groupIndex)"
+                    <PrimeButton icon="pi pi-plus" @click.prevent="showAddMatch(matIndex, groupIndex)"
                       :aria-label="$t('buttons.addMatch')" :title="$t('buttons.addMatch')" />
-                    <Button v-if="isReordering" icon="pi pi-sync" :disabled="!canRandomize(matIndex, groupIndex)"
+                    <PrimeButton v-if="isReordering" icon="pi pi-sync" :disabled="!canRandomize(matIndex, groupIndex)"
                       @click.prevent="randomizeGroup(matIndex, groupIndex)" :aria-label="$t('buttons.randomize')"
                       :title="$t('buttons.randomize')" />
-                    <Button icon="pi pi-pencil" severity="secondary"
+                    <PrimeButton icon="pi pi-pencil" severity="secondary"
                       @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" :aria-label="$t('buttons.editGroup')"
                       :title="$t('buttons.editGroup')" />
-                    <Button icon="pi pi-times" severity="danger" @click.prevent="showDeleteGroup(matIndex, groupIndex)"
-                      :aria-label="$t('buttons.deleteGroup')" :title="$t('buttons.deleteGroup')" />
+                    <PrimeButton icon="pi pi-times" severity="danger"
+                      @click.prevent="showDeleteGroup(matIndex, groupIndex)" :aria-label="$t('buttons.deleteGroup')"
+                      :title="$t('buttons.deleteGroup')" />
                   </div>
                 </div>
               </template>
@@ -93,12 +95,12 @@
                         <div class="flex justify-center gap-2">
                           <NuxtLink :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank"
                             :title="$t('buttons.results')">
-                            <Button icon="pi pi-book" />
+                            <PrimeButton icon="pi pi-book" />
                           </NuxtLink>
-                          <Button icon="pi pi-pencil" severity="secondary"
+                          <PrimeButton icon="pi pi-pencil" severity="secondary"
                             @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
                             :disabled="match.completed || inAction" :title="$t('buttons.editMatch')" />
-                          <Button icon="pi pi-times" severity="danger"
+                          <PrimeButton icon="pi pi-times" severity="danger"
                             @click.prevent="showDeleteMatch(matIndex, groupIndex, index)" :disabled="inAction"
                             :title="$t('buttons.deleteMatch')" />
                         </div>
@@ -107,10 +109,10 @@
                   </template>
                 </draggable>
               </table>
-            </Panel>
+            </PrimePanel>
           </template>
         </draggable>
-      </Panel>
+      </PrimePanel>
     </Container>
     <Prompt name="delete_mat_modal" @submit="deleteMat" text="Yes">
       <span>Delete this mat?</span>

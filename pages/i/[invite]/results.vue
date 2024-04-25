@@ -21,12 +21,12 @@
       <h1 class="hidden md:inline">{{ tournament.name }}</h1>
     </div>
   </div>
-  <Container>
+  <PublicContainer class="pt-16">
     <div class="text-center pb-2">
       <h2 class="text-xl font-bold">{{ getGroupName(group, resultIndex) }}</h2>
     </div>
     <ResultTable :show-sub-total="showSubTotal" :matches="group.matches" />
-  </Container>
+  </PublicContainer>
 </template>
 
 <script setup>

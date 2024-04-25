@@ -44,7 +44,7 @@ export default defineI18nConfig(() => ({
         editMatch: 'Edit Match',
         deleteMatch: 'Delete Match',
         results: 'Results',
-        inviteLink: 'View invite link',
+        inviteLink: 'Tournament Link',
         randomize: 'Randomize matches',
         reorder: 'Reorder',
       },

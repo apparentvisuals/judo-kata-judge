@@ -2,34 +2,35 @@
   <Error :error-string="error" />
   <AdminNav name="Athletes" />
   <Container class="text-surface-700 dark:text-white/80">
-    <DataTable show-gridlines size="small" sort-field="name" :sort-order="1" :value="athletes">
+    <PrimeDataTable show-gridlines size="small" sort-field="name" :sort-order="1" :value="athletes">
       <template #header>
         <ActionBar>
           <Button :label="$t('buttons.addAthlete')" :title="$t('buttons.addAthlete')" icon="pi pi-plus"
             @click.prevent="showAdd" :disabled="inAction" />
         </ActionBar>
       </template>
-      <Column field="name" :header="$t('labels.name')">
-      </Column>
-      <Column :header="$t('labels.rank')" class="w-40 hidden md:table-cell">
+      <PrimeColumn field="name" :header="$t('labels.name')">
+      </PrimeColumn>
+      <PrimeColumn :header="$t('labels.rank')" class="w-40 hidden md:table-cell">
         <template #body="{ data }">
           {{ getRankName(data.rank) }}
         </template>
-      </Column>
-      <Column :header="$t('labels.region')" class="w-48 hidden lg:table-cell">
+      </PrimeColumn>
+      <PrimeColumn :header="$t('labels.region')" class="w-48 hidden lg:table-cell">
         <template #body="{ data }">
           {{ getProvinceName(data.region) }}
         </template>
-      </Column>
-      <Column frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
+      </PrimeColumn>
+      <PrimeColumn frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
         <template #body="{ index }">
           <div class="flex justify-center gap-1">
-            <Button icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(index)" :disabled="inAction" />
-            <Button icon="pi pi-times" severity="danger" @click.prevent="showRemove(index)" :disabled="inAction" />
+            <PrimeButton icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(index)"
+              :disabled="inAction" />
+            <PrimeButton icon="pi pi-times" severity="danger" @click.prevent="showRemove(index)" :disabled="inAction" />
           </div>
         </template>
-      </Column>
-    </DataTable>
+      </PrimeColumn>
+    </PrimeDataTable>
   </Container>
   <Prompt name="add_athlete_modal" @submit="add" :disabled="inAction" text="Add">
     <AthleteInputs :athlete="newAthlete" />

@@ -2,34 +2,34 @@
   <Error :error-string="error" />
   <AdminNav />
   <Container>
-    <DataTable show-gridlines size="small" :value="tournaments">
+    <PrimeDataTable show-gridlines size="small" :value="tournaments">
       <template #header>
         <Button icon="pi pi-plus" :label="$t('buttons.createTournament')" :title="$t('buttons.createTournament')"
           @click.prevent="showAdd" :disabled="inAction" />
       </template>
-      <Column field="name" :header="$t('labels.name')">
+      <PrimeColumn field="name" :header="$t('labels.name')">
         <template #body="{ data }">
           <NuxtLink class="link" :to="`/admin/t/${data.id}`">{{ data.name }}</NuxtLink>
         </template>
-      </Column>
-      <Column :header="$t('labels.region')" class="w-52 hidden lg:table-cell">
+      </PrimeColumn>
+      <PrimeColumn :header="$t('labels.region')" class="w-52 hidden lg:table-cell">
         <template #body="{ data }">
           {{ getOrganization(data.org) }}
         </template>
-      </Column>
-      <Column frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
+      </PrimeColumn>
+      <PrimeColumn frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
         <template #body="{ index }">
           <div class="flex justify-center gap-2">
-            <Button icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(index)" :disabled="inAction"
-              title="Edit Tournament" />
-            <Button icon="pi pi-times" severity="danger" @click.prevent="remove2($event, index)" :disabled="inAction"
-              title="Delete Tournament" />
+            <PrimeButton icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(index)"
+              :disabled="inAction" title="Edit Tournament" />
+            <PrimeButton icon="pi pi-times" severity="danger" @click.prevent="remove2($event, index)"
+              :disabled="inAction" title="Delete Tournament" />
           </div>
         </template>
-      </Column>
-    </DataTable>
+      </PrimeColumn>
+    </PrimeDataTable>
   </Container>
-  <ConfirmPopup></ConfirmPopup>
+  <PrimeConfirmPopup></PrimeConfirmPopup>
   <Prompt name="add_t_modal" @submit="add" :disabled="inAction" text="Add">
     <TournamentInputs :tournament="newTournament" />
   </Prompt>
