@@ -6,7 +6,7 @@
         <label for="code" class="dark:text-surface-200 text-sm">
           <span>{{ $t('labels.adminCode') }}</span>
         </label>
-        <Password input-id="code" v-model="code" :disabled="inAction" :feedback="false" toggle-mask />
+        <PrimePassword input-id="code" v-model="code" :disabled="inAction" :feedback="false" toggle-mask />
         <small class="text-red-500 dark:text-red-400 inline-block">
           <span for="code" v-show="error">{{ error }}</span>
         </small>
