@@ -5,11 +5,12 @@
       @submit.prevent="submit">
       <slot />
       <div class="modal-action">
-        <button v-if="cancellable" for="add-t-form" class="btn btn-sm btn-error btn-outline" type="button"
-          @click="close" :disabled="disabled">
+        <PrimeButton v-if="cancellable" for="add-t-form" severity="danger" type="button" @click="close"
+          :disabled="disabled">
           Cancel
-        </button>
-        <button for="add-t-form" class="btn btn-sm btn-success" type="submit" :disabled="disabled">{{ text }}</button>
+        </PrimeButton>
+        <PrimeButton for="add-t-form" type="submit" :disabled="disabled">{{ text }}
+        </PrimeButton>
       </div>
     </form>
     <form method="dialog" class="modal-backdrop">

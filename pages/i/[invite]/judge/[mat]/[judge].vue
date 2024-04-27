@@ -1,5 +1,6 @@
 <template>
-  <div v-if="status" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
+  <div v-if="status"
+    class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center  text-surface-800 dark:text-surface-200">
     <div class="text-center">
       <span class="text-3xl font-bold">{{ status }}</span>
     </div>
@@ -10,39 +11,41 @@
   <div v-else-if="match && !judge" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
     <CodeForm v-model="judgeCode" title="Judge Code" @submit="submitCode" :error="codeError" />
   </div>
-  <PublicContainer v-else-if="match">
+  <PublicContainer v-else-if="match" class="pt-0">
     <div class="grow" style="height: 300px">
       <ScoreTable :match="match" :group="group" :scores="scores">
-        <div class="flex justify-between">
-          <div class="text-xl hidden md:block">
-            {{ judge.name }} ({{ judgeNumber }})
-          </div>
-          <div class="flex flex-col items-start">
-            <div class="text-xl md:hidden">
-              <span>{{ match.tori }}</span>
-              /
-              <span class="text-blue-500">{{ match.uke }}</span>
+        <template #header>
+          <div class="flex justify-between">
+            <div class="text-xl hidden md:block">
+              {{ judge.name }} ({{ judgeNumber }})
             </div>
-            <div class="text-xl">{{ match ? getGroupName(group) : '' }}</div>
+            <div class="flex flex-col items-start">
+              <div class="text-xl md:hidden">
+                {{ judge.name }} ({{ judgeNumber }})
+              </div>
+              <div class="text-xl">{{ match ? getGroupName(group) : '' }}</div>
+            </div>
+            <div class="text-xl font-bold" v-if="match && group">
+              {{ match.tori }} / {{ match.uke }}
+            </div>
           </div>
-          <div class="text-xl font-bold" v-if="match && group">
-            {{ match.tori }} / {{ match.uke }}
+        </template>
+        <template #footer>
+          <div class="flex justify-between">
+            <div class="flex gap-2">
+              <PrimeButton v-if="judgeCode" severity="danger" icon="pi pi-sign-out" label="Change Judge"
+                @click.prevent.stop="changeJudge" />
+              <LocaleMenu />
+            </div>
+            <PrimeButton v-if="match && judge" @click.prevent="showSubmitScore" :disabled="!canSubmit">
+              Submit</PrimeButton>
           </div>
-        </div>
+        </template>
       </ScoreTable>
-    </div>
-    <div class="flex justify-between">
-      <div class="flex gap-2">
-        <PrimeButton v-if="judgeCode" severity="danger" icon="pi pi-sign-out" label="Change Judge"
-          @click.prevent.stop="changeJudge" />
-        <LocaleMenu />
-      </div>
-      <PrimeButton v-if="match && judge" @click.prevent="showSubmitScore" :disabled="!canSubmit">
-        Submit</PrimeButton>
     </div>
   </PublicContainer>
   <Prompt name="submit_score_modal" @submit="submitScore" text="Yes">
-    <span>Submit final scores? (it can not be undone.)</span>
+    <span class="text-surface-800 dark:text-surface-200">Submit final scores? (it can not be undone.)</span>
   </Prompt>
 </template>
 
@@ -161,10 +164,6 @@ async function submitScore() {
 if (judgeCode.value) {
   await submitCode();
 }
-
-// watch(moves, () => {
-//   scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
-// });
 
 /**
  * @type UpdateEvents

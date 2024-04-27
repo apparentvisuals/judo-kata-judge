@@ -52,7 +52,7 @@ export default {
       props.showGridlines ? 'border-b' : 'border-b border-x-0',
 
       // Spacing
-      'py-3.5 px-3',
+      'py-1 px-0',
 
       // Color
       'bg-surface-0 dark:bg-surface-800',
@@ -93,7 +93,7 @@ export default {
       'border-t-0 border-t border-x-0',
 
       // Spacing
-      'p-4',
+      'py-1 px-0',
 
       // Color
       'bg-surface-0 dark:bg-surface-800',

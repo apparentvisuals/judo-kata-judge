@@ -1,8 +1,11 @@
 <template>
-  <PrimeDataTable show-gridlines scrollable scroll-height="flex" row-group-mode="rowspan" group-rows-by="g" size="small"
-    :value="display">
+  <PrimeDataTable striped-rows show-gridlines scrollable scroll-height="flex" row-group-mode="rowspan" group-rows-by="g"
+    size="small" :value="display" :row-class="techniqueColour">
     <template #header>
-      <slot />
+      <slot name="header" />
+    </template>
+    <template #footer>
+      <slot name="footer" />
     </template>
     <PrimeColumnGroup type="header">
       <PrimeRow>
@@ -138,10 +141,7 @@ const totalSpan = computed(() => {
 function techniqueColour(score) {
   if (score) {
     if (score.deductions && score.deductions[4] === '1') {
-      return 'bg-warning';
-    }
-    if (!score.value || score.value === 10) {
-      return 'bg-yellow-50';
+      return '!text-red-500 !dark:text-red-300 !font-bold';
     }
     return '';
   }
