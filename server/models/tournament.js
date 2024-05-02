@@ -253,9 +253,18 @@ export default class Tournament {
   }
 
   update(tournament) {
-    this.#tournament.name = tournament.name;
-    this.#tournament.org = tournament.org;
-    this.#tournament.showJudgeTotals = tournament.showJudgeTotals;
+    if (tournament.name != null) {
+      this.#tournament.name = tournament.name;
+    }
+    if (tournament.org != null) {
+      this.#tournament.org = tournament.org;
+    }
+    if (tournament.showJudgeTotals != null) {
+      this.#tournament.showJudgeTotals = tournament.showJudgeTotals;
+    }
+    if (tournament.completed != null) {
+      this.#tournament.completed = tournament.completed;
+    }
     if (tournament.mats) {
       this.#tournament.mats = tournament.mats;
     }
@@ -304,16 +313,37 @@ export default class Tournament {
 
 function _getAllQuery(options) {
   if (options.org) {
-    return {
-      query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c._etag FROM c WHERE c.org = @org',
-      parameters: [
-        {
-          name: '@org',
-          value: options.org,
-        },
-      ],
-    };
+    const parameters = [
+      {
+        name: '@org',
+        value: options.org,
+      }
+    ];
+    if (options.archived) {
+      parameters.push({
+        name: '@archived',
+        value: options.archived || false,
+      });
+      return {
+        query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c.complete, c.archived, c._etag FROM c WHERE c.org = @org AND c.archived = @archived',
+        parameters,
+      };
+    } else {
+      return {
+        query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c.complete, c.archived, c._etag FROM c WHERE c.org = @org',
+        parameters,
+      };
+    }
   } else {
-    return { query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c._etag FROM c' };
+    if (options.archived) {
+      const parameters = [
+        {
+          name: '@archived',
+          value: options.archived || false,
+        }];
+      return { query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c.complete, c.archived, c._etag FROM c AND c.archived = @archived', parameters };
+    } else {
+      return { query: 'SELECT c.id, c.name, c.org, c.showJudgeTotals, c.complete, c.archived, c._etag FROM c' };
+    }
   }
 }

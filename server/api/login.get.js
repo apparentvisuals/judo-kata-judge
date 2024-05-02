@@ -5,8 +5,10 @@ export default defineEventHandler(async (event) => {
   if (!token) {
     return createError({ statusCode: 401, message: 'unauthorized' });
   }
-  if (!getAuth(token)) {
+  const context = getAuth(token);
+  if (!context) {
     return createError({ statusCode: 403, message: 'forbidden' });
   }
-  return;
+
+  return context;
 });

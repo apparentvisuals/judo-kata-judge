@@ -1,4 +1,3 @@
-import { omitBy, isNil } from 'lodash-es';
 import Tournament from '~/server/models/tournament';
 import { getAuth, getToken } from '~/server/utils';
 

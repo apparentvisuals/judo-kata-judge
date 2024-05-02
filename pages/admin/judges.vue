@@ -46,9 +46,6 @@
 <script setup>
 import { clone, pickBy } from 'lodash-es';
 
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-
 import { getLevelName, getProvinceName, handleServerError } from '~/src/utils';
 
 useHead({

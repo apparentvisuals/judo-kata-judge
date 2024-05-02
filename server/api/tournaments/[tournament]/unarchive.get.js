@@ -1,5 +1,5 @@
 import Tournament from '~/server/models/tournament';
-import { getAuth, getToken } from '~/server/utils';
+import { getToken, getAuth } from '~/server/utils';
 
 export default defineEventHandler(async (event) => {
   const token = getToken(event);
@@ -14,7 +14,12 @@ export default defineEventHandler(async (event) => {
     if (!tournamentId) {
       return createError({ statusCode: 404, message: 'Tournament not found' });
     }
-    await Tournament.remove(tournamentId);
+    const tournament = await Tournament.get(tournamentId);
+    if (!tournament) {
+      return createError({ statusCode: 404, message: 'Tournament not found' });
+    }
+
+    return await Tournament.update(tournamentId, { archive: false }, {});
   } catch (err) {
     return createError({ statusCode: 400, message: err.message });
   }

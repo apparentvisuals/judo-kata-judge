@@ -44,8 +44,9 @@ async function submit() {
     }
     error.value = '';
     inAction.value = true;
-    await $fetch('/api/login', { headers: { authorization: `Bearer ${code.value}` } });
+    const response = await $fetch('/api/login', { headers: { authorization: `Bearer ${code.value}` } });
     cookie.value.adminCode = code.value;
+    cookie.value.org = response.org;
     if (route.query.from) {
       navigateTo(route.query.from);
     } else {

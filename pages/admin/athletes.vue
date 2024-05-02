@@ -47,9 +47,6 @@
 import { clone, pickBy } from 'lodash-es';
 import { XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline';
 
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-
 import { getProvinceName, getRankName, handleServerError } from '~/src/utils';
 
 useHead({

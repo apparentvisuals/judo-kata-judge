@@ -93,9 +93,11 @@ export async function shimUpdate(key, id, data, options) {
         });
       });
       const container = database.container(`${key}-dev`);
-      const response = await container.item(id).patch(patchOperations, {
-        accessCondition: { type: "IfMatch", condition: options._etag },
-      });
+      const cosmosOptions = {};
+      if (options && options._etag) {
+        cosmosOptions.accessCondition = { type: "IfMatch", condition: options._etag };
+      }
+      const response = await container.item(id).patch(patchOperations, cosmosOptions);
       log(`update ${key} with id ${id}`, response);
       return response.resource;
     }

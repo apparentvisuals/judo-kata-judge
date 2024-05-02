@@ -4,7 +4,7 @@
   <Container>
     <PrimeDataTable show-gridlines size="small" :value="tournaments">
       <template #header>
-        <Button icon="pi pi-plus" :label="$t('buttons.createTournament')" :title="$t('buttons.createTournament')"
+        <PrimeButton icon="pi pi-plus" :label="$t('buttons.createTournament')" :title="$t('buttons.createTournament')"
           @click.prevent="showAdd" :disabled="inAction" />
       </template>
       <PrimeColumn field="name" :header="$t('labels.name')">
@@ -18,12 +18,15 @@
         </template>
       </PrimeColumn>
       <PrimeColumn frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
-        <template #body="{ index }">
-          <div class="flex justify-center gap-2">
-            <PrimeButton icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(index)"
-              :disabled="inAction" title="Edit Tournament" />
-            <PrimeButton icon="pi pi-times" severity="danger" @click.prevent="remove2($event, index)"
-              :disabled="inAction" title="Delete Tournament" />
+        <template #body="{ data, index }">
+          <div class="flex gap-2">
+            <PrimeButton icon="pi pi-check" severity="secondary" title="Complete"
+              @click.prevent="toggleComplete(index)" />
+            <PrimeButton icon="pi pi-box" severity="secondary" title="Archive" @click.prevent="toggleArchive(index)" />
+            <PrimeButton :disabled="data.complete || inAction" icon="pi pi-pencil" @click.prevent="showUpdate(index)"
+              title="Edit" />
+            <PrimeButton :disabled="data.complete || inAction" icon="pi pi-times" severity="danger"
+              @click.prevent="remove2($event, index)" title="Delete" />
           </div>
         </template>
       </PrimeColumn>
@@ -31,20 +34,15 @@
   </Container>
   <PrimeConfirmPopup></PrimeConfirmPopup>
   <Prompt name="add_t_modal" @submit="add" :disabled="inAction" text="Add">
-    <TournamentInputs :tournament="newTournament" />
+    <TournamentInputs :tournament="newTournament" :org="org" />
   </Prompt>
-  <Prompt name="edit_t_modal" @submit="update" :disabled="inAction" text="Update">
-    <TournamentInputs :tournament="toUpdate" />
+  <Prompt name=" edit_t_modal" @submit="update" :disabled="inAction" text="Update">
+    <TournamentInputs :tournament="toUpdate" :org="org" />
   </Prompt>
 </template>
 
 <script setup>
 import { clone, pickBy } from 'lodash-es';
-
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Button from 'primevue/button';
-import ConfirmPopup from 'primevue/confirmpopup';
 
 import { getOrganization, handleServerError } from '~/src/utils';
 
@@ -65,6 +63,7 @@ const updateIndex = ref(-1);
 const toUpdate = ref(clone(DEFAULT));
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
+const org = computed(() => cookie.value.org);
 
 const { data: tournaments, error: err } = await useFetch(`/api/tournaments`, { headers });
 if (err.value) {
@@ -140,6 +139,36 @@ async function remove(index) {
     } finally {
       inAction.value = false;
     }
+  }
+}
+
+async function toggleComplete(index) {
+  try {
+    inAction.value = true;
+    const tournament = tournaments.value[index];
+    const id = tournament.id;
+    const complete = !!tournament.complete;
+    const response = await $fetch(`/api/tournaments/${id}/${complete ? 'uncomplete' : 'complete'}`, { headers });
+    tournament.complete = response.complete;
+  } catch (err) {
+    error.value = handleServerError(err);
+  } finally {
+    inAction.value = false;
+  }
+}
+
+async function toggleArchive(index) {
+  try {
+    inAction.value = true;
+    const tournament = tournaments.value[index];
+    const id = tournament.id;
+    const archive = !!tournament.archive;
+    const response = await $fetch(`/api/tournaments/${id}/${archive ? 'unarchive' : 'archive'}`, { headers });
+    tournament.archive = response.archive;
+  } catch (err) {
+    error.value = handleServerError(err);
+  } finally {
+    inAction.value = false;
   }
 }
 

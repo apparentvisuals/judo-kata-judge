@@ -101,8 +101,8 @@
                             @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
                             :disabled="match.completed || inAction" :title="$t('buttons.editMatch')" />
                           <PrimeButton icon="pi pi-times" severity="danger"
-                            @click.prevent="showDeleteMatch(matIndex, groupIndex, index)" :disabled="inAction"
-                            :title="$t('buttons.deleteMatch')" />
+                            @click.prevent="showDeleteMatch(matIndex, groupIndex, index)"
+                            :disabled="match.completed || inAction" :title="$t('buttons.deleteMatch')" />
                         </div>
                       </CustomTd>
                     </tr>

@@ -7,6 +7,7 @@ export default defineI18nConfig(() => ({
         id: 'ID',
         name: 'Name',
         region: 'Region',
+        org: 'Organization',
         rank: 'Rank',
         actions: 'Actions',
         adminCode: 'Admin Code',
