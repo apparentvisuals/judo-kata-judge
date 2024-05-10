@@ -1,13 +1,9 @@
 <template>
   <Error :error-string="error" />
-  <UserNav :tournament="tournament" :mat="route.params.mat">
-  </UserNav>
-  <div class="p-2 text-xl font-bold md:hidden">
-    {{ tournament.name }} Mat {{ mat }}
-  </div>
-  <ClientOnly>
+  <UserNav :tournament="tournament" :mat="route.params.mat" />
+  <PublicContainer>
     <ScheduleTable :tournament="tournament" :mat="route.params.mat" />
-  </ClientOnly>
+  </PublicContainer>
 </template>
 
 <script setup>

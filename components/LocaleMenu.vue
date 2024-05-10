@@ -3,7 +3,7 @@
     <PrimeButton icon="pi pi-cog" @click.prevent="toggleSetting" aria-haspopup="true" aria-controls="setting_menu" />
     <PrimeMenu ref="settingMenu" id="setting_menu" :popup="true" :model="settingMenuItems" :pt="{ content: '' }">
       <template #submenuheader="{ item }">
-        <span class="text-primary-500 dark:text-primary-400 font-bold leading-none">{{ item.label }}</span>
+        <span class="text-primary-500 dark:text-primary-400 font-bold leading-none">{{ $t(item.label) }}</span>
       </template>
       <template #item="{ item, props }">
         <div v-if="item.type === 'language'" v-bind="props.action">
@@ -42,19 +42,19 @@ const colorModeOptions = ref([{ icon: 'pi pi-cog', value: 'system' }, { icon: 'p
 
 const settingMenu = ref();
 const settingMenuItems = ref([{
-  label: t('labels.colour'),
+  label: 'labels.colour',
   items: [{
     type: 'colour',
     disabled: true
   }],
 }, {
-  label: t('labels.language'),
+  label: 'labels.language',
   items: [{
     type: 'language',
     disabled: true
   }],
 }, {
-  label: t('labels.fontSize'),
+  label: 'labels.fontSize',
   items: [{
     type: 'size',
     disabled: true

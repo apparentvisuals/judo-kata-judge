@@ -1,38 +1,33 @@
 <template>
   <Error :error-string="error" />
-  <div class="navbar bg-primary text-primary-content flex gap-4 text-5xl fixed h-32 justify-center">
-    <img :src="getOrganizationImage(tournament.org)" class="h-20" />
-    <h1>{{ tournament.name }} Mat {{ parseInt(route.params.mat) + 1 }}</h1>
-  </div>
-  <ClientOnly>
-    <div class="flex flex-col fixed top-32 bottom-0 left-0 right-0">
-      <div class="basis-1/2 bg-primary text-primary-content border-b p-2 flex flex-col justify-center">
-        <div v-if="current.kata" class="text-center text-8xl pb-10">{{ getKataName(current.kata) }}</div>
-        <div v-else class=" text-center text-6xl">No More Matches</div>
-        <div v-if="current.kata" class="flex justify-between">
-          <div class="text-8xl">{{ current.tori }}</div>
-          <div class="text-8xl text-right">{{ current.uke }}</div>
-        </div>
-      </div>
-      <div class="basis-1/4 bg-base-100 border-b p-2 flex flex-col justify-center">
-        <div class="text-center text-6xl pb-10">{{ getKataName(onDeck.kata) }}</div>
-        <div class="flex justify-between">
-          <div class="text-6xl">{{ onDeck.tori }}</div>
-          <div class="text-6xl text-right">{{ onDeck.uke }}</div>
-        </div>
-      </div>
-      <div class="basis-1/4 bg-base-100 p-2 flex flex-col justify-center">
-        <div v-if="onDoubleDeck && onDoubleDeck.kata" class="text-center text-6xl pb-10">
-          {{ getKataName(onDoubleDeck.kata) }}
-        </div>
-        <div v-else-if="onDoubleDeck" class=" text-center text-6xl">No More Matches</div>
-        <div v-if="onDoubleDeck && onDoubleDeck.kata" class="flex justify-between">
-          <div class="text-6xl">{{ onDoubleDeck.tori }}</div>
-          <div class="text-6xl text-right">{{ onDoubleDeck.uke }}</div>
-        </div>
+  <UserNav :tournament="tournament" :mat="route.params.mat" class="bg-primary" />
+  <div class="flex flex-col fixed top-16 bottom-0 left-0 right-0">
+    <div class="basis-1/2 bg-primary text-primary-content border-b p flex flex-col justify-center">
+      <div v-if="current.kata" class="text-center text-8xl pb-10">{{ getKataName(current.kata) }}</div>
+      <div v-else class=" text-center text-6xl">No More Matches</div>
+      <div v-if="current.kata" class="flex justify-between">
+        <div class="text-8xl">{{ current.tori }}</div>
+        <div class="text-8xl text-right">{{ current.uke }}</div>
       </div>
     </div>
-  </ClientOnly>
+    <div class="basis-1/4 bg-base-100 border-b p-2 flex flex-col justify-center">
+      <div class="text-center text-6xl pb-10">{{ getKataName(onDeck.kata) }}</div>
+      <div class="flex justify-between">
+        <div class="text-6xl">{{ onDeck.tori }}</div>
+        <div class="text-6xl text-right">{{ onDeck.uke }}</div>
+      </div>
+    </div>
+    <div class="basis-1/4 bg-base-100 p-2 flex flex-col justify-center">
+      <div v-if="onDoubleDeck && onDoubleDeck.kata" class="text-center text-6xl pb-10">
+        {{ getKataName(onDoubleDeck.kata) }}
+      </div>
+      <div v-else-if="onDoubleDeck" class=" text-center text-6xl">No More Matches</div>
+      <div v-if="onDoubleDeck && onDoubleDeck.kata" class="flex justify-between">
+        <div class="text-6xl">{{ onDoubleDeck.tori }}</div>
+        <div class="text-6xl text-right">{{ onDoubleDeck.uke }}</div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>

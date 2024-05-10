@@ -17,28 +17,28 @@
         <template #header>
           <div class="flex justify-between">
             <div class="text-xl hidden md:block">
-              {{ judge.name }} ({{ judgeNumber }})
+              {{ match.tori }} / {{ match.uke }}
             </div>
             <div class="flex flex-col items-start">
               <div class="text-xl md:hidden">
-                {{ judge.name }} ({{ judgeNumber }})
+                {{ match.tori }} / {{ match.uke }}
               </div>
               <div class="text-xl">{{ match ? getGroupName(group) : '' }}</div>
             </div>
             <div class="text-xl font-bold" v-if="match && group">
-              {{ match.tori }} / {{ match.uke }}
+              {{ judge.name }} ({{ judgeNumber }})
             </div>
           </div>
         </template>
         <template #footer>
           <div class="flex justify-between">
             <div class="flex gap-2">
-              <PrimeButton v-if="judgeCode" severity="danger" icon="pi pi-sign-out" label="Change Judge"
-                @click.prevent.stop="changeJudge" />
+              <PrimeButton v-if="judgeCode" severity="danger" icon="pi pi-sign-out"
+                :label="$t('public.judge.changeButton')" @click.prevent.stop="changeJudge" />
               <LocaleMenu />
             </div>
-            <PrimeButton v-if="match && judge" @click.prevent="showSubmitScore" :disabled="!canSubmit">
-              Submit</PrimeButton>
+            <PrimeButton v-if="match && judge" @click.prevent="showSubmitScore" :disabled="!canSubmit"
+              :label="$t('public.judge.submit')" />
           </div>
         </template>
       </ScoreTable>

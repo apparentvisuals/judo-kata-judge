@@ -1,10 +1,8 @@
 <template>
-  <div v-for="(group, groupIndex) in schedule" class="p-2">
+  <div v-for="(group, groupIndex) in schedule" class="pb-2">
     <table class="table border">
+      <caption class="border border-b-0 text-xl py-2">{{ group.kata }}</caption>
       <thead>
-        <tr class="border-none">
-          <th colspan="3" class="text-center text-lg">{{ group.kata }}</th>
-        </tr>
         <tr class="border">
           <th class="w-8"></th>
           <th>Pair</th>
@@ -31,8 +29,6 @@ const DEFAULT_BREAK = 10;
 const DEFAULT_BREAK_EVERY_X_MATCH = 5;
 
 const props = defineProps(['tournament', 'mat']);
-// const currentGroup = useState('current-group', () => -1);
-// const currentMatch = useState('current-match', () => -1);
 
 const schedule = computed(() => {
   if (props.tournament && props.tournament.mats && props.tournament.mats.length > props.mat) {

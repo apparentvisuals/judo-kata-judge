@@ -53,19 +53,45 @@ export default defineI18nConfig(() => ({
         deleteJudge: 'Delete this judge?',
         deleteAthlete: 'Delete this athlete?',
         deleteTournament: 'Delete this tournament?',
+      },
+      public: {
+        button: {
+          open: 'Open',
+          qr: 'QR',
+        },
+        judge: {
+          changeButton: 'Change Judge',
+          submit: 'Submit',
+          total: 'Total',
+        }
       }
     },
     fr: {
-      adminCodeLabel: '',
       labels: {
         name: '',
         region: '',
+        adminCode: '',
+        techniques: 'Techniques',
+        colour: 'Couleur',
+        language: 'Langue',
+        fontSize: 'Zoom',
       },
       titles: {
         tournaments: '',
         judges: '',
         athletes: '',
       },
+      public: {
+        button: {
+          open: 'Ouvrir',
+          qr: 'QR',
+        },
+        judge: {
+          changeButton: 'Changer de juge',
+          submit: 'Envoyer',
+          total: 'Totale',
+        }
+      }
     }
   }
 }));

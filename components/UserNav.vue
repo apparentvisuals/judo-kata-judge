@@ -1,10 +1,7 @@
 <template>
-  <div class="navbar text-xl font-bold">
-    <div class="navbar-center gap-2 flex-1">
-      <img :src="getOrganizationImage(tournament.org)" class="h-12" />
-      <h1 class="hidden md:inline">{{ title }}</h1>
-    </div>
-    <slot />
+  <div class="flex flex-wrap gap-2 items-center p-2 border-b">
+    <img :src="getOrganizationImage(tournament.org)" class="h-12" />
+    <h1 class="text-xl">{{ title }}</h1>
   </div>
 </template>
 
@@ -15,7 +12,7 @@ const props = defineProps(['tournament', 'mat']);
 const title = computed(() => {
   let title = props.tournament.name;
   if (props.mat) {
-    title += ` Mat ${parseInt(props.mat) + 1}`;
+    title += ` mat ${parseInt(props.mat) + 1} / tapis ${parseInt(props.mat) + 1}`;
   }
   return title;
 });

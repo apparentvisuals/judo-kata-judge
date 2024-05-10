@@ -1,5 +1,6 @@
 <template>
   <table class="table border">
+    <caption class="border border-b-0 text-xl py-2">{{ name }}</caption>
     <thead>
       <tr>
         <th class="w-8 text-center hidden md:table-cell"></th>
@@ -19,7 +20,8 @@
           <td :colspan="colspan">({{ matchIndex + 1 }}) {{ match.tori }} / {{ match.uke }}</td>
         </tr>
         <tr>
-          <td class="text-center hidden md:table-cell"><span class="hidden md:table-cell">{{ matchIndex + 1 }}</span></td>
+          <td class="text-center hidden md:table-cell"><span class="hidden md:table-cell">{{ matchIndex + 1 }}</span>
+          </td>
           <td class="hidden md:table-cell">{{ match.tori }}</td>
           <td class="hidden md:table-cell">{{ match.uke }}</td>
           <td v-if="showSubTotal" class="text-center border h-6">{{ match.scores[0] }}</td>
@@ -36,6 +38,6 @@
 
 <script setup>
 const DEFAULT_SPAN = 6;
-const props = defineProps(['showSubTotal', 'matches']);
+const props = defineProps(['name', 'showSubTotal', 'matches']);
 const colspan = computed(() => props.showSubTotal ? DEFAULT_SPAN : DEFAULT_SPAN - 5);
 </script>

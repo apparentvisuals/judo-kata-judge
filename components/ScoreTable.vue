@@ -90,7 +90,7 @@
     </PrimeColumn>
     <PrimeColumnGroup type="footer">
       <PrimeRow>
-        <PrimeColumn footer="Total" :colspan="totalSpan" footer-class="text-right" />
+        <PrimeColumn :footer="$t('public.judge.total')" :colspan="totalSpan" footer-class="text-right" />
         <PrimeColumn :footer="total" footer-class="text-right" />
       </PrimeRow>
     </PrimeColumnGroup>

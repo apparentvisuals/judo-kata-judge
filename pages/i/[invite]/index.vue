@@ -1,34 +1,40 @@
 <template>
   <Error :error-string="error" />
-  <UserNav :tournament="tournament">
-    <!-- <div class="navbar-end w-auto" v-if="tournament.org === 'on'">
-      <img src="/img/sponsors/hatashita.png" class="h-12" />
-    </div> -->
-  </UserNav>
-  <div class="p-2 text-xl font-bold md:hidden">
-    {{ tournament.name }}
-  </div>
-  <div class="pt-16">
-    <div class="px-12" v-if="tournament.mats">
-      <ClientOnly>
-        <div class="flex gap-24 flex-wrap py-12" style="page-break-after: always;">
-          <QR :path="resultsPath" title="Results" params="scroll=1" />
-          <template v-for="(_mat, index) of tournament.mats">
-            <QR :path="`/i/${invite}/schedule/${index}`" :title="`Mat ${index + 1} Schedule`" />
-            <QR :path="`/i/${invite}/announce/${index}`" :title="`Mat ${index + 1} Announce`" />
-          </template>
+  <UserNav :tournament="tournament" />
+  <PublicContainer>
+    <PrimeDataView :value="items">
+      <template #list="{ items }">
+        <div v-for="(item, index) in items" :key="index" class="flex flex-wrap justify-between py-2"
+          :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
+          {{ getTitle(item) }}
+          <div class="flex gap-2">
+            <NuxtLink :to="getUrl(item)" target="_blank">
+              <PrimeButton icon="pi pi-external-link" :title="$t('public.button.open')"></PrimeButton>
+            </NuxtLink>
+            <PrimeButton icon="pi pi-qrcode" :title="$t('public.button.qr')" @click.prevent="showQr($event, item)" />
+          </div>
         </div>
-        <div v-for="(_mat, index) of tournament.mats" class="flex gap-24 flex-wrap py-12"
-          style="page-break-after: always;">
-          <QR :path="`/i/${invite}/judge/${index}/1`" :title="`Mat ${index + 1} Judge 1`" />
-          <QR :path="`/i/${invite}/judge/${index}/2`" :title="`Mat ${index + 1} Judge 2`" />
-          <QR :path="`/i/${invite}/judge/${index}/3`" :title="`Mat ${index + 1} Judge 3`" />
-          <QR :path="`/i/${invite}/judge/${index}/4`" :title="`Mat ${index + 1} Judge 4`" />
-          <QR :path="`/i/${invite}/judge/${index}/5`" :title="`Mat ${index + 1} Judge 5`" />
-        </div>
-      </ClientOnly>
-    </div>
-  </div>
+      </template>
+      <!-- <PrimeColumn field="title">
+        <template #body="{ data }">
+          {{ getTitle(data) }}
+        </template>
+      </PrimeColumn>
+      <PrimeColumn frozen align-frozen="right" class="w-20" field="mat" :header="$t('labels.actions')">
+        <template #body="{ data }">
+          <div class="flex gap-2">
+            <NuxtLink :to="getUrl(data)" target="_blank">
+              <PrimeButton icon="pi pi-external-link" :title="$t('public.button.open')"></PrimeButton>
+            </NuxtLink>
+            <PrimeButton icon="pi pi-qrcode" :title="$t('public.button.qr')" @click.prevent="showQr($event, data)" />
+          </div>
+        </template>
+      </PrimeColumn> -->
+    </PrimeDataView>
+    <PrimeOverlayPanel ref="op">
+      <img :src="qr" :alt="qrString" class="w-36 max-w-4xl join-item" />
+    </PrimeOverlayPanel>
+  </PublicContainer>
 </template>
 
 <script setup>
@@ -37,12 +43,19 @@ definePageMeta({
 });
 
 import { handleServerError } from '~/src/utils';
+import { useQRCode } from '@vueuse/integrations/useQRCode';
 
 const route = useRoute();
 const invite = computed(() => route.params.invite);
 const resultsPath = computed(() => `/i/${invite.value}/results`);
-
+const items = computed(() => {
+  const items = [{ title: 'results' }];
+  return items.concat(tournament.value.mats.map((mat, index) => _generateMatItems(mat, index)).flat());
+});
 const error = ref('');
+const qrString = ref();
+const qr = useQRCode(qrString);
+const op = ref();
 
 const { data: tournament, error: err } = await useFetch(`/api/invites/${invite.value}`);
 if (err.value) {
@@ -52,4 +65,51 @@ if (err.value) {
 useHead({
   title: tournament.value.name,
 });
+
+function _generateMatItems(mat, index) {
+  return [
+    { title: 'schedule', mat, index },
+    { title: 'announce', mat, index },
+    { title: 'judge', judge: 1, mat, index },
+    { title: 'judge', judge: 2, mat, index },
+    { title: 'judge', judge: 3, mat, index },
+    { title: 'judge', judge: 4, mat, index },
+    { title: 'judge', judge: 5, mat, index },
+  ];
+}
+
+function getTitle(data) {
+  switch (data.title) {
+    case 'results':
+      return 'Results / Résultat';
+    case 'schedule':
+      return `Mat ${data.index + 1} Schedule / Horaire du tapis ${data.index + 1}`;
+    case 'announce':
+      return `Mat ${data.index + 1} Announce / Announce tapis ${data.index + 1}`;
+    case 'judge':
+      return `Mat ${data.index + 1} judge ${data.judge} / Tapis ${data.index + 1} juge ${data.judge}`;
+  }
+}
+
+function getUrl(data) {
+  switch (data.title) {
+    case 'results':
+      return _genUrl(`/i/${invite.value}/results`);
+    case 'schedule':
+      return _genUrl(`/i/${invite.value}/schedule/${data.index}`);
+    case 'announce':
+      return _genUrl(`/i/${invite.value}/announce/${data.index}`);
+    case 'judge':
+      return _genUrl(`/i/${invite.value}/judge/${data.index}/${data.judge}`);
+  }
+}
+
+function showQr(event, data) {
+  qrString.value = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''
+    }${getUrl(data)}`;
+  op.value.toggle(event);
+}
+function _genUrl(path) {
+  return path;
+}
 </script>
