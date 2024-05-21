@@ -120,10 +120,8 @@ async function remove2(event, index) {
     accept: () => {
       remove(index);
     },
-    reject: () => {
-
-    },
-  })
+    reject: () => { },
+  });
 }
 
 async function remove(index) {

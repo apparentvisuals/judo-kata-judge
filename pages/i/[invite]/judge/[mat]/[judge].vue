@@ -37,16 +37,22 @@
                 :label="$t('public.judge.changeButton')" @click.prevent.stop="changeJudge" />
               <LocaleMenu />
             </div>
-            <PrimeButton v-if="match && judge" @click.prevent="showSubmitScore" :disabled="!canSubmit"
+            <PrimeButton v-if="match && judge" @click.prevent="preSubmit" :disabled="!canSubmit"
               :label="$t('public.judge.submit')" />
           </div>
         </template>
       </ScoreTable>
     </div>
   </PublicContainer>
-  <Prompt name="submit_score_modal" @submit="submitScore" text="Yes">
-    <span class="text-surface-800 dark:text-surface-200">Submit final scores? (it can not be undone.)</span>
-  </Prompt>
+  <PrimeConfirmDialog group="forgottenWarning" :closable="false">
+    <template #message="slotProps">
+      <div class="flex flex-column align-items-center w-full gap-3 border-bottom-1 surface-border">
+        <i :class="slotProps.message.icon" class="text-6xl text-red-500 dark:text-red-40"></i>
+        <p class="text-red-500 dark:text-red-40">{{ slotProps.message.message }}</p>
+      </div>
+    </template>
+  </PrimeConfirmDialog>
+  <PrimeConfirmDialog group="submit" :closable="false"></PrimeConfirmDialog>
 </template>
 
 <script setup>
@@ -54,7 +60,7 @@ import { clone } from 'lodash-es';
 import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 
-import { getGroupName, handleServerError, moveList } from '~/src/utils';
+import { calculateHasMajor, getGroupName, handleServerError, moveList } from '~/src/utils';
 import { UpdateEvents } from '~/src/event-sources';
 
 definePageMeta({
@@ -67,6 +73,7 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 const route = useRoute();
 const scores = useLocalStorage(`scores`, clone(DEFAULT_SCORES));
 const toast = useToast();
+const confirm = useConfirm();
 
 const inviteCode = computed(() => route.params.invite);
 const matNumber = computed(() => route.params.mat);
@@ -83,12 +90,6 @@ const judge = ref(undefined);
 const inAction = ref(false);
 
 const moves = computed(() => group.value ? moveList(group.value.kata) : []);
-
-const title = computed(() => {
-  if (tournament.value) {
-    return `${tournament.value.name} Mat ${parseInt(matNumber.value) + 1}`;
-  }
-});
 
 const judgeCode = computed({
   get() {
@@ -121,6 +122,7 @@ const status = computed(() => {
 const canSubmit = computed(() => {
   return scores.value.points.every((score) => score.value != null && score.value !== 10);
 });
+const hasMajor = computed(() => calculateHasMajor(scores.value.points));
 
 async function submitCode() {
   try {
@@ -143,8 +145,33 @@ async function changeJudge() {
   }
 }
 
-function showSubmitScore() {
-  submit_score_modal.showModal();
+async function preSubmit(event) {
+  if (hasMajor.value) {
+    confirm.require({
+      group: 'forgottenWarning',
+      header: 'Major/Forgotten Technique',
+      icon: 'pi pi-exclamation-triangle',
+      message: 'Score contains forgotten technique, confirm it has been discussed and continue?',
+      acceptClass: '!bg-red-500 dark:!bg-red-40 !border-red-500 dark:!border-red-400 !ring-red-500 dark:!ring-red-400 hover:!bg-red-600 dark:hover:!bg-red-300 hover:!border-red-600 dark:hover:!border-red-300 focus:!ring-red-400/50 dark:!focus:ring-red-300/50',
+      accept: async () => {
+        submitScore2(event);
+      },
+    });
+  } else {
+    await submitScore2(event);
+  }
+}
+
+async function submitScore2() {
+  confirm.require({
+    group: 'submit',
+    header: 'Submit scores?',
+    message: 'This can not be undone.',
+    acceptClass: '!bg-red-500 dark:!bg-red-40 !border-red-500 dark:!border-red-400 !ring-red-500 dark:!ring-red-400 hover:!bg-red-600 dark:hover:!bg-red-300 hover:!border-red-600 dark:hover:!border-red-300 focus:!ring-red-400/50 dark:!focus:ring-red-300/50',
+    accept: () => {
+      submitScore();
+    },
+  });
 }
 
 async function submitScore() {
