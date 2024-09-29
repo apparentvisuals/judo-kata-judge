@@ -30,8 +30,11 @@ jobs:
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
+          include-hidden-files: true
           name: node-app
-          path: .
+          path: |
+            .nuxt
+            .output
 
   deploy:
     runs-on: ubuntu-latest
