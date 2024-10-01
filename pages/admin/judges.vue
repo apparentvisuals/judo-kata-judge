@@ -4,10 +4,8 @@
   <Container>
     <PrimeDataTable show-gridlines size="small" :value="judges">
       <template #header>
-        <ActionBar>
-          <Button :label="$t('buttons.addJudge')" :title="$t('buttons.addJudge')" icon="pi pi-plus"
-            @click.prevent="showAdd" :disabled="inAction" />
-        </ActionBar>
+        <PrimeButton icon="pi pi-plus" :label="$t('buttons.addJudge')" :title="$t('buttons.addJudge')"
+          @click.prevent="showAdd" :disabled="inAction" />
       </template>
       <PrimeColumn field="id" :header="$t('labels.id')" class="w-10"></PrimeColumn>
       <PrimeColumn field="name" :header="$t('labels.name')"></PrimeColumn>

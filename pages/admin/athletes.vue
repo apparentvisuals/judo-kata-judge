@@ -4,10 +4,8 @@
   <Container class="text-surface-700 dark:text-white/80">
     <PrimeDataTable show-gridlines size="small" sort-field="name" :sort-order="1" :value="athletes">
       <template #header>
-        <ActionBar>
-          <Button :label="$t('buttons.addAthlete')" :title="$t('buttons.addAthlete')" icon="pi pi-plus"
-            @click.prevent="showAdd" :disabled="inAction" />
-        </ActionBar>
+        <PrimeButton icon="pi pi-plus" :label="$t('buttons.addAthlete')" :title="$t('buttons.addAthlete')"
+          @click.prevent="showAdd" :disabled="inAction" />
       </template>
       <PrimeColumn field="name" :header="$t('labels.name')">
       </PrimeColumn>
