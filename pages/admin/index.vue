@@ -36,7 +36,7 @@
   <Prompt name="add_t_modal" @submit="add" :disabled="inAction" text="Add">
     <TournamentInputs :tournament="newTournament" :org="org" />
   </Prompt>
-  <Prompt name=" edit_t_modal" @submit="update" :disabled="inAction" text="Update">
+  <Prompt name="edit_t_modal" @submit="update" :disabled="inAction" text="Update">
     <TournamentInputs :tournament="toUpdate" :org="org" />
   </Prompt>
 </template>

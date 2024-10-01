@@ -1,7 +1,6 @@
 <template>
   <Error :error-string="error" />
-  <UserNav :tournament="tournament" :mat="route.params.mat" class="bg-primary" />
-  <div class="flex flex-col fixed top-16 bottom-0 left-0 right-0">
+  <div class="flex flex-col fixed top-0 bottom-0 left-0 right-0">
     <div class="basis-1/2 bg-primary text-primary-content border-b p flex flex-col justify-center">
       <div v-if="current.kata" class="text-center text-8xl pb-10">{{ getKataName(current.kata) }}</div>
       <div v-else class=" text-center text-6xl">No More Matches</div>

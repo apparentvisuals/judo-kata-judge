@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-wrap gap-2 p-2 border-b items-center z-50">
+  <div class="flex flex-wrap gap-2 p-2 border-b items-center z-50" :class="kiosk ? 'hidden' : ''">
     <div class="dropdown">
       <label tabindex="0" class="btn btn-ghost btn-square drawer-button print:hidden">
         <Bars3Icon class="w-6 h-6" />
@@ -17,8 +17,15 @@
         </ul>
       </div>
     </div>
-    <img class="h-12" :src="getOrganizationImage(tournament.org)" />
-    <h1 class="text-xl">{{ tournament.name }}</h1>
+    <img class="h-12 hidden md:block" :src="getOrganizationImage(tournament.org)" />
+    <h1 class="text-xl hidden md:block">{{ tournament.name }}</h1>
+  </div>
+  <div class="flex flex-wrap gap-2 p-2 border-b items-center z-50 justify-between" :class="kiosk ? '' : 'hidden'">
+    <h1 class="text-3xl font-bold">{{ tournament.name }}</h1>
+    <div class="flex">
+      <img class="h-20 p-1" src="/img/sponsors/hatashita.png" />
+      <img class="h-20" :src="getOrganizationImage(tournament.org)" />
+    </div>
   </div>
   <PublicContainer>
     <ResultTable :name="getGroupName(group, resultIndex)" :show-sub-total="showSubTotal" :matches="group.matches" />
@@ -38,6 +45,7 @@ definePageMeta({
 const route = useRoute();
 const inviteCode = computed(() => route.params.invite);
 const autoScroll = computed(() => route.query.scroll);
+const kiosk = computed(() => route.query.kiosk);
 
 const tournament = ref({});
 const scores = ref({});
