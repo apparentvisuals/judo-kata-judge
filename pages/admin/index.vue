@@ -78,6 +78,9 @@ async function add() {
   try {
     inAction.value = true;
     const body = newTournament.value;
+    if (org.value) {
+      body.org = org.value;
+    }
     const tournament = await $fetch(`/api/tournaments`, { method: 'POST', body, headers });
     tournaments.value.push(tournament);
     newTournament.value = clone(DEFAULT);
