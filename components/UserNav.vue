@@ -7,6 +7,7 @@
     <h1 class="text-3xl font-bold">{{ title }}</h1>
     <div class="flex">
       <img class="h-20 p-1" src="/img/sponsors/hatashita.png" />
+      <img class="h-20 p-1" src="/img/sponsors/mizuno.png" />
       <img class="h-20" :src="getOrganizationImage(tournament.org)" />
     </div>
   </div>

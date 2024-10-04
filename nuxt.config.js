@@ -3,6 +3,7 @@ import path from 'path';
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
+
   vite: {
     vue: {
       script: {
@@ -10,14 +11,18 @@ export default defineNuxtConfig({
       }
     }
   },
+
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt', 'nuxt-primevue', 'nuxt-headlessui'],
+
   colorMode: {
     classSuffix: '',
   },
+
   i18n: {
     strategy: 'no_prefix',
     vueI18n: './i18n.config.js',
   },
+
   primevue: {
     options: {
       unstyled: true,
@@ -28,9 +33,11 @@ export default defineNuxtConfig({
     },
     importPT: { from: path.resolve(__dirname, './presets/wind/') },
   },
+
   headlessui: {
     prefix: 'Hl'
   },
+
   nitro: {
     storage: {
       'tournaments-dev': {
@@ -51,8 +58,11 @@ export default defineNuxtConfig({
       }
     }
   },
+
   css: [
     '~/assets/css/base.css',
     '/node_modules/primeicons/primeicons.css'
-  ]
+  ],
+
+  compatibilityDate: '2024-10-04'
 })
