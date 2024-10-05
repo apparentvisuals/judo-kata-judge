@@ -37,8 +37,8 @@
                 :label="$t('public.judge.changeButton')" @click.prevent.stop="changeJudge" />
               <LocaleMenu />
             </div>
-            <PrimeButton v-if="match && judge" @click.prevent="preSubmit" :disabled="!canSubmit"
-              :label="$t('public.judge.submit')" />
+            <PrimeButton v-if="match && judge" @click.prevent="showSubmit" :disabled="!canSubmit"
+              :label="$t('public.judge.submit')" :severity="hasMajor ? 'danger' : 'success'" />
           </div>
         </template>
       </ScoreTable>
@@ -145,24 +145,7 @@ async function changeJudge() {
   }
 }
 
-async function preSubmit(event) {
-  if (hasMajor.value) {
-    confirm.require({
-      group: 'forgottenWarning',
-      header: 'Major/Forgotten Technique',
-      icon: 'pi pi-exclamation-triangle',
-      message: 'Score contains forgotten technique, confirm it has been discussed and continue?',
-      acceptClass: '!bg-red-500 dark:!bg-red-40 !border-red-500 dark:!border-red-400 !ring-red-500 dark:!ring-red-400 hover:!bg-red-600 dark:hover:!bg-red-300 hover:!border-red-600 dark:hover:!border-red-300 focus:!ring-red-400/50 dark:!focus:ring-red-300/50',
-      accept: async () => {
-        submitScore2(event);
-      },
-    });
-  } else {
-    await submitScore2(event);
-  }
-}
-
-async function submitScore2() {
+async function showSubmit() {
   confirm.require({
     group: 'submit',
     header: 'Submit scores?',

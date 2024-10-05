@@ -3,13 +3,14 @@
   <div class="flex flex-col fixed top-0 bottom-0 left-0 right-0">
     <div class="h-24 bg-base-100 flex flex-wrap gap-2 p-2 border-b items-center justify-between">
       <h1 class="text-3xl font-bold">{{ tournament.name }}</h1>
-      <div class="flex" v-if="tournament.org === 'on'">
-        <img class=" h-20 p-1" src="/img/sponsors/hatashita.png" />
-        <img class="h-20 p-1" src="/img/sponsors/mizuno.png" />
+      <div class="flex gap-2" v-if="tournament.org === 'on'">
+        <img class="h-20" src="/img/sponsors/hatashita.png" />
+        <img class="h-20" src="/img/sponsors/mizuno.png" />
+        <img class="h-20" src="/img/sponsors/fuji.png" />
         <img class="h-20" :src="getOrganizationImage(tournament.org)" />
       </div>
     </div>
-    <div class="basis-1/2 bg-primary text-primary-content border-b p flex flex-col justify-center">
+    <div class="basis-1/2 bg-base-100 text-primary border-b p flex flex-col justify-center">
       <div v-if="current.kata" class="text-center text-8xl pb-10">{{ getKataName(current.kata) }}</div>
       <div v-else class=" text-center text-6xl">No More Matches</div>
       <div v-if="current.kata" class="flex flex-col">
