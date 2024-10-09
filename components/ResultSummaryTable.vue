@@ -13,7 +13,7 @@
       </div>
     </template>
     <template #footer>
-      <div class="flex flex-wrap justify-between text-sm print:hidden">
+      <div class="flex flex-wrap justify-between text-sm">
         <div class="flex flex-col">
           <div v-for="index of numberOfResults">
             Judge {{ index }}: {{ match.scores[index - 1].name }}
