@@ -13,7 +13,7 @@
       "args": [
         "dev"
       ],
-    }
+    },
     {
       "name": "debug",
       "type": "node",

@@ -175,7 +175,7 @@ async function toggleScore(score, index) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="pcss">
 .score {
   @apply px-0 text-center py-3;
 }

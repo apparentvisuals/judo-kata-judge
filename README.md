@@ -46,3 +46,36 @@ npm run preview
 ```
 
 Checkout the [deployment documentation](https://v3.nuxtjs.org/guide/deploy/presets) for more information.
+
+## Schemas
+
+### Judge
+
+```json
+{
+  "id": "string",
+  "name": "string",
+  "region": "string",
+  "rank": "string",
+  "nnk": "string",
+  "knk": "string",
+  "jnk": "string",
+  "kgj": "string",
+  "kink": "string",
+  "konk": "string",
+}
+```
+
+### JudgeDetails
+
+```json
+{
+  "id": "string", //Judge ID
+  "kata": "string", // nnk, knk, jnk, etc.
+  "rank": "string", // Nat, PJC, IJF, etc.
+  "received": "date",
+  "lastUpdated": "date",
+  "lastJudged": "date",
+}
+```
+

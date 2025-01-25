@@ -15,13 +15,19 @@ export default defineEventHandler(async (event) => {
   if (!judgeId) {
     return createError({ statusCode: 404, message: 'Judge not found' });
   }
-  const { name, rank, region, _etag } = await readBody(event);
+
+  const judge = await Judge.get(judgeId.toUpperCase());
+  if (!judge) {
+    return createError({ statusCode: 404, message: 'Judge not found' });
+  }
+
+  const { name, region, nnk, knk, jnk, kgj, kink, konk, ink, _etag } = await readBody(event);
   if (!_etag) {
     return createError({ statusCode: 400, message: 'Invalid update data' });
   }
 
   try {
-    return await Judge.update(judgeId.toUpperCase(), omitBy({ name, rank, region }, isNil), { _etag });
+    return await Judge.update(judgeId.toUpperCase(), omitBy({ name, region, nnk, knk, jnk, kgj, kink, konk, ink }, isNil), { _etag });
   } catch (err) {
     return createError({ statusCode: 400, message: err.message });
   }
