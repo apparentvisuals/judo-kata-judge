@@ -1,7 +1,8 @@
 <template>
   <Container>
-    <PrimeDataTable show-gridlines size="small" :value="judges">
+    <PrimeDataTable show-gridlines size="small" :value="filteredJudges">
       <template #header>
+        <input v-model="search" class="input input-bordered"></input>
       </template>
       <PrimeColumn field="name" :header="$t('labels.name')"></PrimeColumn>
       <PrimeColumn :header="$t('labels.region')" class="w-48 hidden lg:table-cell">
@@ -49,13 +50,33 @@
 </template>
 
 <script setup>
-import { clone, pickBy } from 'lodash-es';
+import { getKataName, getLevelName, getProvinceName, handleServerError } from '~/src/utils';
 
-import { LEVEL_MAP, getKataName, getLevelName, getProvinceName, handleServerError } from '~/src/utils';
+const search = ref('');
 
 const { data: judges, error: err } = await useFetch(`/api/public/judges`);
 if (err.value) {
   error.value = handleServerError(err);
 }
+
+const filteredJudges = computed(() => {
+  return judges.value.filter((a) => {
+    if (search.value && search.value.length > 2) {
+      if (a.name.toUpperCase().startsWith(search.value.toUpperCase())) {
+        return a;
+      }
+    } else {
+      return a;
+    }
+  }).sort((a, b) => {
+    if (a.name < b.name) {
+      return -1;
+    }
+    if (a.name > b.name) {
+      return 1;
+    }
+    return 0;
+  });
+});
 
 </script>
