@@ -1,5 +1,3 @@
-const defaultTheme = require('tailwindcss/defaultTheme');
-
 module.exports = {
   mode: 'jit',
   plugins: [require('@tailwindcss/typography'), require('daisyui')],
@@ -17,11 +15,10 @@ module.exports = {
     "./error.vue",
   ],
   theme: {
-    screens: {
-      'xs': '328px',
-      ...defaultTheme.screens,
-    },
     extend: {
+      screens: {
+        'xs': '328px',
+      },
       colors: {
         "primary-50": "rgb(var(--primary-50))",
         "primary-100": "rgb(var(--primary-100))",

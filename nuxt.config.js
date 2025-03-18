@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt', 'nuxt-primevue', 'nuxt-headlessui'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt', '@primevue/nuxt-module', 'nuxt-headlessui'],
 
   colorMode: {
     classSuffix: '',
@@ -20,7 +20,7 @@ export default defineNuxtConfig({
 
   i18n: {
     strategy: 'no_prefix',
-    vueI18n: './i18n.config.js',
+    vueI18n: '../i18n.config.js',
   },
 
   primevue: {
