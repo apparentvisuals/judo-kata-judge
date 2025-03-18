@@ -2,7 +2,7 @@ import { isDev } from "../utils";
 import { database, log } from './cosmos';
 import { omit, omitBy, isNil } from 'lodash-es';
 
-const useShim = false;
+const useShim = process.env.DEV_SHIM || false;
 
 export async function shimGet(key, id) {
   if (isDev()) {
