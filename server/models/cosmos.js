@@ -7,7 +7,7 @@ const INFO = 30;
 const WARN = 40;
 const ERROR = 50;
 
-const endpoint = 'https://judo-kata-judge.documents.azure.com:443/';
+const endpoint = process.env.COSMOS_ENDPOINT;
 const client = getClient();
 function getClient() {
   const key = process.env.COSMOS_KEY;
@@ -23,20 +23,20 @@ function getClient() {
 
 export const database = client.database('judo-kata-judge');
 export function log(message, response) {
-  _log(DEBUG, message, response ? { rc: response.headers['x-ms-request-charge'] } : {});
+  console.debug(_log(DEBUG, message, response ? { rc: response.headers['x-ms-request-charge'] } : {}));
 }
 export function info(message, response) {
-  _log(INFO, message, response ? { rc: response.headers['x-ms-request-charge'] } : {});
+  console.info(_log(INFO, message, response ? { rc: response.headers['x-ms-request-charge'] } : {}));
 }
 export function warn(message, response) {
-  _log(WARN, message, response ? { rc: response.headers['x-ms-request-charge'] } : {});
+  console.warn(_log(WARN, message, response ? { rc: response.headers['x-ms-request-charge'] } : {}));
 }
 export function error(message, response) {
-  _log(ERROR, message, response ? { rc: response.headers['x-ms-request-charge'] } : {});
+  console.error(_log(ERROR, message, response ? { rc: response.headers['x-ms-request-charge'] } : {}));
 }
 
 function _log(level, message, props) {
-  console.log(`[${new Date().toISOString()}]${_levelText(level)} ${message} ${_propText(props)}`);
+  return `[${new Date().toISOString()}]${_levelText(level)} ${message} ${_propText(props)}`;
 }
 
 function _levelText(level) {
