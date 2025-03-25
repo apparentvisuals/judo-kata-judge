@@ -7,7 +7,15 @@ Judo Kata judging software based on IJF ruleset. Open sourced under the AGPL Lic
 ## Setup
 
 1. Login to your Azure account or create one.
-2. Create a free Cosmos DB with the name `judo-kata-judge`.
+2. Create the database.
+    1. Create a free Cosmos DB with the database name `judo-kata-judge`.
+    2. Create tables without partitioning, choose a partition key that does not exist and will not set a value. e.g. /partitionKey
+        - athletes-dev
+        - judges-dev
+        - tournaments-dev
+        - invites-dev
+        - matches-dev
+
 3. Create a `.env` file at the root of the repository with at least the follow:
 
 ```
