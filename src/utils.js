@@ -1,6 +1,6 @@
 
 import data from './data.json' with { type: 'json' };
-import kata from './kata.json' with { type: 'json' };
+import kataData from './kata.json' with { type: 'json' };
 
 export const ORG_MAP = data.organizations;
 export const ORG_IMAGE_MAP = data.organizationImages;
@@ -8,22 +8,7 @@ export const PROVINCE_MAP = data.provinces;
 export const LEVEL_MAP = data.judgeLevels;
 export const RANK_MAP = data.athleteRanks;
 
-export const KATA_MAP = kata.kataNames;
-
-const NNK3_MOVE_LIST = kata.nage3;
-const NNK_MOVE_LIST = kata.nage5;
-const KNK_MOVE_LIST = kata.katame;
-const JNK_MOVE_LIST = kata.ju;
-const KGJ_MOVE_LIST = kata.goshin;
-const KINK_MOVE_LIST = kata.kime;
-
-const KO1_MOVE_LIST = kata.kodomo1;
-const KO2_MOVE_LIST = kata.kodomo2;
-const KO3_MOVE_LIST = kata.kodomo3;
-const KO4_MOVE_LIST = kata.kodomo4;
-const KO5_MOVE_LIST = kata.kodomo5;
-const KO6_MOVE_LIST = kata.kodomo6;
-const KO7_MOVE_LIST = kata.kodomo7;
+export const KATA_MAP = kataData.kataNames;
 
 export function getOrganization(org) {
   if (org) {
@@ -58,35 +43,7 @@ export function moveList(kata) {
 }
 
 function legacyMoveList(kata) {
-  switch (kata) {
-    case 'nnk3':
-      return NNK3_MOVE_LIST;
-    case 'nnk':
-      return NNK_MOVE_LIST;
-    case 'knk':
-      return KNK_MOVE_LIST;
-    case 'jnk':
-      return JNK_MOVE_LIST;
-    case 'kgj':
-      return KGJ_MOVE_LIST;
-    case 'kink':
-      return KINK_MOVE_LIST;
-    case 'ko1':
-      return KO1_MOVE_LIST;
-    case 'ko2':
-      return KO2_MOVE_LIST;
-    case 'ko3':
-      return KO3_MOVE_LIST;
-    case 'ko4':
-      return KO4_MOVE_LIST;
-    case 'ko5':
-      return KO5_MOVE_LIST;
-    case 'ko6':
-      return KO6_MOVE_LIST;
-    case 'ko7':
-      return KO7_MOVE_LIST;
-    default: return [];
-  }
+  return kataData[kata] || [];
 }
 
 export function duration(kata) {
