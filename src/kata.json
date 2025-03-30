@@ -12,9 +12,11 @@
     "ko4": "Kodomo-no-kata 4",
     "ko5": "Kodomo-no-kata 5",
     "ko6": "Kodomo-no-kata 6",
-    "ko7": "Kodomo-no-kata 7"
+    "ko7": "Kodomo-no-kata 7",
+    "konk": "Koshiki-no-kata",
+    "ink": "Itsutsu-no-kata"
   },
-  "nage3": [
+  "nnk3": [
     ":Opening Ceremony",
     "te-waza:Uki-otoshi",
     "te-waza:Seoi-nage",
@@ -27,7 +29,7 @@
     "ashi-waza:Uchi-mata",
     ":Closing Ceremony"
   ],
-  "nage5": [
+  "nnk": [
     ":Opening Ceremony",
     "te-waza:Uki-otoshi",
     "te-waza:Seoi-nage",
@@ -46,7 +48,7 @@
     "yoko-sutemi-waza:Uki-waza",
     ":Closing Ceremony"
   ],
-  "katame": [
+  "knk": [
     ":Opening Ceremony",
     "osaekomi-waza:Kesa-gatame",
     "osaekomi-waza:Kata-gatame",
@@ -65,7 +67,7 @@
     "kansetsu-waza:Ashi-garami",
     ":Closing Ceremony"
   ],
-  "ju": [
+  "jnk": [
     ":Opening Ceremony",
     "ikkyo:Tsuki-dashi",
     "ikkyo:Kata-oshi",
@@ -84,7 +86,7 @@
     "sankyo:Ryogan-tsuki",
     ":Closing Ceremony"
   ],
-  "goshin": [
+  "kgj": [
     ":Opening Ceremony",
     "unarmed-held:Ryote-dori",
     "unarmed-held:Hidari-eri-dori",
@@ -109,7 +111,7 @@
     "armed-pistol:Haimen-zuke",
     ":Closing Ceremony"
   ],
-  "kime": [
+  "kink": [
     ":Opening Ceremony",
     "idori-waza-unarmed:Ryote-dori",
     "idori-waza-unarmed:Tsukkake",
@@ -133,7 +135,7 @@
     "tachi-waza-armed:Kiri-oroshi",
     ":Closing Ceremony"
   ],
-  "kodomo1": [
+  "ko1": [
     ":Opening Ceremony",
     "ukemi:Mae-mawari-ukemi Horse To Feet",
     "ashi-waza:Uchi-mata Fixed",
@@ -147,7 +149,7 @@
     "osaekomi-waza:Kami-shiho-gatame Transition",
     ":Closing Ceremony"
   ],
-  "kodomo2": [
+  "ko2": [
     ":Opening Ceremony",
     "ukemi:Mae-ukemi Stand",
     "ukemi:Mae-mawari-ukemi Walk To Feet",
@@ -161,7 +163,7 @@
     "osaekomi-waza:Kata-gatame Transition",
     ":Closing Ceremony"
   ],
-  "kodomo3": [
+  "ko3": [
     ":Opening Ceremony",
     "ukemi:Mae-ukemi Knees to Feet",
     "ukemi:Mae-mawari-ukemi Walk To Feet",
@@ -173,7 +175,7 @@
     "osaekomi-waza:Sasae-tsurikomi-ashi to Kesa Transition",
     ":Closing Ceremony"
   ],
-  "kodomo4": [
+  "ko4": [
     ":Opening Ceremony",
     "ukemi:Ushiro-ukemi Walking",
     "ukemi:Yoko-ukemi Sliding",
@@ -186,7 +188,7 @@
     "koshi-waza:O-goshi Lift/Step-Over",
     ":Closing Ceremony"
   ],
-  "kodomo5": [
+  "ko5": [
     ":Opening Ceremony",
     "ukemi:Ushiro-ukemi Stand to Feet",
     "ukemi:Yoko-ukemi Stand to Feet",
@@ -198,7 +200,7 @@
     "koshi-waza:Uki-goshi Step-Over",
     ":Closing Ceremony"
   ],
-  "kodomo6": [
+  "ko6": [
     ":Opening Ceremony",
     "ukemi:Ushiro-ukemi Sit to Sit",
     "ukemi:Ushiro-ukemi Grip to Squat",
@@ -212,7 +214,7 @@
     "te-waza:Tai-otoshi Knee",
     ":Closing Ceremony"
   ],
-  "kodomo7": [
+  "ko7": [
     ":Opening Ceremony",
     "ukemi:Ushiro-ukemi Flat",
     "ukemi:Ushiro-ukemi Sit to Sit",
@@ -224,6 +226,40 @@
     "shintai-dosa:Tsugi-ashi Side",
     "te-waza:Mae-sabaki Knees Throwing",
     "te-waza:Ushiro-sabaki Knee Throwing",
+    ":Closing Ceremony"
+  ],
+  "konk": [
+    ":Opening Ceremony",
+    "Omote:Tai",
+    "Omote:Yume-no-uchi",
+    "Omote:Ryoku-hi",
+    "Omote:Mizu-guruma",
+    "Omote:Mizu-nagare",
+    "Omote:Hiki-otoshi",
+    "Omote:Ko-daore",
+    "Omote:Uchi-kudaki",
+    "Omote:Tani-otoshi",
+    "Omote:Kuruma-daore",
+    "Omote:Shikoro-dori",
+    "Omote:Shikoro-gaeshi",
+    "Omote:Yu-dachi",
+    "Omote:Taki-otoshi",
+    "Ura:Mi-kudaki",
+    "Ura:Kuruma-gaeshi",
+    "Ura:Mizu-iri",
+    "Ura:Ryu-setsu",
+    "Ura:Saka-otoshi",
+    "Ura:Yuki-ore",
+    "Ura:Iwa-nami",
+    ":Closing Ceremony"
+  ],
+  "ink": [
+    ":Opening Ceremony",
+    ":Ippon-me",
+    ":Nihon-me",
+    ":Sanbon-me",
+    ":Yonhon-me",
+    ":Gohon-me",
     ":Closing Ceremony"
   ]
 }
