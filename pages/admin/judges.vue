@@ -9,14 +9,50 @@
       </template>
       <PrimeColumn field="id" :header="$t('labels.id')" class="w-10"></PrimeColumn>
       <PrimeColumn field="name" :header="$t('labels.name')"></PrimeColumn>
-      <PrimeColumn field="rank" :header="$t('labels.rank')" class="w-32 hidden md:table-cell">
-        <template #body="{ data }">
-          {{ getLevelName(data.rank) }}
-        </template>
-      </PrimeColumn>
       <PrimeColumn :header="$t('labels.region')" class="w-48 hidden lg:table-cell">
         <template #body="{ data }">
           {{ getProvinceName(data.region) }}
+        </template>
+      </PrimeColumn>
+      <PrimeColumn field="rank" :header="$t('labels.rank')" class="w-32 hidden md:table-cell">
+        <template #body="{ data }">
+          {{ getLevelName(_getHighestLevel('', [data.nnk, data.knk, data.jnk, data.kgj, data.kink, data.konk,
+          data.ink])) }}
+        </template>
+      </PrimeColumn>
+      <PrimeColumn field="nnk" :header="getKataName('nnk')" class="w-32 hidden md:table-cell">
+        <template #body="{ data }">
+          {{ getLevelName(data.nnk || '') }}
+        </template>
+      </PrimeColumn>
+      <PrimeColumn field="knk" :header="getKataName('knk')" class="w-32 hidden md:table-cell">
+        <template #body="{ data }">
+          {{ getLevelName(data.knk || '') }}
+        </template>
+      </PrimeColumn>
+      <PrimeColumn field="jnk" :header="getKataName('jnk')" class="w-32 hidden md:table-cell">
+        <template #body="{ data }">
+          {{ getLevelName(data.jnk || '') }}
+        </template>
+      </PrimeColumn>
+      <PrimeColumn field="kgj" :header="getKataName('kgj')" class="w-32 hidden md:table-cell">
+        <template #body="{ data }">
+          {{ getLevelName(data.kgj || '') }}
+        </template>
+      </PrimeColumn>
+      <PrimeColumn field="kink" :header="getKataName('kink')" class="w-32 hidden md:table-cell">
+        <template #body="{ data }">
+          {{ getLevelName(data.kink || '') }}
+        </template>
+      </PrimeColumn>
+      <PrimeColumn field="konk" :header="getKataName('konk')" class="w-32 hidden md:table-cell">
+        <template #body="{ data }">
+          {{ getLevelName(data.konk || '') }}
+        </template>
+      </PrimeColumn>
+      <PrimeColumn field="ink" :header="getKataName('ink')" class="w-32 hidden md:table-cell">
+        <template #body="{ data }">
+          {{ getLevelName(data.ink || '') }}
         </template>
       </PrimeColumn>
       <PrimeColumn frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
@@ -44,13 +80,14 @@
 <script setup>
 import { clone, pickBy } from 'lodash-es';
 
-import { getLevelName, getProvinceName, handleServerError } from '~/src/utils';
+import { LEVEL_MAP, getKataName, getLevelName, getProvinceName, handleServerError } from '~/src/utils';
 
 useHead({
   title: 'Judges - Kata Admin',
 });
 
 const DEFAULT = { name: '', region: 'on', rank: 'n' };
+const RANKS = Object.keys(LEVEL_MAP);
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 
@@ -135,11 +172,26 @@ function _filterUpdate(value, key, original) {
   if (key === '_etag') {
     return true;
   }
-  if (["name", "rank", "region"].includes(key)) {
+  if (["name", "region", 'nnk', 'knk', 'jnk', 'kgj', 'kink', 'konk', 'ink'].includes(key)) {
     if (original[key] !== value) {
       return true;
     }
   }
   return false;
+}
+
+function _getHighestLevel(rank, individualRanks) {
+  let highest = RANKS.indexOf(rank || '');
+  individualRanks.forEach((rank) => {
+    const individual = RANKS.indexOf(rank);
+    if (individual > highest) {
+      highest = individual;
+    }
+  });
+  if (highest > 0) {
+    return RANKS[highest];
+  } else {
+    return '';
+  }
 }
 </script>
