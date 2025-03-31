@@ -54,3 +54,35 @@ The app will create tables with a `-dev` suffix inside the `judo-kata-judge` dat
 
 The deployment is published from the `main` branch using Github actions as an Azure Web App. Manual deployment
 instructions will be added at a later time.
+
+## Schemas
+
+### Judge
+
+```json
+{
+  "id": "string",
+  "name": "string",
+  "region": "string",
+  "rank": "string",
+  "nnk": "string",
+  "knk": "string",
+  "jnk": "string",
+  "kgj": "string",
+  "kink": "string",
+  "konk": "string",
+}
+```
+
+### JudgeDetails (Future)
+
+```json
+{
+  "id": "string", //Judge ID
+  "kata": "string", // nnk, knk, jnk, etc.
+  "rank": "string", // Nat, PJC, IJF, etc.
+  "received": "date",
+  "lastUpdated": "date",
+  "lastJudged": "date",
+}
+```
