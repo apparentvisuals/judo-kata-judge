@@ -120,7 +120,7 @@ const status = computed(() => {
 });
 
 const canSubmit = computed(() => {
-  return scores.value.points.every((score) => score.value != null && score.value !== 10);;
+  return scores.value.points.every((score) => score.value != null && score.value !== 10);
 });
 const hasMajor = computed(() => calculateHasMajor(scores.value.points));
 
