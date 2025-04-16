@@ -69,18 +69,18 @@
       </PrimeRow>
     </PrimeColumnGroup>
   </PrimeDataTable>
-  <Prompt name="delete_j_modal" @submit="remove" text="Yes">
-    <span>Delete judge {{ deleteIndex }} scores?</span>
-  </Prompt>
+  <PrimeConfirmPopup />
 </template>
 
 <script setup>
 import { calculateMoveTotal, getKataName, getScoreCounts, groupedMoveList } from '~/src/utils';
 
+const confirm = useConfirm();
+const { t } = useI18n();
+
 const props = defineProps(['match', 'group', 'scores', 'disabled']);
 const emit = defineEmits(['remove']);
 
-const deleteIndex = ref(-1);
 const moves = computed(() => groupedMoveList(props.match.kata));
 const numberOfResults = computed(() => props.match.numberOfJudges);
 
@@ -109,12 +109,14 @@ const scoreTotals = computed(() => {
 });
 
 function showDelete(index) {
-  deleteIndex.value = index;
-  delete_j_modal.showModal();
-}
-
-async function remove() {
-  emit('remove', deleteIndex.value);
+  confirm.require({
+    message: `Delete judge ${index} scores?`,
+    acceptClass: '!bg-red-500 dark:!bg-red-40 !border-red-500 dark:!border-red-400 !ring-red-500 dark:!ring-red-400 hover:!bg-red-600 dark:hover:!bg-red-300 hover:!border-red-600 dark:hover:!border-red-300 focus:!ring-red-400/50 dark:!focus:ring-red-300/50',
+    accept: () => {
+      emit('remove', index);
+    },
+    reject: () => { },
+  });
 }
 
 </script>

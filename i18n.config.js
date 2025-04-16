@@ -53,6 +53,10 @@ export default defineI18nConfig(() => ({
         deleteJudge: 'Delete this judge?',
         deleteAthlete: 'Delete this athlete?',
         deleteTournament: 'Delete this tournament?',
+        deleteMat: 'Delete this mat?',
+        deleteGroup: 'Delete this group?',
+        deleteMatch: 'Delete this match?',
+        deleteScore: 'Delete this score?',
       },
       public: {
         button: {

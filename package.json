@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "NODE_ENV=production nuxt build",
+    "build:cf": "NITRO_PRESET=cloudflare_pages NODE_ENV=production nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -38,7 +39,9 @@
     "@vueuse/integrations": "^10.11.1",
     "@vueuse/nuxt": "^10.11.1",
     "nuxt-headlessui": "^1.2.0",
+    "postcss-import": "^16.1.0",
     "primeicons": "^7.0.0",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "tailwindcss-primeui": "^0.6.1"
   }
 }

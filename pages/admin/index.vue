@@ -2,22 +2,22 @@
   <Error :error-string="error" />
   <AdminNav />
   <Container>
-    <PrimeDataTable show-gridlines size="small" :value="tournaments">
+    <PrimeDataTable resizableColumns columnResizeMode="fit" scrollable scrollHeight="flex" :value="tournaments">
       <template #header>
         <PrimeButton icon="pi pi-plus" :label="$t('buttons.createTournament')" :title="$t('buttons.createTournament')"
-          @click.prevent="showAdd" :disabled="inAction" />
+          @click.prevent="addVisible = true" :disabled="inAction" />
       </template>
       <PrimeColumn field="name" :header="$t('labels.name')">
         <template #body="{ data }">
           <NuxtLink class="link" :to="`/admin/t/${data.id}`">{{ data.name }}</NuxtLink>
         </template>
       </PrimeColumn>
-      <PrimeColumn :header="$t('labels.region')" class="w-52 hidden lg:table-cell">
+      <PrimeColumn field="region" :header="$t('labels.region')">
         <template #body="{ data }">
           {{ getOrganization(data.org) }}
         </template>
       </PrimeColumn>
-      <PrimeColumn frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
+      <PrimeColumn field="actions" frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
         <template #body="{ data, index }">
           <div class="flex gap-2">
             <PrimeButton icon="pi pi-check" severity="secondary" title="Complete"
@@ -32,17 +32,17 @@
       </PrimeColumn>
     </PrimeDataTable>
   </Container>
-  <PrimeConfirmPopup></PrimeConfirmPopup>
-  <Prompt name="add_t_modal" @submit="add" :disabled="inAction" text="Add">
-    <TournamentInputs :tournament="newTournament" :org="org" />
-  </Prompt>
-  <Prompt name="edit_t_modal" @submit="update" :disabled="inAction" text="Update">
-    <TournamentInputs :tournament="toUpdate" :org="org" />
-  </Prompt>
+  <PrimeConfirmPopup />
+  <PrimeDialog v-model:visible="addVisible" modal header="Add Tournament" class="w-full md:w-1/2 lg:w-1/3">
+    <TournamentInputs :org="org" @cancel="addVisible = false" @submit="add" />
+  </PrimeDialog>
+  <PrimeDialog v-model:visible="updateVisible" modal header="Update Tournament" class="w-full md:w-1/2 lg:w-1/3">
+    <TournamentInputs :tournament="toUpdate" :org="org" @cancel="updateVisible = false" @submit="update" />
+  </PrimeDialog>
 </template>
 
 <script setup>
-import { clone, pickBy } from 'lodash-es';
+import { pickBy } from 'lodash-es';
 
 import { getOrganization, handleServerError } from '~/src/utils';
 
@@ -50,17 +50,16 @@ useHead({
   title: 'Tournaments - Kata Admin',
 });
 
-const DEFAULT = { name: '', org: 'jc', showJudgeTotals: true };
-
 const cookie = useCookie('jkj', { default: () => ({}) });
 const confirm = useConfirm();
 const { t } = useI18n();
 
 const error = ref('');
 const inAction = ref(false);
-const newTournament = ref(clone(DEFAULT));
 const updateIndex = ref(-1);
-const toUpdate = ref(clone(DEFAULT));
+const toUpdate = ref();
+const addVisible = ref(false);
+const updateVisible = ref(false);
 
 const headers = { authorization: `Bearer ${cookie.value.adminCode}` };
 const org = computed(() => cookie.value.org);
@@ -70,21 +69,14 @@ if (err.value) {
   error.value = handleServerError(err);
 }
 
-function showAdd() {
-  add_t_modal.showModal();
-}
-
-async function add() {
+async function add(data) {
   try {
     inAction.value = true;
-    const body = newTournament.value;
-    if (org.value) {
-      body.org = org.value;
-    }
+    const body = data;
     const tournament = await $fetch(`/api/tournaments`, { method: 'POST', body, headers });
     tournaments.value.push(tournament);
-    newTournament.value = clone(DEFAULT);
     error.value = '';
+    addVisible.value = false;
   } catch (err) {
     error.value = handleServerError(err);
   } finally {
@@ -94,20 +86,22 @@ async function add() {
 
 function showUpdate(index) {
   updateIndex.value = index;
-  toUpdate.value = clone(tournaments.value[index]);
-  edit_t_modal.showModal();
+  toUpdate.value = tournaments.value[index];
+  updateVisible.value = true;
 }
 
-async function update() {
+async function update(data) {
   try {
     const id = toUpdate.value.id;
     const original = tournaments.value[updateIndex.value];
-    const body = pickBy(toUpdate.value, (value, key) => _filterUpdate(value, key, original));
+    const body = pickBy(data, (value, key) => _filterUpdate(value, key, original));
+    body._etag = original._etag;
     const tournament = await $fetch(`/api/tournaments/${id}`, { method: 'POST', body, headers });
     Object.assign(original, tournament);
     updateIndex.value = -1;
-    toUpdate.value = clone(DEFAULT);
+    toUpdate.value = undefined;
     error.value = '';
+    updateVisible.value = false;
   } catch (err) {
     error.value = handleServerError(err);
   } finally {
@@ -120,8 +114,8 @@ async function remove2(event, index) {
     target: event.currentTarget,
     message: t('prompts.deleteTournament'),
     acceptClass: '!bg-red-500 dark:!bg-red-40 !border-red-500 dark:!border-red-400 !ring-red-500 dark:!ring-red-400 hover:!bg-red-600 dark:hover:!bg-red-300 hover:!border-red-600 dark:hover:!border-red-300 focus:!ring-red-400/50 dark:!focus:ring-red-300/50',
-    accept: () => {
-      remove(index);
+    accept: async () => {
+      await remove(index);
     },
     reject: () => { },
   });

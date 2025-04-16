@@ -1,17 +1,13 @@
 <template>
-  <div class="w-full p-1 xs:w-80 max-h-96">
-    <form valid="isValid" @submit.prevent="emit('submit')">
-      <div class="form-control w-full">
-        <label class="label" for="code">
-          <span class="label-text">{{ title }}</span>
-        </label>
-        <input id="code" name="code" type="text" class="input input-bordered" v-model="code" />
-        <label class="label">
-          <span for="code" class="label-text-alt text-error" v-if="error">{{ error }}</span>
-        </label>
-      </div>
-      <button type="submit" class="btn btn-primary mt-4">Submit</button>
-    </form>
+  <div class="w-full flex items-center justify-center">
+    <PrimeForm valid="isValid" @submit="emit('submit')" class="flex flex-col gap-4">
+      <PrimeMessage severity="error" icon="pi pi-times-circle" v-if="error">{{ error }}</PrimeMessage>
+      <PrimeIftaLabel>
+        <PrimeInputText id="code" name="code" v-model="code" />
+        <label for="code">{{ title }}</label>
+      </PrimeIftaLabel>
+      <PrimeButton type="submit" :label="$t('buttons.submit')" />
+    </PrimeForm>
   </div>
 </template>
 

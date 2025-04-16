@@ -1,61 +1,77 @@
 <template>
-  <div class="form-control w-full">
-    <label class="label" for="group-name">
-      <span class="label-text">Name</span>
-    </label>
-    <input id="group-name" type="text" class="input input-bordered" v-model="group.name" autocomplete="off" />
-  </div>
-  <div class="form-control w-full">
-    <label class="label" for="group-kata">
-      <span class="label-text">Kata</span>
-    </label>
-    <select id="group-kata" class="select select-bordered" v-model="group.kata" required>
-      <option v-for="kata of Object.keys(KATA_MAP)" :value="kata">{{ getKataName(kata) }}</option>
-    </select>
-  </div>
-  <div class="form-control w-full">
-    <label class="label" for="group-numberOfJudges">
-      <span class="label-text">Number of Judges</span>
-    </label>
-    <input id="group-numberOfJudges" type="range" min="1" max="5" step="1" class="range range-primary"
-      v-model.number="group.numberOfJudges" />
-    <div class="w-full flex justify-between text-xs px-2">
-      <span>1</span>
-      <span>2</span>
-      <span>3</span>
-      <span>4</span>
-      <span>5</span>
+  <PrimeForm v-slot="$form" :initial-values :resolver validate-on-mount @submit="onSubmit" class="flex flex-col gap-4">
+    <PrimeIftaLabel>
+      <PrimeInputText id="group-name" name="name" fluid />
+      <label class="label" for="group-name">Name</label>
+    </PrimeIftaLabel>
+    <PrimeIftaLabel>
+      <PrimeSelect input-id="group-kata" name="kata" :options="objectToPairs(KATA_MAP)" option-label="value"
+        option-value="key" fluid />
+      <label for="group-kata">Kata</label>
+    </PrimeIftaLabel>
+    <PrimeIftaLabel>
+      <PrimeInputNumber input-id="group-numberOfJudges" name="numberOfJudges" :min="1" :max="5" :step="1" fluid
+        show-buttons />
+      <label for="group-numberOfJudges">Number of Judges</label>
+    </PrimeIftaLabel>
+    <PrimeIftaLabel>
+      <PrimeDatePicker input-id="startTime" name="startTime" fluid timeOnly hourFormat="24" />
+      <label for="startTime">Start Time</label>
+    </PrimeIftaLabel>
+    <div class="flex items-center gap-2">
+      <PrimeCheckbox input-id="group-disableDivideByHalf" name="disableDivideByHalf" binary />
+      <label for="group-disableDivideByHalf">Don't divide total by half on forgotten techniques?</label>
     </div>
-  </div>
-  <div class="form-control w-full">
-    <label class="label" for="group-startTime">
-      <span class="label-text">Start Time</span>
-    </label>
-    <input id="group-startTime" type="text" class="input input-bordered join-item" placeholder="09:00"
-      v-model="group.startTime" />
-  </div>
-  <div class="form-control">
-    <label class="label" for="disableDivideByHalf">
-      <span class="label-text">Don't divide total by half on forgotten techniques?</span>
-      <input id="disableDivideByHalf" type="checkbox" v-model="group.disableDivideByHalf" />
-    </label>
-  </div>
-  <div class="form-control">
-    <label class="label" for="disableForgotten">
-      <span class="label-text">Don't allow forgotten techniques?</span>
-      <input id="disableForgotten" type="checkbox" v-model="group.disableForgotten" />
-    </label>
-  </div>
-  <div class="form-control">
-    <label class="label" for="disableMajor">
-      <span class="label-text">Don't allow major/big mistakes?</span>
-      <input id="disableMajor" type="checkbox" v-model="group.disableMajor" />
-    </label>
-  </div>
+    <div class="flex items-center gap-2">
+      <PrimeCheckbox input-id="disableForgotten" name="disableForgotten" binary />
+      <label for="disableForgotten">Don't allow forgotten techniques?</label>
+    </div>
+    <div class="flex items-center gap-2">
+      <PrimeCheckbox input-id="disableMajor" name="disableMajor" binary />
+      <label for="disableMajor">Don't allow major/big mistakes?</label>
+    </div>
+    <div class="flex justify-end gap-2">
+      <PrimeButton severity="secondary" @click="onCancel">Cancel</PrimeButton>
+      <PrimeButton raised type="submit" :disabled="!$form.valid">Submit</PrimeButton>
+    </div>
+  </PrimeForm>
 </template>
 
 <script setup>
-import { KATA_MAP, getKataName } from '~/src/utils';
+import { Form as PrimeForm } from '@primevue/forms';
 
-const props = defineProps(['group']);
+import { KATA_MAP, objectToPairs } from '~/src/utils';
+
+const prop = defineProps(['group']);
+const emit = defineEmits(['submit', 'cancel']);
+
+const initialValues = reactive({
+  name: prop.group && prop.group.name || '',
+  kata: prop.group && prop.group.kata || '',
+  numberOfJudges: prop.group && prop.group.numberOfJudges || 3,
+  startTime: prop.group && prop.group.startTime || '',
+  disableDivideByHalf: prop.group && prop.group.disableDivideByHalf || false,
+  disableForgotten: prop.group && prop.group.disableForgotten || false,
+  disableMajor: prop.group && prop.group.disableMajor || false,
+});
+
+const resolver = ({ values }) => {
+  const errors = {};
+  if (!values.kata) {
+    errors.kata = [{ message: 'Kata is required' }]
+  }
+  if (!values.numberOfJudges) {
+    errors.numberOfJudges = [{ message: 'Number of judges is required' }]
+  }
+  return { values, errors };
+};
+
+const onSubmit = ({ valid, values }) => {
+  if (valid) {
+    emit('submit', values);
+  }
+};
+const onCancel = () => {
+  emit('cancel');
+}
 </script>

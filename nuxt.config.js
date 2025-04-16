@@ -1,6 +1,4 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
-import path from 'path';
-
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
@@ -28,13 +26,11 @@ export default defineNuxtConfig({
 
   primevue: {
     options: {
-      unstyled: true,
-      ripple: true
+      theme: 'none',
     },
     components: {
       prefix: 'Prime'
     },
-    importPT: { from: path.resolve(__dirname, './presets/wind/') },
   },
 
   headlessui: {
@@ -63,9 +59,18 @@ export default defineNuxtConfig({
   },
 
   css: [
+    '~/assets/css/tailwind.css',
     '~/assets/css/base.css',
     '/node_modules/primeicons/primeicons.css'
   ],
 
-  compatibilityDate: '2024-10-04'
-})
+  postcss: {
+    plugins: {
+      'postcss-import': {},
+      'tailwindcss': {},
+      'autoprefixer': {},
+    },
+  },
+
+  compatibilityDate: '2025-04-01',
+});

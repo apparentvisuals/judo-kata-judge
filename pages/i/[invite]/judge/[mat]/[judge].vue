@@ -1,6 +1,6 @@
 <template>
   <div v-if="status"
-    class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center  text-surface-800 dark:text-surface-200">
+    class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center text-surface-800 dark:text-surface-200">
     <div class="text-center">
       <span class="text-3xl font-bold">{{ status }}</span>
     </div>

@@ -92,7 +92,10 @@ export function getProvinceName(code) {
 }
 
 export function getLevelName(code) {
-  return LEVEL_MAP[code] || '';
+  if (code) {
+    return LEVEL_MAP[code] || '';
+  }
+  return '';
 }
 
 export function getRankName(code) {
@@ -211,4 +214,10 @@ export function getScoreCounts(scores) {
     }
   });
   return totals;
+}
+
+export function objectToPairs(obj) {
+  return Object.entries(obj).map(([key, value]) => {
+    return { key, value };
+  });
 }

@@ -1,7 +1,7 @@
 <template>
-  <div class="join join-vertical">
+  <div class="flex flex-col items-center">
     <img :src="qr" :alt="`${title} link QR code`" class="w-36 max-w-4xl join-item" />
-    <NuxtLink :to="params ? `${url}?${params}` : url" target="_blank" class="btn btn-sm btn-primary w-full join-item">
+    <NuxtLink :to="params ? `${url}?${params}` : url" target="_blank" class="p-button">
       {{ title }}
     </NuxtLink>
   </div>

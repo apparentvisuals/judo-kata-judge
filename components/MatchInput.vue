@@ -1,88 +1,86 @@
 <template>
-  <div class="form-control w-full">
-    <label class="label" for="tori">
-      <span class="label-text">Tori</span>
-    </label>
-    <input id="tori" type="text" class="input input-bordered" v-model="match.tori" />
-  </div>
-  <div class="form-control w-full" v-show="match.tori && matchedTori.length > 0">
-    <label class="label" for="suggestedTori">
-      <span class="label-text">Athlete</span>
-    </label>
-    <select id="suggestedTori" class="select select-bordered" v-model="foundTori">
-      <option v-for="tori of matchedTori" :value="tori">{{ tori.name }} ({{ getProvinceName(tori.region) }})</option>
-    </select>
-  </div>
-  <div class="form-control w-full ">
-    <label class="label" for="uke">
-      <span class="label-text">Uke</span>
-    </label>
-    <input id="uke" type="text" class="input input-bordered" v-model=match.uke />
-  </div>
-  <div class="form-control w-full" v-show="match.uke && matchedUke.length > 0">
-    <label class="label" for="suggestedUke">
-      <span class="label-text">Athlete</span>
-    </label>
-    <select id="suggestedUke" class="select select-bordered" v-model="foundUke">
-      <option v-for="uke of matchedUke" :value="uke">{{ uke.name }} ({{ getProvinceName(uke.region) }})</option>
-    </select>
-  </div>
+  <PrimeForm v-slot="$form" :initial-values :resolver validate-on-mount @submit="onSubmit" class="flex flex-col gap-4">
+    <PrimeIftaLabel>
+      <PrimeAutoComplete input-id="tori" name="tori" :suggestions="matchedTori" option-label="name"
+        @complete="searchTori" fluid />
+      <label for="tori">Tori</label>
+    </PrimeIftaLabel>
+    <PrimeIftaLabel>
+      <PrimeAutoComplete input-id="uke" name="uke" :suggestions="matchedUke" option-label="name" @complete="searchUke"
+        fluid />
+      <label for="uke">Uke</label>
+    </PrimeIftaLabel>
+    <div class="flex justify-end gap-2">
+      <PrimeButton severity="secondary" @click="onCancel">Cancel</PrimeButton>
+      <PrimeButton raised type="submit" :disabled="!$form.valid">Submit</PrimeButton>
+    </div>
+  </PrimeForm>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { getProvinceName } from '~/src/utils';
+import { Form as PrimeForm } from '@primevue/forms';
 
-const props = defineProps(['match', 'athletes']);
+const prop = defineProps(['match', 'athletes']);
+const emit = defineEmits(['submit', 'cancel']);
+
 const matchedTori = ref([]);
 const matchedUke = ref([]);
-const foundTori = ref(undefined);
-const foundUke = ref(undefined);
 
-watch(() => props.match, async (newMatch) => {
-  if (newMatch.tori) {
-    let matched = [];
-    if (newMatch.tori.length > 4) {
-      matched = props.athletes.filter((athlete) => athlete.name.toLowerCase().search(newMatch.tori.toLowerCase()) != -1);
-    }
-    matchedTori.value = matched;
-    if (matched.length === 0) {
-      foundTori.value = undefined;
-    }
-    if (newMatch.toriId) {
-      foundTori.value = matched.find((athlete) => athlete.id === newMatch.toriId);
-    }
-  }
-  if (newMatch.uke) {
-    let matched = [];
-    if (newMatch.uke.length > 4) {
-      matched = props.athletes.filter((athlete) => athlete.name.toLowerCase().search(newMatch.uke.toLowerCase()) != -1);
-    }
-    matchedUke.value = matched;
-    if (matched.length === 0) {
-      foundUke.value = undefined;
-    }
-    if (newMatch.ukeId) {
-      foundUke.value = matched.find((athlete) => athlete.id === newMatch.ukeId);
-    }
-  }
+const initialValues = reactive({
+  tori: prop.match && prop.match.tori || '',
+  toriId: prop.match && prop.match.toriId || undefined,
+  uke: prop.match && prop.match.uke || '',
+  ukeId: prop.match && prop.match.ukeId || undefined,
 });
 
-watch(foundTori, (newValue) => {
-  if (newValue && newValue.name) {
-    props.match.tori = newValue.name;
-    props.match.toriId = newValue.id;
-  } else {
-    props.match.toriId = undefined;
+const resolver = ({ values }) => {
+  const errors = {};
+  if (!values.tori) {
+    errors.tori = [{ message: 'Tori is required' }];
   }
-});
+  if (!values.uke) {
+    errors.uke = [{ message: 'Uke is required' }];
+  }
+  return { values, errors };
+};
 
-watch(foundUke, (newValue) => {
-  if (newValue && newValue.name) {
-    props.match.uke = newValue.name;
-    props.match.ukeId = newValue.id;
+const searchTori = async (event) => {
+  setTimeout(() => {
+    if (event.query.length > 2) {
+      matchedTori.value = prop.athletes.filter((athlete) => athlete.name.toLowerCase().search(event.query.toLowerCase()) != -1);
+    } else {
+      matchedTori.value = [...prop.athletes];
+    }
+  }, 250);
+};
+
+const searchUke = async (event) => {
+  if (event.query.length > 4) {
+    matchedUke.value = prop.athletes.filter((athlete) => athlete.name.toLowerCase().search(event.query.toLowerCase()) != -1);
   } else {
-    props.match.ukeId = undefined;
+    matchedUke.value = [];
   }
-})
+};
+
+const onSubmit = ({ valid, values }) => {
+  if (valid) {
+    if (typeof values.tori === 'object') {
+      values.toriId = values.tori.id;
+      values.tori = values.tori.name;
+    } else {
+      values.toriId = undefined;
+    }
+    if (typeof values.uke === 'object') {
+      values.ukeId = values.uke.id;
+      values.uke = values.uke.name;
+    } else {
+      values.ukeId = undefined;
+    }
+    emit('submit', values);
+  }
+};
+
+const onCancel = () => {
+  emit('cancel');
+};
 </script>

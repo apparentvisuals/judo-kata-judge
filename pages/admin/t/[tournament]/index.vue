@@ -21,12 +21,11 @@
         </template>
         <template #end>
           <PrimeButton icon="pi pi-copy" :label="$t('buttons.makeCopy')" :title="$t('buttons.makeCopy')"
-            @click.prevent="cloneT" class="mr-2"></PrimeButton>
+            @click.prevent="cloneTournament" class="mr-2" />
           <PrimeButton severity="danger" v-if="isReordering" :label="$t('buttons.cancel')" @click.prevent="cancel"
-            :aria-label="$t('buttons.cancel')" class="mr-2"></PrimeButton>
+            :aria-label="$t('buttons.cancel')" class="mr-2" />
           <PrimeButton icon="pi pi-sort" :label="isReordering ? $t('buttons.save') : $t('buttons.reorder')"
-            @click.prevent="save" :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')">
-          </PrimeButton>
+            @click.prevent="save" :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')" />
         </template>
       </PrimeToolbar>
       <PrimePanel v-for="(mat, matIndex) in tournament.mats" toggleable :pt="{ content: '!p-2' }"
@@ -114,60 +113,52 @@
         </draggable>
       </PrimePanel>
     </Container>
-    <Prompt name="delete_mat_modal" @submit="deleteMat" text="Yes">
-      <span>Delete this mat?</span>
-    </Prompt>
-    <Prompt name="add_group_modal" @submit="addGroup" :disabled="inAction" text="Add">
-      <GroupInput :group="newGroup" />
-    </Prompt>
-    <Prompt name="edit_group_modal" @submit="updateGroup" :disabled="inAction" text="update">
-      <GroupInput :group="groupToUpdate" />
-    </Prompt>
-    <Prompt name="delete_group_modal" @submit="deleteGroup" text="Yes">
-      <span>Delete this group?</span>
-    </Prompt>
-    <Prompt name="add_match_modal" @submit="addMatch" :disabled="inAction" text="Add">
-      <MatchInput :match="newMatch" :athletes="athletes" />
-    </Prompt>
-    <Prompt name="edit_match_modal" @submit="updateMatch" :disabled="inAction" text="Update">
-      <MatchInput :match="matchToUpdate" :athletes="athletes" />
-    </Prompt>
-    <Prompt name="delete_match_modal" @submit="deleteMatch" text="Yes">
-      <span>Delete this match?</span>
-    </Prompt>
-    <Prompt name="view_invite_modal" text="Close" :cancellable="false">
-      <div class="flex flex-col items-center">
-        <QR :path="invitePath" :title="$t('buttons.inviteLink')" />
-      </div>
-    </Prompt>
+    <PrimeConfirmPopup />
+    <PrimeDialog v-model:visible="addGroupVisible" modal header="Add Group" class="w-full md:w-1/2 lg:w-1/3">
+      <GroupInput @cancel="addGroupVisible = false" @submit="addGroup" />
+    </PrimeDialog>
+    <PrimeDialog v-model:visible="updateGroupVisible" modal header="Update Group" class="w-full md:w-1/2 lg:w-1/3">
+      <GroupInput :group="groupToUpdate" @cancel="updateGroupVisible = false" @submit="updateGroup" />
+    </PrimeDialog>
+    <PrimeDialog v-model:visible="addMatchVisible" modal header="Add Match" class="w-full md:w-1/2 lg:w-1/3">
+      <MatchInput :athletes="athletes" @cancel="addMatchVisible = false" @submit="addMatch" />
+    </PrimeDialog>
+    <PrimeDialog v-model:visible="updateMatchVisible" modal header="Update Match" class="w-full md:w-1/2 lg:w-1/3">
+      <MatchInput :match="matchToUpdate" :athletes="athletes" @cancel="updateMatchVisible = false"
+        @submit="updateMatch" />
+    </PrimeDialog>
+    <PrimeDialog v-model:visible="inviteVisible" modal header="Invitation" class="w-full md:w-[14rem]">
+      <QR :path="invitePath" :title="$t('buttons.inviteLink')" />
+    </PrimeDialog>
   </ClientOnly>
 </template>
 
 <script setup>
-import { clone, omit } from 'lodash-es';
-import { ArrowsUpDownIcon, XMarkIcon, ArrowLeftIcon, PencilIcon, PlusIcon, ArrowPathIcon, DocumentTextIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
+import { ArrowsUpDownIcon } from '@heroicons/vue/24/outline';
 
 import { getGroupName, handleServerError, shuffle } from '~/src/utils';
 
-const DEFAULT_GROUP = { name: '', kata: '', numberOfJudges: 5, startTime: '' };
-const DEFAULT_MATCH = { tori: '', uke: '' };
-
 const route = useRoute();
-const tournamentId = computed(() => route.params.tournament);
-
 const cookie = useCookie('jkj', { default: () => ({}) });
-const headers = computed(() => ({ authorization: `Bearer ${cookie.value.adminCode}` }));
+const confirm = useConfirm();
+const { t } = useI18n();
 
 const error = ref('');
 const inAction = ref(false);
-const newGroup = ref(clone(DEFAULT_GROUP));
-const newMatch = ref(clone(DEFAULT_MATCH));
 const matToEdit = ref();
 const groupToEdit = ref();
 const matchToEdit = ref();
-const groupToUpdate = ref(clone(DEFAULT_GROUP));
-const matchToUpdate = ref(clone(DEFAULT_MATCH));
+const groupToUpdate = ref();
+const matchToUpdate = ref();
 const isReordering = ref(false);
+const addGroupVisible = ref(false);
+const updateGroupVisible = ref(false);
+const addMatchVisible = ref(false);
+const updateMatchVisible = ref(false);
+const inviteVisible = ref(false);
+
+const tournamentId = computed(() => route.params.tournament);
+const headers = computed(() => ({ authorization: `Bearer ${cookie.value.adminCode}` }));
 
 const invite = computed(() => {
   if (tournament.value.invites) {
@@ -195,23 +186,24 @@ async function createInvite() {
     newInviteCode[response.id] = {};
     tournament.value.invites = Object.assign({}, tournament.value.invites, newInviteCode);
   }
-  view_invite_modal.showModal();
+  inviteVisible.value = true;
 }
 
-async function cloneT() {
+async function cloneTournament() {
   const response = await $fetch(`/api/tournaments/${tournamentId.value}/clone`, { headers: headers.value });
   await navigateTo(`/admin/t/${response.id}`, { replace: true });
 }
 
-async function showDeleteMat(matIndex) {
-  matToEdit.value = matIndex;
-  delete_mat_modal.showModal();
-}
-
-async function deleteMat() {
-  const mat = matToEdit.value;
-  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}`, { method: 'DELETE', headers: headers.value });
-  tournament.value = response;
+async function showDeleteMat(mat) {
+  confirm.require({
+    message: t('prompts.deleteMat'),
+    acceptClass: '!bg-red-500 dark:!bg-red-40 !border-red-500 dark:!border-red-400 !ring-red-500 dark:!ring-red-400 hover:!bg-red-600 dark:hover:!bg-red-300 hover:!border-red-600 dark:hover:!border-red-300 focus:!ring-red-400/50 dark:!focus:ring-red-300/50',
+    accept: async () => {
+      const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}`, { method: 'DELETE', headers: headers.value });
+      tournament.value = response;
+    },
+    reject: () => { },
+  });
 }
 
 async function cancel() {
@@ -240,43 +232,44 @@ async function save() {
 
 async function showAddGroup(matIndex) {
   matToEdit.value = matIndex;
-  add_group_modal.showModal();
+  addGroupVisible.value = true;
 }
 
-async function addGroup() {
+async function addGroup(data) {
   const mat = matToEdit.value;
-  const body = newGroup.value;
+  const body = data;
   const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
-  newGroup.value.name = '';
+  addGroupVisible.value = false;
 }
 
 async function showUpdateGroup(matIndex, groupIndex, groupValue) {
   matToEdit.value = matIndex;
   groupToEdit.value = groupIndex;
-  groupToUpdate.value = clone(omit(groupValue, 'matches'));
-  edit_group_modal.showModal();
+  groupToUpdate.value = groupValue;
+  updateGroupVisible.value = true;
 }
 
-async function updateGroup() {
+async function updateGroup(data) {
   const mat = matToEdit.value;
   const group = groupToEdit.value;
-  const body = groupToUpdate.value;
+  const body = data;
+  body.id = groupToUpdate.value.id;
   const result = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}`, { method: 'POST', body, headers: headers.value });
   tournament.value = result;
+  updateGroupVisible.value = false;
 }
 
-async function showDeleteGroup(matIndex, groupIndex) {
-  matToEdit.value = matIndex;
-  groupToEdit.value = groupIndex;
-  delete_group_modal.showModal();
-}
-
-async function deleteGroup() {
-  const mat = matToEdit.value;
-  const group = groupToEdit.value;
-  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}`, { method: 'DELETE', headers: headers.value });
-  tournament.value = response;
+async function showDeleteGroup(mat, group) {
+  confirm.require({
+    message: t('prompts.deleteGroup'),
+    acceptClass: '!bg-red-500 dark:!bg-red-40 !border-red-500 dark:!border-red-400 !ring-red-500 dark:!ring-red-400 hover:!bg-red-600 dark:hover:!bg-red-300 hover:!border-red-600 dark:hover:!border-red-300 focus:!ring-red-400/50 dark:!focus:ring-red-300/50',
+    accept: async () => {
+      const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}`, { method: 'DELETE', headers: headers.value });
+      tournament.value = response;
+    },
+    reject: () => { },
+  });
 }
 
 function canRandomize(matIndex, groupIndex) {
@@ -292,49 +285,47 @@ function randomizeGroup(matIndex, groupIndex) {
 async function showAddMatch(matIndex, groupIndex) {
   matToEdit.value = matIndex;
   groupToEdit.value = groupIndex;
-  add_match_modal.showModal();
+  addMatchVisible.value = true;
 }
 
-async function addMatch() {
+async function addMatch(data) {
   const mat = matToEdit.value;
   const group = groupToEdit.value;
-  const body = newMatch.value;
+  const body = data;
   const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}/match`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
-  newMatch.value.tori = '';
-  newMatch.value.uke = '';
+  addMatchVisible.value = false;
 }
 
 async function showUpdateMatch(selectedMat, selectedGroup, selectedMatch, matchValue) {
   matToEdit.value = selectedMat;
   groupToEdit.value = selectedGroup;
   matchToEdit.value = selectedMatch;
-  matchToUpdate.value = clone(omit(matchValue, ['scores']));
-  edit_match_modal.showModal();
+  matchToUpdate.value = matchValue;
+  updateMatchVisible.value = true;
 }
 
-async function updateMatch() {
+async function updateMatch(data) {
   const mat = matToEdit.value;
   const group = groupToEdit.value;
   const match = matchToEdit.value;
-  const body = matchToUpdate.value;
+  const body = data;
+  body.id = matchToUpdate.value.id;
   const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}/match/${match}`, { method: 'POST', body, headers: headers.value });
   tournament.value = response;
+  updateMatchVisible.value = false;
 }
 
-async function showDeleteMatch(selectedMat, selectedGroup, selectedMatch) {
-  matToEdit.value = selectedMat;
-  groupToEdit.value = selectedGroup;
-  matchToEdit.value = selectedMatch;
-  delete_match_modal.showModal();
-}
-
-async function deleteMatch() {
-  const mat = matToEdit.value;
-  const group = groupToEdit.value;
-  const match = matchToEdit.value;
-  const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}/match/${match}`, { method: 'DELETE', headers: headers.value });
-  tournament.value = response;
+async function showDeleteMatch(mat, group, match) {
+  confirm.require({
+    message: t('prompts.deleteMatch'),
+    acceptClass: '!bg-red-500 dark:!bg-red-40 !border-red-500 dark:!border-red-400 !ring-red-500 dark:!ring-red-400 hover:!bg-red-600 dark:hover:!bg-red-300 hover:!border-red-600 dark:hover:!border-red-300 focus:!ring-red-400/50 dark:!focus:ring-red-300/50',
+    accept: async () => {
+      const response = await $fetch(`/api/tournaments/${tournamentId.value}/m/${mat}/g/${group}/match/${match}`, { method: 'DELETE', headers: headers.value });
+      tournament.value = response;
+    },
+    reject: () => { },
+  });
 }
 
 const { data: tournament, error: tError } = await useFetch(`/api/tournaments/${tournamentId.value}`, { headers: headers.value });
