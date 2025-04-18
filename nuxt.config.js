@@ -1,5 +1,6 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
+  compatibilityDate: '2025-04-17',
   devtools: { enabled: true },
 
   vite: {
@@ -10,7 +11,7 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt', '@primevue/nuxt-module'],
+  modules: ['nitro-cloudflare-dev', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt', '@primevue/nuxt-module'],
 
   colorMode: {
     classSuffix: '',
@@ -34,6 +35,13 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    prerender: {
+      autoSubfolderIndex: false,
+    },
+    cloudflare: {
+      deployConfig: true,
+      nodeCompat: true,
+    },
     storage: {
       'tournaments-dev': {
         driver: 'fs',
@@ -67,6 +75,4 @@ export default defineNuxtConfig({
       'autoprefixer': {},
     },
   },
-
-  compatibilityDate: '2025-04-01',
 });

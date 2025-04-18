@@ -3,25 +3,26 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "packageManager": "npm@10.8.3",
   "scripts": {
     "build": "NODE_ENV=production nuxt build",
-    "build:cf": "NITRO_PRESET=cloudflare_pages NODE_ENV=production nuxt build",
+    "build:cf": "NODE_ENV=development nuxt build --preset=cloudflare_pages",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "start": "node .output/server/index.mjs"
   },
   "dependencies": {
-    "@azure/cosmos": "^4.2.0",
-    "@azure/identity": "^4.8.0",
+    "@azure/cosmos": "^4.3.0",
+    "@azure/identity": "^4.9.0",
     "@heroicons/vue": "^2.2.0",
-    "@primevue/forms": "^4.3.2",
+    "@primevue/forms": "^4.3.3",
     "autoprefixer": "^10.4.21",
     "daisyui": "^4.12.24",
     "date-fns": "^3.6.0",
     "lodash-es": "^4.17.21",
-    "nanoid": "^5.1.4",
-    "nuxt": "^3.16.0",
+    "nanoid": "^5.1.5",
+    "nuxt": "^3.16.2",
     "postcss": "^8.5.3",
     "primevue": "^4.2.5",
     "uuid": "^9.0.1",
@@ -30,9 +31,9 @@
   "devDependencies": {
     "@headlessui/vue": "^1.7.23",
     "@nuxtjs/color-mode": "^3.5.2",
-    "@nuxtjs/i18n": "^9.3.1",
+    "@nuxtjs/i18n": "^9.5.3",
     "@nuxtjs/tailwindcss": "^6.13.2",
-    "@primevue/nuxt-module": "^4.3.2",
+    "@primevue/nuxt-module": "^4.3.3",
     "@tailwindcss/typography": "^0.5.16",
     "@vueuse/core": "^10.9.0",
     "@vueuse/integrations": "^10.11.1",
@@ -40,6 +41,9 @@
     "postcss-import": "^16.1.0",
     "primeicons": "^7.0.0",
     "qrcode": "^1.5.4",
-    "tailwindcss-primeui": "^0.6.1"
+    "tailwindcss-primeui": "^0.6.1",
+    "@cloudflare/workers-types": "^4.20250417.0",
+    "nitro-cloudflare-dev": "^0.2.2",
+    "wrangler": "^4.12.0"
   }
 }

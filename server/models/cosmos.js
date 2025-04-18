@@ -8,9 +8,9 @@ const WARN = 40;
 const ERROR = 50;
 
 const endpoint = process.env.COSMOS_ENDPOINT;
+const key = process.env.COSMOS_KEY;
 const client = getClient();
 function getClient() {
-  const key = process.env.COSMOS_KEY;
   if (key) {
     info('authenticating cosmos with key');
     return new CosmosClient({ endpoint, key });
