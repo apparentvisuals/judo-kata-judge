@@ -11,7 +11,6 @@ declare module 'vue' {
     PrimeAutoComplete: typeof import('primevue/autocomplete')['default']
     PrimeButton: typeof import('primevue/button')['default']
     PrimeCheckbox: typeof import('primevue/checkbox')['default']
-    PrimeChip: typeof import('primevue/chip')['default']
     PrimeColumn: typeof import('primevue/column')['default']
     PrimeColumnGroup: typeof import('primevue/columngroup')['default']
     PrimeConfirmDialog: typeof import('primevue/confirmdialog')['default']
