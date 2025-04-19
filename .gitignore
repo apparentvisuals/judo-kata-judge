@@ -11,3 +11,4 @@ data/*
 archive/*
 .DS_Store
 .dev.vars
+.wrangler/
