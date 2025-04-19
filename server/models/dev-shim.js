@@ -1,8 +1,11 @@
-import { isDev } from "../utils";
 import { database, log } from './cosmos';
 import { omit, omitBy, isNil } from 'lodash-es';
 
-const useShim = process.env.DEV_SHIM || false;
+const useShim = isDev() && !!process.env.DEV_SHIM;
+
+function isDev() {
+  return !!process.env.DEV;
+}
 
 export async function shimGet(key, id) {
   if (isDev()) {

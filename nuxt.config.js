@@ -41,6 +41,12 @@ export default defineNuxtConfig({
     cloudflare: {
       deployConfig: true,
       nodeCompat: true,
+      wrangler: {
+        vars: {
+          "COSMOS_ENDPOINT": "https://judo-kata-judge.documents.azure.com:443/",
+          "DEV": "1",
+        },
+      }
     },
     storage: {
       'tournaments-dev': {
