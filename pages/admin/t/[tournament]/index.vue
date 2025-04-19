@@ -1,141 +1,113 @@
 <template>
   <Error :error-string="error" />
-  <NavBar :menu="false" class="bg-surface-100 dark:bg-surface-900 border-b border-surface-300 dark:border-surface-600">
-    <template #left>
-      <NuxtLink to="/admin">
-        <PrimeButton text icon="pi pi-angle-left text-lg" />
-      </NuxtLink>
-      <span class="pl-2">{{ `${tournament.name}` }}</span>
-    </template>
-  </NavBar>
-  <ClientOnly>
-    <Container class="pt-4">
-      <PrimeToolbar>
-        <template #start>
-          <PrimeButton icon="pi pi-plus" :label="$t('buttons.addMat')" @click.prevent="addMat" title="Add Mat"
-            class="mr-2">
+  <AdminNav />
+  <Container class="pt-16">
+    <PrimeToolbar>
+      <template #start>
+        <div class="flex items-center gap-2">
+          <span>{{ tournament.name }}</span>
+          <PrimeButton icon="pi pi-plus" :label="$t('buttons.addMat')" @click.prevent="addMat" title="Add Mat">
           </PrimeButton>
           <PrimeButton icon="pi pi-envelope" :label="$t('buttons.inviteLink')" @click.prevent="createInvite"
             title="Show Invite">
           </PrimeButton>
-        </template>
-        <template #end>
-          <PrimeButton icon="pi pi-copy" :label="$t('buttons.makeCopy')" :title="$t('buttons.makeCopy')"
-            @click.prevent="cloneTournament" class="mr-2" />
-          <PrimeButton severity="danger" v-if="isReordering" :label="$t('buttons.cancel')" @click.prevent="cancel"
-            :aria-label="$t('buttons.cancel')" class="mr-2" />
-          <PrimeButton icon="pi pi-sort" :label="isReordering ? $t('buttons.save') : $t('buttons.reorder')"
-            @click.prevent="save" :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')" />
-        </template>
-      </PrimeToolbar>
-      <PrimePanel v-for="(mat, matIndex) in tournament.mats" toggleable :pt="{ content: '!p-2' }"
-        :pt-options="{ mergeProps: true }" class="mt-2 ring-1 ring-surface-100 dark:ring-surface-700">
-        <template #header>
-          <span class="flex items-center gap-2 w-full">
-            <h2 class="font-medium">Mat {{ matIndex + 1 }}</h2>
+        </div>
+      </template>
+      <template #end>
+        <PrimeButton icon="pi pi-copy" :label="$t('buttons.makeCopy')" :title="$t('buttons.makeCopy')"
+          @click.prevent="cloneTournament" class="mr-2" />
+        <PrimeButton severity="danger" v-if="isReordering" :label="$t('buttons.cancel')" @click.prevent="cancel"
+          :aria-label="$t('buttons.cancel')" class="mr-2" />
+        <PrimeButton icon="pi pi-sort" :label="isReordering ? $t('buttons.save') : $t('buttons.reorder')"
+          @click.prevent="save" :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')" />
+      </template>
+    </PrimeToolbar>
+    <PrimePanel v-for="(mat, matIndex) in tournament.mats" toggleable class="mt-2">
+      <template #header>
+        <span class="flex items-center justify-between w-full">
+          <h2 class="font-medium">Mat {{ matIndex + 1 }}</h2>
+          <div class="flex gap-2">
             <PrimeButton icon="pi pi-plus" @click.prevent="showAddGroup(matIndex)" :title="$t('buttons.addGroup')">
             </PrimeButton>
             <PrimeButton severity="danger" icon="pi pi-times" @click.prevent="showDeleteMat(matIndex)"
               :title="$t('buttons.deleteMat')">
             </PrimeButton>
-          </span>
-        </template>
-        <draggable v-model="mat.groups" tag="div" group="groups" item-key="name" handle=".handle"
-          :disabled="!isReordering">
-          <template #item="{ element: group, index: groupIndex }">
-            <PrimePanel toggleable :pt="{ content: '!p-2' }" :pt-options="{ mergeProps: true }"
-              class="mb-2 last:mb-0 ring-1 ring-surface-100 dark:ring-surface-700">
-              <template #header>
-                <div class="flex flex-wrap items-center gap-2 w-full">
-                  <span v-if="isReordering" class="handle w-6 h-6 pi pi-sort" />
-                  <span class="font-medium">{{ getGroupName(group, groupIndex) }}</span>
-                  <PrimeChip icon="pi pi-user" :label="group.numberOfJudges.toString()" />
-                  <PrimeChip v-if="group.day" icon="pi pi-calendar" :label="group.day" />
-                  <PrimeChip v-if="group.startTime" icon="pi pi-calendar-clock" :label="group.startTime" />
-                  <div class="flex gap-2">
-                    <PrimeButton icon="pi pi-plus" @click.prevent="showAddMatch(matIndex, groupIndex)"
-                      :aria-label="$t('buttons.addMatch')" :title="$t('buttons.addMatch')" />
-                    <PrimeButton v-if="isReordering" icon="pi pi-sync" :disabled="!canRandomize(matIndex, groupIndex)"
-                      @click.prevent="randomizeGroup(matIndex, groupIndex)" :aria-label="$t('buttons.randomize')"
-                      :title="$t('buttons.randomize')" />
-                    <PrimeButton icon="pi pi-pencil" severity="secondary"
-                      @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" :aria-label="$t('buttons.editGroup')"
-                      :title="$t('buttons.editGroup')" />
-                    <PrimeButton icon="pi pi-times" severity="danger"
-                      @click.prevent="showDeleteGroup(matIndex, groupIndex)" :aria-label="$t('buttons.deleteGroup')"
-                      :title="$t('buttons.deleteGroup')" />
-                  </div>
+          </div>
+        </span>
+      </template>
+      <PrimeDataTable :value="mat.groups" v-model:expanded-rows="expandedRows" @row-reorder="mat.groupReorder"
+        data-key="id">
+        <PrimeColumn v-if="isReordering" row-reorder class="w-2" />
+        <PrimeColumn expander class="w-2" />
+        <PrimeColumn field="kata" :header="$t('labels.name')">
+          <template #body="{ data: group }">
+            {{ getGroupName(group) }}
+          </template>
+        </PrimeColumn>
+        <PrimeColumn field="actions" :header="$t('labels.actions')" class="w-20">
+          <template #body="{ data: group, index: groupIndex }">
+            <div class="flex justify-center gap-2">
+              <PrimeButton v-if="!isReordering" icon="pi pi-plus" @click.prevent="showAddMatch(matIndex, groupIndex)"
+                :aria-label="$t('buttons.addMatch')" :title="$t('buttons.addMatch')" />
+              <PrimeButton v-if="isReordering" icon="pi pi-sync" :disabled="!canRandomize(matIndex, groupIndex)"
+                @click.prevent="randomizeGroup(matIndex, groupIndex)" :aria-label="$t('buttons.randomize')"
+                :title="$t('buttons.randomize')" />
+              <PrimeButton v-if="!isReordering" icon="pi pi-pencil" severity="secondary"
+                @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" :aria-label="$t('buttons.editGroup')"
+                :title="$t('buttons.editGroup')" />
+              <PrimeButton v-if="!isReordering" icon="pi pi-times" severity="danger"
+                @click.prevent="showDeleteGroup(matIndex, groupIndex)" :aria-label="$t('buttons.deleteGroup')"
+                :title="$t('buttons.deleteGroup')" />
+            </div>
+          </template>
+        </PrimeColumn>
+        <template #expansion="{ data, index }">
+          <PrimeDataTable :value="data.matches" @row-reorder="data.matchReorder" data-key="id">
+            <PrimeColumn v-if="isReordering" row-reorder class="w-2" />
+            <PrimeColumn field="tori" :header="$t('labels.tori')" />
+            <PrimeColumn field="uke" :header="$t('labels.uke')" />
+            <PrimeColumn field="actions" :header="$t('labels.actions')" class="w-20">
+              <template #body="{ data: match }">
+                <div class="flex justify-center gap-2">
+                  <NuxtLink v-if="!isReordering"
+                    :to="`/admin/t/${tournament.id}/${matIndex}/${match.groupIndex}/${index}`" target="_blank"
+                    :title="$t('buttons.results')" class="p-button p-component p-button-icon-only">
+                    <i class="pi pi-book" />
+                  </NuxtLink>
+                  <PrimeButton v-if="!isReordering" icon="pi pi-pencil" severity="secondary"
+                    @click.prvent="showUpdateMatch(matIndex, match.groupIndex, index, match)"
+                    :disabled="match.completed || inAction" :title="$t('buttons.editMatch')" />
+                  <PrimeButton v-if="!isReordering" icon="pi pi-times" severity="danger"
+                    @click.prevent="showDeleteMatch(matIndex, match.groupIndex, index)"
+                    :disabled="match.completed || inAction" :title="$t('buttons.deleteMatch')" />
                 </div>
               </template>
-              <table class="w-full border-spacing-0 border-separate text-sm" role="table">
-                <thead>
-                  <tr>
-                    <CustomTh v-if="isReordering"></CustomTh>
-                    <CustomTh>{{ $t('labels.tori') }}</CustomTh>
-                    <CustomTh>{{ $t('labels.uke') }}</CustomTh>
-                    <CustomTh class="w-12">{{ $t('labels.actions') }}</CustomTh>
-                  </tr>
-                </thead>
-                <draggable v-model="group.matches" tag="tbody" group="matches" item-key="tori" handle=".handle"
-                  :disabled="!isReordering">
-                  <template #item="{ element: match, index }">
-                    <tr class="dark:text-white/80 bg-surface-0 text-surface-600 dark:bg-surface-800">
-                      <CustomTd v-if="isReordering">
-                        <ArrowsUpDownIcon class="handle w-6 h-6" />
-                      </CustomTd>
-                      <CustomTd>
-                        <div>{{ match.tori }}</div>
-                        <div class="sm:hidden">{{ match.uke }}</div>
-                      </CustomTd>
-                      <CustomTd>
-                        {{ match.uke }}
-                      </CustomTd>
-                      <CustomTd>
-                        <div class="flex justify-center gap-2">
-                          <NuxtLink :to="`/admin/t/${tournament.id}/${matIndex}/${groupIndex}/${index}`" target="_blank"
-                            :title="$t('buttons.results')">
-                            <PrimeButton icon="pi pi-book" />
-                          </NuxtLink>
-                          <PrimeButton icon="pi pi-pencil" severity="secondary"
-                            @click.prvent="showUpdateMatch(matIndex, groupIndex, index, match)"
-                            :disabled="match.completed || inAction" :title="$t('buttons.editMatch')" />
-                          <PrimeButton icon="pi pi-times" severity="danger"
-                            @click.prevent="showDeleteMatch(matIndex, groupIndex, index)"
-                            :disabled="match.completed || inAction" :title="$t('buttons.deleteMatch')" />
-                        </div>
-                      </CustomTd>
-                    </tr>
-                  </template>
-                </draggable>
-              </table>
-            </PrimePanel>
-          </template>
-        </draggable>
-      </PrimePanel>
-    </Container>
-    <PrimeConfirmPopup />
-    <PrimeDialog v-model:visible="addGroupVisible" modal header="Add Group" class="w-full md:w-1/2 lg:w-1/3">
-      <GroupInput @cancel="addGroupVisible = false" @submit="addGroup" />
-    </PrimeDialog>
-    <PrimeDialog v-model:visible="updateGroupVisible" modal header="Update Group" class="w-full md:w-1/2 lg:w-1/3">
-      <GroupInput :group="groupToUpdate" @cancel="updateGroupVisible = false" @submit="updateGroup" />
-    </PrimeDialog>
-    <PrimeDialog v-model:visible="addMatchVisible" modal header="Add Match" class="w-full md:w-1/2 lg:w-1/3">
-      <MatchInput :athletes="athletes" @cancel="addMatchVisible = false" @submit="addMatch" />
-    </PrimeDialog>
-    <PrimeDialog v-model:visible="updateMatchVisible" modal header="Update Match" class="w-full md:w-1/2 lg:w-1/3">
-      <MatchInput :match="matchToUpdate" :athletes="athletes" @cancel="updateMatchVisible = false"
-        @submit="updateMatch" />
-    </PrimeDialog>
-    <PrimeDialog v-model:visible="inviteVisible" modal header="Invitation" class="w-full md:w-[14rem]">
-      <QR :path="invitePath" :title="$t('buttons.inviteLink')" />
-    </PrimeDialog>
-  </ClientOnly>
+            </PrimeColumn>
+          </PrimeDataTable>
+        </template>
+      </PrimeDataTable>
+    </PrimePanel>
+  </Container>
+  <PrimeConfirmPopup />
+  <PrimeDialog v-model:visible="addGroupVisible" modal header="Add Group" class="w-full md:w-1/2 lg:w-1/3">
+    <GroupInput @cancel="addGroupVisible = false" @submit="addGroup" />
+  </PrimeDialog>
+  <PrimeDialog v-model:visible="updateGroupVisible" modal header="Update Group" class="w-full md:w-1/2 lg:w-1/3">
+    <GroupInput :group="groupToUpdate" @cancel="updateGroupVisible = false" @submit="updateGroup" />
+  </PrimeDialog>
+  <PrimeDialog v-model:visible="addMatchVisible" modal header="Add Match" class="w-full md:w-1/2 lg:w-1/3">
+    <MatchInput :athletes="athletes" @cancel="addMatchVisible = false" @submit="addMatch" />
+  </PrimeDialog>
+  <PrimeDialog v-model:visible="updateMatchVisible" modal header="Update Match" class="w-full md:w-1/2 lg:w-1/3">
+    <MatchInput :match="matchToUpdate" :athletes="athletes" @cancel="updateMatchVisible = false"
+      @submit="updateMatch" />
+  </PrimeDialog>
+  <PrimeDialog v-model:visible="inviteVisible" modal header="Invitation" class="w-full md:w-[14rem]">
+    <QR :path="invitePath" :title="$t('buttons.inviteLink')" />
+  </PrimeDialog>
 </template>
 
 <script setup>
-import { ArrowsUpDownIcon } from '@heroicons/vue/24/outline';
-
 import { getGroupName, handleServerError, shuffle } from '~/src/utils';
 
 const route = useRoute();
@@ -156,6 +128,7 @@ const updateGroupVisible = ref(false);
 const addMatchVisible = ref(false);
 const updateMatchVisible = ref(false);
 const inviteVisible = ref(false);
+const expandedRows = ref({});
 
 const tournamentId = computed(() => route.params.tournament);
 const headers = computed(() => ({ authorization: `Bearer ${cookie.value.adminCode}` }));
@@ -328,10 +301,12 @@ async function showDeleteMatch(mat, group, match) {
   });
 }
 
+
 const { data: tournament, error: tError } = await useFetch(`/api/tournaments/${tournamentId.value}`, { headers: headers.value });
 watch(tError, (error) => {
   error.value = handleServerError(err);
 });
+
 const { data: athletes, error: aError } = await useFetch(`/api/athletes`, { headers: headers.value });
 watch(aError, (error) => {
   error.value = handleServerError(err);
@@ -341,4 +316,19 @@ function _tournamentToPayload(tournament) {
   return tournament;
 }
 
+onMounted(() => {
+  tournament.value.mats.forEach((mat) => {
+    mat.groupReorder = (event) => {
+      mat.groups = event.value;
+    };
+    mat.groups.forEach((group, groupIndex) => {
+      group.matchReorder = (event) => {
+        group.matches = event.value;
+      };
+      group.matches.forEach((match) => {
+        match.groupIndex = groupIndex;
+      });
+    });
+  });
+});
 </script>

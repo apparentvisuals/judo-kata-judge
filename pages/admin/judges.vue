@@ -1,50 +1,53 @@
 <template>
   <Error :error-string="error" />
   <AdminNav name="Judges" />
-  <Container>
-    <PrimeDataTable resizableColumns columnResizeMode="fit" scrollable scrollHeight="flex" :value="judges" data-key="id"
-      v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['id', 'name']">
-      <template #header>
-        <div class="flex justify-between">
-          <PrimeButton icon="pi pi-plus" :label="$t('buttons.addJudge')" :title="$t('buttons.addJudge')"
-            @click.prevent="addVisible = true" :disabled="inAction" />
-          <PrimeIconField>
-            <PrimeInputIcon>
-              <i class="pi pi-search" />
-            </PrimeInputIcon>
-            <PrimeInputText v-model="filters['global'].value" placeholder="Keyword Search" />
-          </PrimeIconField>
-        </div>
+  <Container class="pt-16">
+    <PrimeToolbar>
+      <template #start>
+        <PrimeButton icon="pi pi-plus" :label="$t('buttons.addJudge')" :title="$t('buttons.addJudge')"
+          @click.prevent="addVisible = true" :disabled="inAction" />
       </template>
-      <PrimeColumn field="id" :header="$t('labels.id')" class="w-10" />
-      <PrimeColumn field="name" :header="$t('labels.name')" />
-      <PrimeColumn field="region" :header="$t('labels.region')" class="w-48 hidden lg:table-cell"
-        :show-filter-match-modes="false" show-clear-button>
-        <template #body="{ data }">{{ getProvinceName(data.region) }}</template>
-        <template #filter="{ filterModel }">
-          <PrimeSelect v-model="filterModel.value" :options="objectToPairs(PROVINCE_MAP)" option-label="value"
-            option-value="key" />
-        </template>
-      </PrimeColumn>
-      <PrimeColumn v-for="key of ['nnk', 'knk', 'jnk', 'kgj', 'kink', 'konk', 'ink']" :key :field="key"
-        :header="getKataName(key)" :show-filter-match-modes="false" show-clear-button>
-        <template #body="{ data }">{{ getLevelName(data[key]) }}</template>
-        <template #filter="{ filterModel }">
-          <PrimeSelect v-model="filterModel.value" :options="objectToPairs(LEVEL_MAP)" option-label="value"
-            option-value="key" />
-        </template>
-      </PrimeColumn>
-      <PrimeColumn field="actions" frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
-        <template #body="{ data }">
-          <div class="flex justify-center gap-2">
-            <PrimeButton icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(data)" :disabled="inAction"
-              title="edit" />
-            <PrimeButton icon="pi pi-times" severity="danger" @click="remove(data)" title="delete"
-              :disabled="inAction" />
-          </div>
-        </template>
-      </PrimeColumn>
-    </PrimeDataTable>
+      <template #end>
+        <PrimeIconField>
+          <PrimeInputIcon>
+            <i class="pi pi-search" />
+          </PrimeInputIcon>
+          <PrimeInputText v-model="filters['global'].value" placeholder="Keyword Search" />
+        </PrimeIconField>
+      </template>
+    </PrimeToolbar>
+    <PrimePanel class="mt-2">
+      <PrimeDataTable columnResizeMode="fit" scrollable scrollHeight="flex" :value="judges" data-key="id"
+        v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['id', 'name']">
+        <PrimeColumn field="id" :header="$t('labels.id')" class="w-10" />
+        <PrimeColumn field="name" :header="$t('labels.name')" />
+        <PrimeColumn field="region" :header="$t('labels.region')" class="w-48 hidden lg:table-cell"
+          :show-filter-match-modes="false" show-clear-button>
+          <template #body="{ data }">{{ getProvinceName(data.region) }}</template>
+          <template #filter="{ filterModel }">
+            <PrimeSelect v-model="filterModel.value" :options="objectToPairs(PROVINCE_MAP)" option-label="value"
+              option-value="key" />
+          </template>
+        </PrimeColumn>
+        <PrimeColumn v-for="key of ['nnk', 'knk', 'jnk', 'kgj', 'kink', 'konk', 'ink']" :key :field="key"
+          :header="getKataName(key)" :show-filter-match-modes="false" show-clear-button>
+          <template #body="{ data }">{{ getLevelName(data[key]) }}</template>
+          <template #filter="{ filterModel }">
+            <PrimeSelect v-model="filterModel.value" :options="objectToPairs(LEVEL_MAP)" option-label="value"
+              option-value="key" />
+          </template>
+        </PrimeColumn>
+        <PrimeColumn field="actions" frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
+          <template #body="{ data }">
+            <div class="flex justify-center gap-2">
+              <PrimeButton icon="pi pi-pencil" @click.prevent="showUpdate(data)" :disabled="inAction" title="edit" />
+              <PrimeButton icon="pi pi-times" severity="danger" @click="remove(data)" title="delete"
+                :disabled="inAction" />
+            </div>
+          </template>
+        </PrimeColumn>
+      </PrimeDataTable>
+    </PrimePanel>
   </Container>
   <PrimeConfirmPopup />
   <PrimeDialog v-model:visible="addVisible" modal header="Add Judge" class="w-full md:w-1/2 lg:w-1/3">

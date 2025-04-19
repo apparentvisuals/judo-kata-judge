@@ -1,39 +1,33 @@
 <template>
-  <NavBar :menu="true" class="bg-surface-100 dark:bg-surface-900 border-b border-surface-300 dark:border-surface-600">
-    <template #left>
+  <PrimeMenubar :model="items" class="rounded-none border-0 fixed top-0 left-0 right-0 z-50 shadow-md">
+    <template #start>
       <span class="pi pi-crown p-2 text-lg" />
     </template>
-    <template #menu>
-      <nuxt-link v-for="item in navigation" :key="item.name" :to="item.href"
-        :class="[item.current ? 'bg-surface-400 dark:bg-surface-700' : 'hover:bg-surface-400 dark:hover:bg-surface-700', 'text-surface-800 dark:text-white/80 block rounded-md p-2 text-sm font-medium']"
-        :aria-current="item.current ? 'page' : undefined">{{ item.name }}</nuxt-link>
+    <template #item="{ item, props }">
+      <nuxt-link v-ripple :to="item.href" class="flex items-center" v-bind="props.action">
+        <span>{{ item.name }}</span>
+      </nuxt-link>
     </template>
-    <template #right>
-      <PrimeButton icon="pi pi-sign-out" :label="$t('buttons.logout')" :title="$t('buttons.logout')" severity="danger"
-        @click.prevent="logout" class="mr-2 hidden sm:block" />
+    <template #end>
+      <div class="flex gap-2">
+        <PrimeButton icon="pi pi-sign-out" :label="$t('buttons.logout')" :title="$t('buttons.logout')" severity="danger"
+          @click.prevent="logout" />
+        <LocaleMenu />
+      </div>
     </template>
-  </NavBar>
+  </PrimeMenubar>
 </template>
 
 <script setup>
-const { t } = useI18n();
-const { path } = useRoute();
-const cookie = useCookie('jkj', { default: () => ({}) });
+const items = ref([
+  { name: 'Tournaments', href: '/admin' },
+  { name: 'Judges', href: '/admin/judges' },
+  { name: 'Athletes', href: '/admin/athletes' },
+]);
 
-const navigation = computed(() => {
-  const menu = [
-    { name: t('titles.tournaments'), href: '/admin' },
-    { name: t('titles.judges'), href: '/admin/judges' },
-    { name: t('titles.athletes'), href: '/admin/athletes' },
-  ];
-  menu.forEach((item) => {
-    item.current = path === item.href;
-  });
-  return menu;
-});
-
-function logout() {
-  cookie.value.adminCode = '';
-  navigateTo('/admin/code');
-}
+const logout = async () => {
+  const cookie = useCookie('jkj', { default: () => ({}) })
+  cookie.value.adminCode = ''
+  await navigateTo('/admin/code')
+};
 </script>

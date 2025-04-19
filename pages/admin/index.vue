@@ -1,36 +1,41 @@
 <template>
   <Error :error-string="error" />
   <AdminNav />
-  <Container>
-    <PrimeDataTable resizableColumns columnResizeMode="fit" scrollable scrollHeight="flex" :value="tournaments">
-      <template #header>
+  <Container class="pt-16">
+    <PrimeToolbar>
+      <template #start>
         <PrimeButton icon="pi pi-plus" :label="$t('buttons.createTournament')" :title="$t('buttons.createTournament')"
           @click.prevent="addVisible = true" :disabled="inAction" />
       </template>
-      <PrimeColumn field="name" :header="$t('labels.name')">
-        <template #body="{ data }">
-          <NuxtLink class="link" :to="`/admin/t/${data.id}`">{{ data.name }}</NuxtLink>
-        </template>
-      </PrimeColumn>
-      <PrimeColumn field="region" :header="$t('labels.region')">
-        <template #body="{ data }">
-          {{ getOrganization(data.org) }}
-        </template>
-      </PrimeColumn>
-      <PrimeColumn field="actions" frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
-        <template #body="{ data, index }">
-          <div class="flex gap-2">
-            <PrimeButton icon="pi pi-check" severity="secondary" title="Complete"
-              @click.prevent="toggleComplete(index)" />
-            <PrimeButton icon="pi pi-box" severity="secondary" title="Archive" @click.prevent="toggleArchive(index)" />
-            <PrimeButton :disabled="data.complete || inAction" icon="pi pi-pencil" @click.prevent="showUpdate(index)"
-              title="Edit" />
-            <PrimeButton :disabled="data.complete || inAction" icon="pi pi-times" severity="danger"
-              @click.prevent="remove2($event, index)" title="Delete" />
-          </div>
-        </template>
-      </PrimeColumn>
-    </PrimeDataTable>
+    </PrimeToolbar>
+    <PrimePanel class="mt-2">
+      <PrimeDataTable columnResizeMode="fit" scrollable scrollHeight="flex" :value="tournaments">
+        <PrimeColumn field="name" :header="$t('labels.name')">
+          <template #body="{ data }">
+            <NuxtLink class="link" :to="`/admin/t/${data.id}`">{{ data.name }}</NuxtLink>
+          </template>
+        </PrimeColumn>
+        <PrimeColumn field="region" :header="$t('labels.region')">
+          <template #body="{ data }">
+            {{ getOrganization(data.org) }}
+          </template>
+        </PrimeColumn>
+        <PrimeColumn field="actions" frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
+          <template #body="{ data, index }">
+            <div class="flex gap-2">
+              <PrimeButton icon="pi pi-check" severity="secondary" title="Complete"
+                @click.prevent="toggleComplete(index)" />
+              <PrimeButton icon="pi pi-box" severity="secondary" title="Archive"
+                @click.prevent="toggleArchive(index)" />
+              <PrimeButton :disabled="data.complete || inAction" icon="pi pi-pencil" @click.prevent="showUpdate(index)"
+                title="Edit" />
+              <PrimeButton :disabled="data.complete || inAction" icon="pi pi-times" severity="danger"
+                @click.prevent="remove2($event, index)" title="Delete" />
+            </div>
+          </template>
+        </PrimeColumn>
+      </PrimeDataTable>
+    </PrimePanel>
   </Container>
   <PrimeConfirmPopup />
   <PrimeDialog v-model:visible="addVisible" modal header="Add Tournament" class="w-full md:w-1/2 lg:w-1/3">

@@ -26,6 +26,7 @@ declare module 'vue' {
     PrimeInputIcon: typeof import('primevue/inputicon')['default']
     PrimeInputNumber: typeof import('primevue/inputnumber')['default']
     PrimeInputText: typeof import('primevue/inputtext')['default']
+    PrimeMenubar: typeof import('primevue/menubar')['default']
     PrimeMessage: typeof import('primevue/message')['default']
     PrimeOverlayPanel: typeof import('primevue/overlaypanel')['default']
     PrimePanel: typeof import('primevue/panel')['default']
@@ -38,5 +39,8 @@ declare module 'vue' {
     PrimeToolbar: typeof import('primevue/toolbar')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+  }
+  export interface ComponentCustomProperties {
+    Ripple: typeof import('primevue/ripple')['default']
   }
 }

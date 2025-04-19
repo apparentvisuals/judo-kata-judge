@@ -1,13 +1,16 @@
 <template>
   <Error :error-string="error" />
-  <NavBar :menu="true" class="bg-surface-100 dark:bg-surface-900 border-b border-surface-300 dark:border-surface-600">
-    <template #menu>
-      <a v-for="item in navigation" href="#" @click.prevent="changeView(...item.payload)"
+  <PrimeMenubar :model="navigation" class="rounded-none border-0">
+    <template #item="{ item, props }">
+      <a v-ripple v-bind="props.action" href="#" @click.prevent="changeView(...item.payload)"
         :class="[isCurrent(item) ? 'bg-surface-400 dark:bg-surface-700' : 'hover:bg-surface-400 dark:hover:bg-surface-700', 'text-surface-800 dark:text-white/80 block rounded-md p-2 text-sm font-medium']">
         {{ item.name }}
       </a>
     </template>
-  </NavBar>
+    <template #end>
+      <LocaleMenu />
+    </template>
+  </PrimeMenubar>
   <Container v-if="match" class="p-2">
     <ResultSummaryTable v-if="view === 'summary'" :match="match" :group="match" :scores="scores" @remove="remove" />
     <ResultScoreTable :match="match" :group="match" :scores="scores[judgeIndex - 1]" :disabled="true"

@@ -10,7 +10,7 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt', '@primevue/nuxt-module', 'nuxt-headlessui'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt', '@primevue/nuxt-module'],
 
   colorMode: {
     classSuffix: '',
@@ -31,10 +31,6 @@ export default defineNuxtConfig({
     components: {
       prefix: 'Prime'
     },
-  },
-
-  headlessui: {
-    prefix: 'Hl'
   },
 
   nitro: {

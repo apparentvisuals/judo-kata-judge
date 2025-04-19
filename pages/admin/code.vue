@@ -1,5 +1,4 @@
 <template>
-  <NavBar :menu="false"></NavBar>
   <div class="fixed top-20 bottom-0 w-full flex items-center justify-center">
     <PrimeForm v-slot="$form" :resolver validate-on-mount @submit="onSubmit" class="flex flex-col gap-4">
       <PrimeMessage severity="error" icon="pi pi-times-circle" v-if="error">{{ error }}</PrimeMessage>

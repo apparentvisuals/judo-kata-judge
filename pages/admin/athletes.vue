@@ -1,31 +1,35 @@
 <template>
   <Error :error-string="error" />
-  <AdminNav name="Athletes" />
-  <Container class="text-surface-700 dark:text-white/80">
-    <PrimeDataTable resizableColumns columnResizeMode="fit" scrollable scrollHeight="flex" :value="athletes">
-      <template #header>
+  <AdminNav />
+  <Container class="pt-16">
+    <PrimeToolbar>
+      <template #start>
         <PrimeButton icon="pi pi-plus" :label="$t('buttons.addAthlete')" :title="$t('buttons.addAthlete')"
           @click.prevent="addVisible = true" :disabled="inAction" />
       </template>
-      <PrimeColumn field="name" :header="$t('labels.name')">
-      </PrimeColumn>
-      <PrimeColumn field="rank" :header="$t('labels.rank')">
-        <template #body="{ data }">{{ getRankName(data.rank) }}</template>
-      </PrimeColumn>
-      <PrimeColumn field="region" :header="$t('labels.region')">
-        <template #body="{ data }">{{ getProvinceName(data.region) }}</template>
-      </PrimeColumn>
-      <PrimeColumn field="actions" frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
-        <template #body="{ index }">
-          <div class="flex justify-center gap-2">
-            <PrimeButton icon="pi pi-pencil" severity="secondary" @click.prevent="showUpdate(index)"
-              :disabled="inAction" />
-            <PrimeButton icon="pi pi-times" severity="danger" @click.prevent="remove2($event, index)"
-              :disabled="inAction" />
-          </div>
-        </template>
-      </PrimeColumn>
-    </PrimeDataTable>
+      <template #end></template>
+    </PrimeToolbar>
+    <PrimePanel class="mt-2">
+      <PrimeDataTable columnResizeMode="fit" scrollable scrollHeight="flex" :value="athletes">
+        <PrimeColumn field="name" :header="$t('labels.name')">
+        </PrimeColumn>
+        <PrimeColumn field="rank" :header="$t('labels.rank')">
+          <template #body="{ data }">{{ getRankName(data.rank) }}</template>
+        </PrimeColumn>
+        <PrimeColumn field="region" :header="$t('labels.region')">
+          <template #body="{ data }">{{ getProvinceName(data.region) }}</template>
+        </PrimeColumn>
+        <PrimeColumn field="actions" frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
+          <template #body="{ index }">
+            <div class="flex justify-center gap-2">
+              <PrimeButton icon="pi pi-pencil" @click.prevent="showUpdate(index)" :disabled="inAction" />
+              <PrimeButton icon="pi pi-times" severity="danger" @click.prevent="remove2($event, index)"
+                :disabled="inAction" />
+            </div>
+          </template>
+        </PrimeColumn>
+      </PrimeDataTable>
+    </PrimePanel>
   </Container>
   <PrimeConfirmPopup />
   <PrimeDialog v-model:visible="addVisible" modal header="Add Athlete" class="w-full md:w-1/2 lg:w-1/3">

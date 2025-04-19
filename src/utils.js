@@ -73,14 +73,13 @@ export function duration(kata) {
   }
 }
 
-export function getGroupName(group, index) {
+export function getGroupName(group) {
   if (group.name) {
-    return group.name;
+    return `${group.name} (${getKataName(group.kata)})`;
   }
   if (group.kata) {
     return getKataName(group.kata);
   }
-  return `Group ${index + 1}`;
 }
 
 export function getKataName(kata) {
