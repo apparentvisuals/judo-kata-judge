@@ -1,24 +1,23 @@
 <template>
-  <div v-for="(group, groupIndex) in schedule" class="pb-2">
-    <table class="table border">
-      <caption class="border border-b-0 text-xl py-2">{{ group.kata }}</caption>
-      <thead>
-        <tr class="border">
-          <th class="w-8"></th>
-          <th>Pair</th>
-          <th class="w-10 text-right">Start</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(match, matchIndex) in group.matches">
-          <td>{{ matchIndex + 1 }}</td>
-          <td v-if="match.break">Break</td>
-          <td v-else>{{ match.tori }} / {{ match.uke }}</td>
-          <td>{{ match.startTime ? `${format(match.startTime, 'HH:mm')}` : '' }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <PrimePanel v-for="(group, groupIndex) in schedule" :key="groupIndex">
+    <template #header>
+      {{ group.kata }}
+    </template>
+    <PrimeDataTable :value="group.matches">
+      <PrimeColumn field="index" class="w-8">
+        <template #body="{ index }">
+          {{ index + 1 }}
+        </template>
+      </PrimeColumn>
+      <PrimeColumn field="tori" header="Tori" />
+      <PrimeColumn field="uke" header="Uke" />
+      <PrimeColumn field="startTime" header="Time" class="w-16">
+        <template #body="{ data }">
+          {{ data.startTime ? `${format(data.startTime, 'HH:mm')}` : '' }}
+        </template>
+      </PrimeColumn>
+    </PrimeDataTable>
+  </PrimePanel>
 </template>
 
 <script setup>
@@ -45,18 +44,16 @@ const schedule = computed(() => {
       let matchCount = 0;
       for (const match of group.matches) {
         const matSchedule = { uke: match.uke, tori: match.tori };
+        groupSchedule.matches.push(matSchedule);
         if (lastTime) {
           matSchedule.startTime = lastTime;
           lastTime = addMinutes(lastTime, duration(group.kata));
-        }
-        groupSchedule.matches.push(matSchedule);
-        if (lastTime) {
           if (matchCount % DEFAULT_BREAK_EVERY_X_MATCH === DEFAULT_BREAK_EVERY_X_MATCH - 1) {
             groupSchedule.matches.push({ break: true, startTime: lastTime });
             lastTime = addMinutes(lastTime, DEFAULT_BREAK);
           }
+          matchCount += 1;
         }
-        matchCount += 1;
       }
       schedule.push(groupSchedule);
     }

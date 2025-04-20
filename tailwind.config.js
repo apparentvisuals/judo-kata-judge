@@ -1,9 +1,6 @@
 module.exports = {
   mode: 'jit',
   plugins: [require('@tailwindcss/typography'), require('tailwindcss-primeui')],
-  daisyui: {
-    themes: ['corporate', 'business']
-  },
   darkMode: 'class',
   content: [
     "presets/**/*.{js,vue,ts}",

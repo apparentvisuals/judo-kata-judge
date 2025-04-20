@@ -11,7 +11,7 @@
       <LocaleMenu />
     </template>
   </PrimeMenubar>
-  <Container v-if="match" class="p-2">
+  <Container v-if="match">
     <ResultSummaryTable v-if="view === 'summary'" :match="match" :group="match" :scores="scores" @remove="remove" />
     <ResultScoreTable :match="match" :group="match" :scores="scores[judgeIndex - 1]" :disabled="true"
       v-if="view === 'judge'">

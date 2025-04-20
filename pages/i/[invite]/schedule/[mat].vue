@@ -1,7 +1,7 @@
 <template>
   <Error :error-string="error" />
-  <UserNav :tournament="tournament" :mat="route.params.mat" />
-  <PublicContainer>
+  <PublicContainer class="flex flex-col gap-2">
+    <UserNav :tournament="tournament" :mat="route.params.mat" />
     <ScheduleTable :tournament="tournament" :mat="route.params.mat" />
   </PublicContainer>
 </template>
@@ -14,7 +14,6 @@ import { handleServerError } from '~/src/utils';
 
 const route = useRoute();
 const inviteCode = computed(() => route.params.invite);
-const mat = computed(() => parseInt(route.params.mat) + 1);
 
 const error = ref('')
 const tournament = ref({});

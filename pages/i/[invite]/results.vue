@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-wrap gap-2 p-2 border-b items-center z-50" :class="kiosk ? 'hidden' : ''">
+  <!-- <div class="flex flex-wrap gap-2 p-2 border-b items-center z-50" :class="kiosk ? 'hidden' : ''">
     <div class="dropdown">
       <label tabindex="0" class="btn btn-ghost btn-square drawer-button print:hidden">
         <Bars3Icon class="w-6 h-6" />
@@ -26,7 +26,16 @@
         <img class="h-20" :src="getOrganizationImage(tournament.org)" />
       </div> -->
     </div>
-  </div>
+  </div> -->
+  <PrimeTabs scrollable v-model:value="resultIndex">
+    <PrimeTabList>
+      <PrimeTab v-for="(group, index) in scores.results" :key="index" :value="index">
+        <a href="#" @click="show(index)">
+          {{ getGroupName(group, index) }}
+        </a>
+      </PrimeTab>
+    </PrimeTabList>
+  </PrimeTabs>
   <PublicContainer>
     <ResultTable :name="getGroupName(group, resultIndex)" :show-sub-total="showSubTotal" :matches="group.matches" />
   </PublicContainer>
@@ -34,7 +43,6 @@
 
 <script setup>
 import { ref } from 'vue';
-import { Bars3Icon } from '@heroicons/vue/24/outline';
 import { getOrganizationImage, getGroupName } from '~/src/utils';
 import { SummaryEvents } from '~/src/event-sources';
 
@@ -64,7 +72,7 @@ const group = computed(() => {
   return {};
 })
 
-function show(index) {
+const show = (index) => {
   if (index != null) {
     resultIndex.value = index;
   }

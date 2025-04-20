@@ -38,6 +38,7 @@
 </template>
 
 <script setup>
+import { parse } from 'date-fns';
 import { Form as PrimeForm } from '@primevue/forms';
 
 import { KATA_MAP, objectToPairs } from '~/src/utils';
@@ -62,6 +63,16 @@ const resolver = ({ values }) => {
   }
   if (!values.numberOfJudges) {
     errors.numberOfJudges = [{ message: 'Number of judges is required' }]
+  }
+  if (values.startTime) {
+    try {
+      const parsedTime = parse(values.startTime, 'HH:mm', new Date());
+      if (isNaN(parsedTime)) {
+        errors.startTime = [{ message: 'Invalid start time' }]
+      }
+    } catch (e) {
+      errors.startTime = [{ message: 'Invalid start time' }]
+    }
   }
   return { values, errors };
 };
