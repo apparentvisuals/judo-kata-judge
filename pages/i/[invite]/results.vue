@@ -19,12 +19,12 @@
     </div>
     <div class="hidden lg:flex flex-1 items-center justify-between">
       <h1 class="text-3xl font-bold">{{ tournament.name }}</h1>
-      <div class="flex" v-if="tournament.org === 'on'">
+      <!-- <div class="flex" v-if="tournament.org === 'on'">
         <img class="h-20 p-1" src="/img/sponsors/hatashita.png" />
         <img class="h-20 p-1" src="/img/sponsors/mizuno.png" />
         <img class="h-20" src="/img/sponsors/fuji.png" />
         <img class="h-20" :src="getOrganizationImage(tournament.org)" />
-      </div>
+      </div> -->
     </div>
   </div>
   <PublicContainer>
