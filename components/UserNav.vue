@@ -1,15 +1,13 @@
 <template>
   <PrimeMenubar>
     <template #start>
-      <span class="pi pi-crown p-2 text-lg" />
-      <h1 class="text-xl md:text-2xl lg:text-3xl font-bold">{{ title }}</h1>
+      <span class="pi pi-crown p-2 text-lg"></span>
+      <h1>{{ title }}</h1>
     </template>
   </PrimeMenubar>
 </template>
 
 <script setup>
-import { getOrganizationImage } from '~/src/utils';
-
 const props = defineProps(['tournament', 'mat']);
 
 const title = computed(() => {

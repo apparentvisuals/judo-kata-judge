@@ -11,21 +11,21 @@
   <div v-else-if="match && !judge" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
     <CodeForm v-model="judgeCode" title="Judge Code" @submit="submitCode" :error="codeError" />
   </div>
-  <PublicContainer v-else-if="match" class="pt-0">
-    <div class="grow" style="height: 300px">
+  <PublicContainer v-else-if="match">
+    <div class="grow md:text-xl lg:text-2xl xl:text-3xl" style="height: 300px">
       <ScoreTable :match="match" :group="group" :scores="scores">
         <template #header>
           <div class="flex justify-between">
-            <div class="text-xl hidden md:block">
+            <div class="hidden md:block">
               {{ match.tori }} / {{ match.uke }}
             </div>
             <div class="flex flex-col items-start">
-              <div class="text-xl md:hidden">
+              <div class="md:hidden">
                 {{ match.tori }} / {{ match.uke }}
               </div>
-              <div class="text-xl">{{ match ? getGroupName(group) : '' }}</div>
+              <div>{{ match ? getGroupName(group) : '' }}</div>
             </div>
-            <div class="text-xl font-bold" v-if="match && group">
+            <div class="font-bold" v-if="match && group">
               {{ judge.name }} ({{ judgeNumber }})
             </div>
           </div>
@@ -120,7 +120,7 @@ const status = computed(() => {
 });
 
 const canSubmit = computed(() => {
-  return scores.value.points.every((score) => score.value != null && score.value !== 10);
+  return scores.value.points.every((score) => score.dirty);
 });
 const hasMajor = computed(() => calculateHasMajor(scores.value.points));
 
@@ -201,7 +201,7 @@ onMounted(async () => {
     state.value = data.state;
 
     if (data.matchIndex !== scores.value.matchIndex || data.groupIndex !== scores.value.groupIndex) {
-      scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
+      scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill(''), dirty: false }));
     }
 
     scores.value.matchIndex = data.matchIndex;

@@ -164,7 +164,7 @@ export function calculateMoveScore(deductions) {
   } else if (deductions[5] === '-') {
     total -= 0.5;
   }
-  return Math.min(Math.max(0, total), 10);
+  return Math.min(Math.max(deductions[4] === '1' ? 0 : 1, total), 10);
 }
 
 /**

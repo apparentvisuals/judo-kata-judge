@@ -1,14 +1,12 @@
 <template>
   <div class="flex min-h-10 min-w-10 items-center justify-center">
-    <XMarkIcon class="h-6 w-6" v-if="binary && modelValue === '1'" />
-    <PlusIcon class="h-6 w-6" v-if="!binary && modelValue === '+'" />
-    <MinusIcon class="h-6 w-6" v-if="!binary && modelValue === '-'" />
+    <i class="pi pi-times md:text-xl lg:text-2xl xl:text-3xl" v-if="binary && modelValue === '1'" />
+    <i class="pi pi-plus md:text-xl lg:text-2xl xl:text-3xl" v-if="!binary && modelValue === '+'" />
+    <i class="pi pi-minus md:text-xl lg:text-2xl xl:text-3xl" v-if="!binary && modelValue === '-'" />
   </div>
 </template>
 
 <script setup>
-import { PlusIcon, MinusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
-
 const modelValue = defineModel();
 const props = defineProps({
   binary: Boolean,
