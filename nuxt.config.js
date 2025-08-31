@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['nitro-cloudflare-dev', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt', '@primevue/nuxt-module'],
+  modules: [/*'nitro-cloudflare-dev', */'@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n', '@vueuse/nuxt', '@primevue/nuxt-module'],
 
   colorMode: {
     classSuffix: '',
@@ -39,16 +39,16 @@ export default defineNuxtConfig({
     prerender: {
       autoSubfolderIndex: false,
     },
-    cloudflare: {
-      deployConfig: true,
-      nodeCompat: true,
-      wrangler: {
-        vars: {
-          "COSMOS_ENDPOINT": "https://judo-kata-judge.documents.azure.com:443/",
-          "DEV": "1",
-        },
-      }
-    },
+    // cloudflare: {
+    //   deployConfig: true,
+    //   nodeCompat: true,
+    //   wrangler: {
+    //     vars: {
+    //       "COSMOS_ENDPOINT": "https://judo-kata-judge.documents.azure.com:443/",
+    //       "DEV": "1",
+    //     },
+    //   }
+    // },
     storage: {
       'tournaments-dev': {
         driver: 'fs',
