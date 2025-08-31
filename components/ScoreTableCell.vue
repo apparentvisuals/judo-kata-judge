@@ -1,16 +1,28 @@
 <template>
-  <div class="flex min-h-10 min-w-10 items-center justify-center">
-    <i class="pi pi-times md:text-xl lg:text-2xl xl:text-3xl" v-if="binary && modelValue === '1'" />
-    <i class="pi pi-plus md:text-xl lg:text-2xl xl:text-3xl" v-if="!binary && modelValue === '+'" />
-    <i class="pi pi-minus md:text-xl lg:text-2xl xl:text-3xl" v-if="!binary && modelValue === '-'" />
-  </div>
+  <!-- <div class="flex items-center justify-center w-[3vw] h-[3vw]"> -->
+  <button style="font-size: clamp(2rem, 2vw, 5rem)" class="aspect-square w-full h-auto" :class="iconClass" />
+  <!-- </div> -->
 </template>
 
 <script setup>
-const modelValue = defineModel();
+const model = defineModel();
 const props = defineProps({
   binary: Boolean,
   hidden: Boolean,
   hint: String
+});
+
+const iconClass = computed(() => {
+  if (props.binary) {
+    return model.value === '1' ? 'pi pi-times' : '';
+  } else {
+    if (model.value === '+') {
+      return 'pi pi-plus';
+    } else if (model.value === '-') {
+      return 'pi pi-minus';
+    } else {
+      return '';
+    }
+  }
 });
 </script>

@@ -80,10 +80,10 @@ body,
   height: 100%;
 }
 
-.p-datatable-header-cell.kj-center > .p-datatable-column-header-content {
-  @apply justify-center
+.p-datatable-header-cell.kj-center>.p-datatable-column-header-content {
+  @apply justify-center;
 }
 
-.p-datatable-header-cell.kj-end > .p-datatable-column-header-content {
-  @apply justify-center
+.p-datatable-header-cell.kj-end>.p-datatable-column-header-content {
+  @apply justify-center;
 }

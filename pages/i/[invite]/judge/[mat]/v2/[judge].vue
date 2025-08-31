@@ -1,15 +1,11 @@
 <template>
   <div v-if="status"
-    class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center text-surface-800 dark:text-surface-200">
-    <div class="text-center">
-      <span class="text-3xl font-bold">{{ status }}</span>
-    </div>
-    <div class="p-2">
-      <span class="loading loading-ring loading-lg"></span>
-    </div>
+    class="w-full h-full flex flex-col items-center justify-center text-surface-800 dark:text-surface-200">
+    <div class="text-3xl font-bold">{{ status }}</div>
+    <div class="mt-4 p-4"><i class="pi pi-spinner animate-spin text-3xl" /></div>
   </div>
-  <div v-else-if="match && !judge" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
-    <CodeForm v-model="judgeCode" title="Judge Code" @submit="submitCode" :error="codeError" />
+  <div v-else-if="!judge" class="fixed top-16 bottom-0 w-full flex flex-col items-center justify-center">
+    <CodeForm v-model="judgeInput" title="Judge Code" @submit="submitCode" :error="codeError" />
   </div>
   <PublicContainer v-else-if="match">
     <div class="grow" style="height: 300px">
@@ -26,7 +22,7 @@
               <div>{{ match ? getGroupName(group) : '' }}</div>
             </div>
             <div class="font-bold" v-if="match && group">
-              {{ judge.name }} ({{ judgeNumber }})
+              {{ judge.name }} (Shadow)
             </div>
           </div>
         </template>
@@ -57,17 +53,16 @@
 
 <script setup>
 import { clone } from 'lodash-es';
-import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 
 import { calculateHasMajor, getGroupName, handleServerError, moveList } from '~/src/utils';
-import { UpdateEvents } from '~/src/event-sources';
+import { StatusEvents } from '~/src/event-sources';
 
 definePageMeta({
   layout: 'public'
 });
 
-const DEFAULT_SCORES = { id: '', points: [] };
+const DEFAULT_SCORES = { id: '', judgeNumber: -1, points: [] };
 
 const cookie = useCookie('jkj', { default: () => ({}) });
 const route = useRoute();
@@ -79,15 +74,9 @@ const inviteCode = computed(() => route.params.invite);
 const matNumber = computed(() => route.params.mat);
 const judgeNumber = computed(() => route.params.judge);
 
+const judgeInput = ref('');
 const error = ref('');
-const tournament = ref(undefined);
-const match = ref(undefined);
-const group = ref(undefined);
-const state = ref(undefined);
-const codeError = ref('');
-const loading = ref(true);
-const judge = ref(undefined);
-const inAction = ref(false);
+const inAction = ref(true);
 
 const moves = computed(() => group.value ? moveList(group.value.kata) : []);
 
@@ -101,13 +90,16 @@ const judgeCode = computed({
 });
 
 const status = computed(() => {
-  if (loading.value) {
-    return 'Loading match info ...';
+  if (codeError.value) {
+    return '';
+  }
+  if (inAction.value) {
+    return 'Loading...'
   }
   if (!tournament.value) {
     return error.value;
   }
-  if (scores.value.matchIndex === -1) {
+  if (!group.value && !match.value) {
     return 'No more matches';
   }
   if (judgeNumber.value > group.value.numberOfJudges) {
@@ -116,33 +108,57 @@ const status = computed(() => {
   if (!match.value.completed && state.value[judgeNumber.value - 1]) {
     return 'Please wait until all judges have submitted their score...';
   }
+
+  if (scores.value.points.length === 0) {
+    return 'Loading next match...'
+  }
   return '';
 });
 
 const canSubmit = computed(() => {
   return scores.value.points.every((score) => score.dirty);
 });
-const hasMajor = computed(() => calculateHasMajor(scores.value.points));
 
-async function submitCode() {
-  try {
-    inAction.value = true;
-    codeError.value = '';
-    judge.value = await $fetch(`/api/invites/${inviteCode.value}/${matNumber.value}/${judgeCode.value}`);
-  } catch (err) {
-    codeError.value = handleServerError(err);
-  } finally {
+const hasMajor = computed(() => calculateHasMajor(scores.value.points));
+const codeError = computed(() => judgeError.value ? handleServerError(judgeError.value) : '');
+
+const { data: judge, error: judgeError, clear: clearJudge } = await useAsyncData('judge', () => {
+  if (judgeCode.value) {
+    return $fetch(`/api/invites/${inviteCode.value}/${matNumber.value}/${judgeCode.value}`);
+  }
+}, { watch: [judgeCode] });
+
+const { data, status: dataStatus, error: dataError, refresh: refreshData, clear: clearData } = await useAsyncData('match', () => {
+  return $fetch(`/api/invites/${inviteCode.value}/${matNumber.value}/match`);
+}, { watch: [judge] });
+
+const tournament = computed(() => data.value ? data.value.tournament : undefined);
+const group = computed(() => data.value ? data.value.group : undefined);
+const match = computed(() => data.value ? data.value.match : undefined);
+const state = computed(() => data.value ? data.value.state : undefined);
+
+watch(match, () => {
+  if (match.value) {
     inAction.value = false;
   }
+  if (group.value) {
+    if (scores.value.points.length === 0 || judgeNumber.value !== scores.value.judgeNumber) {
+      scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
+      scores.value.judgeNumber = judgeNumber.value;
+    }
+  }
+}, { immediate: true });
+
+async function submitCode() {
+  judgeCode.value = judgeInput.value;
 }
 
 async function changeJudge() {
-  judge.value = undefined;
+  clearJudge();
+  judgeInput.value = '';
   judgeCode.value = '';
-  scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
-  if (event) {
-    event.close();
-  }
+  scores.value.id = '';
+  scores.value.points = [];
 }
 
 async function showSubmit() {
@@ -159,64 +175,30 @@ async function showSubmit() {
 
 async function submitScore() {
   try {
-    inAction.value = true;
     const body = _scoreToPayload();
-    const response = await $fetch(`/api/invites/${inviteCode.value}/${matNumber.value}/${judgeNumber.value}`, { method: 'POST', body });
-    state.value = response;
-    scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill('') }));
-  } catch (err) {
-    toast.add({ severity: 'error', summary: 'Error', detail: handleServerError(err), life: 5000 });
-  } finally {
-    inAction.value = false;
-  }
-}
-
-if (judgeCode.value) {
-  await submitCode();
-}
-
-/**
- * @type UpdateEvents
- */
-let event = new UpdateEvents(matNumber.value, inviteCode.value);
-onMounted(async () => {
-  if (scores.value.mat !== matNumber.value || scores.value.judge !== judgeNumber.value) {
-    scores.value = clone(DEFAULT_SCORES);
-    scores.value.mat = matNumber.value;
-    scores.value.judge = judgeNumber.value;
-  }
-  event.connect((data) => {
-    loading.value = false;
-    if (data.error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: data.error, life: 5000 });
-      event.close();
+    const state = await $fetch(`/api/invites/${inviteCode.value}/${matNumber.value}/submit`, { method: 'POST', body });
+    scores.value.points = [];
+    data.value.state = state;
+    const complete = state.every((s) => s);
+    if (complete) {
+      refreshData();
       return;
     }
-
-    if (data.tournament) {
-      tournament.value = data.tournament;
-    }
-    group.value = data.group;
-    match.value = data.match;
-    state.value = data.state;
-
-    if (data.matchIndex !== scores.value.matchIndex || data.groupIndex !== scores.value.groupIndex) {
-      scores.value.points = Array(moves.value.length).fill('').map(() => ({ deductions: Array(6).fill(''), dirty: false }));
-    }
-
-    scores.value.matchIndex = data.matchIndex;
-    scores.value.groupIndex = data.groupIndex;
-  });
-});
-
-onUnmounted(() => {
-  if (event) {
-    event.close();
+    let event = new StatusEvents(matNumber.value, inviteCode.value);
+    event.connect((data) => {
+      const complete = data.every((s) => s);
+      if (complete) {
+        event.close();
+        refreshData();
+      }
+    });
+  } catch (err) {
+    toast.add({ severity: 'error', summary: 'Error', detail: handleServerError(err), life: 5000 });
   }
-});
+}
 
 function _scoreToPayload() {
-  const payload = { id: match.value.id };
+  const payload = { id: match.value.id, judgeNumber: judgeNumber.value };
   const judgeData = { id: judge.value.id, name: judge.value.name, scores: [] };
   for (const score of scores.value.points) {
     judgeData.scores.push({ deductions: (score.deductions || Array(6).fill('')).join(':') });

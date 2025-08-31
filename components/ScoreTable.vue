@@ -1,89 +1,94 @@
 <template>
+  <PrimeCard class="mb-2">
+    <template #content>
+      <slot name="header" />
+    </template>
+  </PrimeCard>
   <PrimePanel>
     <template #header>
-      <slot name="header" />
+      <slot name="footer" />
     </template>
     <template #footer>
       <slot name="footer" />
     </template>
-    <PrimeDataTable show-gridlines scrollable scroll-height="flex" row-group-mode="rowspan" group-rows-by="g"
-      :value="display" :row-class="techniqueColour">
+    <PrimeDataTable size="small" show-gridlines scrollable scroll-height="flex" row-group-mode="rowspan"
+      group-rows-by="g" :value="display" style="font-size: clamp(1rem, 3vw, 4rem)" :row-class="techniqueColour">
       <PrimeColumnGroup type="header">
         <PrimeRow>
           <PrimeColumn :header="$t('labels.techniques')" :colspan="3" />
-          <PrimeColumn header="S" header-class="!bg-yellow-300/25 kj-center" />
-          <PrimeColumn header="S" header-class="!bg-yellow-300/25 kj-center" />
-          <PrimeColumn v-if="!group.disableMajor" header="M" header-class="!bg-green-300/25 kj-center" />
-          <PrimeColumn header="B" header-class="!bg-orange-300/25 kj-center" />
-          <PrimeColumn header="+" header-class="!bg-blue-300/25 kj-center" />
-          <PrimeColumn header="-" header-class="!bg-blue-300/25 kj-center" />
-          <PrimeColumn v-if="!group.disableForgotten" header="F" header-class="!bg-red-300/25 kj-center" />
-          <PrimeColumn header="" />
+          <PrimeColumn header="S" header-class="!bg-yellow-300/25 w-[6vw] kj-center" />
+          <PrimeColumn header="S" header-class="!bg-yellow-300/25 w-[6vw] kj-center" />
+          <PrimeColumn v-if="!group.disableMajor" header="M" header-class="!bg-green-300/25 w-[6vw] kj-center" />
+          <PrimeColumn header="B" header-class="!bg-orange-300/25 w-[6vw] kj-center" />
+          <PrimeColumn header="+" header-class="!bg-blue-300/25 w-[6vw] kj-center" />
+          <PrimeColumn header="-" header-class="!bg-blue-300/25 w-[6vw] kj-center" />
+          <PrimeColumn v-if="!group.disableForgotten" header="F" header-class="!bg-red-300/25 w-[6vw] kj-center" />
+          <PrimeColumn header="" header-class="w-[8vw]" />
         </PrimeRow>
       </PrimeColumnGroup>
-      <PrimeColumn header="" class="w-12 text-center">
+      <PrimeColumn header="" class="w-[1vw] !py-0 !px-2 !text-center">
         <template #body="{ index }">{{ index + 1 }}</template>
       </PrimeColumn>
-      <PrimeColumn field="g" header="" class="w-12">
+      <PrimeColumn field="g" header="" class="!p-0 !text-center">
         <template #body="{ index }">
           <span style="writing-mode: vertical-lr;">{{ moves[index].g }}</span>
         </template>
       </PrimeColumn>
-      <PrimeColumn header="Technique" class="min-w-60 md:min-w-80">
+      <PrimeColumn header="Technique" class="!pl-2 !p-0">
         <template #body="{ index }">
           <span>{{ moves[index].t }}</span>
         </template>
       </PrimeColumn>
-      <PrimeColumn header="S" bodyClass="w-16 !p-0 bg-yellow-300/25">
+      <PrimeColumn header="S" bodyClass="!p-0 bg-yellow-300/25 relative">
         <template #body="{ index }">
           <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[0]"
             @click.prevent="toggleScore(scores.points[index], 0)" hint="S" />
         </template>
       </PrimeColumn>
-      <PrimeColumn header="S" bodyClass="w-16 !p-0 bg-yellow-300/25">
+      <PrimeColumn header="S" bodyClass="relative !p-0 bg-yellow-300/25">
         <template #body="{ index }">
           <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[1]"
             @click.prevent="toggleScore(scores.points[index], 1)" hint="S" />
         </template>
       </PrimeColumn>
-      <PrimeColumn header="M" bodyClass="w-16 !p-0 bg-green-300/25">
+      <PrimeColumn header="M" bodyClass="relative !p-0 bg-green-300/25">
         <template #body="{ index }">
           <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[2]"
             @click.prevent="toggleScore(scores.points[index], 2)" hint="M" />
         </template>
       </PrimeColumn>
-      <PrimeColumn v-if="!group.disableMajor" header="B" bodyClass="w-16 !p-0 bg-orange-300/25">
+      <PrimeColumn v-if="!group.disableMajor" header="B" bodyClass="relative !p-0 bg-orange-300/25">
         <template #body="{ index }">
           <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[3]"
             @click.prevent="toggleScore(scores.points[index], 3)" hint="B" />
         </template>
       </PrimeColumn>
-      <PrimeColumn header="+" bodyClass="w-16 !p-0 bg-blue-300/25" headerClass="!bg-blue-300/25"
-        :pt="{ headercontent: 'justify-center' }" :pt-options="{ mergeProps: true }">
+      <PrimeColumn header="+" bodyClass="!p-0 relative bg-blue-300/25" :pt="{ headercontent: 'justify-center' }"
+        :pt-options="{ mergeProps: true }">
         <template #body="{ index }">
           <ScoreTableCell :binary="scores.points[index].deductions[5] !== '+'"
             v-model="scores.points[index].deductions[5]" @click.prevent="toggleScore(scores.points[index], 5)"
             hint="+" />
         </template>
       </PrimeColumn>
-      <PrimeColumn header="-" bodyClass="w-16 !p-0 bg-blue-300/25">
+      <PrimeColumn header="-" bodyClass="!p-0 relative bg-blue-300/25">
         <template #body="{ index }">
           <ScoreTableCell :binary="scores.points[index].deductions[5] !== '-'"
             v-model="scores.points[index].deductions[5]" @click.prevent="toggleScore(scores.points[index], 6)"
             hint="-" />
         </template>
       </PrimeColumn>
-      <PrimeColumn v-if="!group.disableForgotten" header="F" bodyClass="w-16 !p-0 bg-red-300/25">
+      <PrimeColumn v-if="!group.disableForgotten" header="F" bodyClass="relative !p-0 bg-red-300/25">
         <template #body="{ index }">
           <ScoreTableCell :binary="true" v-model="scores.points[index].deductions[4]"
             @click.prevent="toggleScore(scores.points[index], 4)" />
         </template>
       </PrimeColumn>
-      <PrimeColumn field="value" header="Score" class="w-40 lg:w-32 !text-right" />
+      <PrimeColumn field="value" header="Score" class="!p-0 !pr-1 !text-right" />
       <PrimeColumnGroup type="footer">
         <PrimeRow>
           <PrimeColumn :footer="$t('public.judge.total')" :colspan="totalSpan" footer-class="!text-right" />
-          <PrimeColumn :footer="total" footer-class="!text-right" />
+          <PrimeColumn :footer="total" footer-class="!p-0 !pr-1 !text-right" />
         </PrimeRow>
       </PrimeColumnGroup>
     </PrimeDataTable>
@@ -135,7 +140,6 @@ function techniqueColour(score) {
   if (score) {
     if (score.deductions && score.deductions[4] === '1') {
       return '!bg-red-500';
-      // return '!text-red-500 !dark:text-red-300 !font-bold';
     } else if (!score.dirty) {
       return '!bg-gray-400/25';
     }
@@ -172,14 +176,9 @@ async function toggleScore(score, index) {
 }
 </script>
 
-<style scoped>
-.score {
+<style scoped lang="pcss">
+/* .score {
   @apply px-0 text-center py-3;
-}
-
-th,
-td {
-  @apply border;
 }
 
 th.score {
@@ -188,5 +187,5 @@ th.score {
 
 td.score {
   @apply py-3 px-3;
-}
+} */
 </style>

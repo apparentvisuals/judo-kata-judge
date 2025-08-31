@@ -5,21 +5,21 @@ export default defineEventHandler(async (event) => {
   const invite = getRouterParam(event, 'invite');
   const judgeId = getRouterParam(event, 'judge');
   if (!judgeId) {
-    return createError({ statusCode: 404, message: 'Judge not found' });
+    return createError({ statusCode: 404, statusMessage: 'Judge not found' });
   }
 
   const inviteData = await Invite.get(invite);
   if (!inviteData) {
-    return createError({ statusCode: 404, message: 'Judge not found' });
+    return createError({ statusCode: 404, statusMessage: 'Judge not found' });
   }
 
   try {
     const judge = await Judge.get(judgeId.toUpperCase());
     if (!judge) {
-      return createError({ statusCode: 404, message: 'Judge not found' });
+      return createError({ statusCode: 404, statusMessage: 'Judge not found', });
     }
     return judge;
   } catch (err) {
-    return createError({ statusCode: 400, message: err.message });
+    return createError({ statusCode: 400, statusMessage: err.message });
   }
 });
