@@ -179,7 +179,6 @@ async function downloadResults(index) {
   const tournament = tournaments.value[index];
   const id = tournament.id;
   const tournamentDetails = await $fetch(`/api/tournaments/${id}`, { headers });
-  console.log(tournamentDetails);
   const workbook = XLSX.utils.book_new();
   tournamentDetails.mats.forEach((mat) => {
     mat.groups.forEach((group) => {
