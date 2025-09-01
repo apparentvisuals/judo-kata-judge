@@ -23,6 +23,8 @@
         <PrimeColumn field="actions" frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
           <template #body="{ data, index }">
             <div class="flex gap-2">
+              <PrimeButton icon="pi pi-book" severity="secondary" title="Results"
+                @click.prevent="downloadResults(index)" />
               <PrimeButton icon="pi pi-check" severity="secondary" title="Complete"
                 @click.prevent="toggleComplete(index)" />
               <PrimeButton icon="pi pi-box" severity="secondary" title="Archive"
@@ -48,6 +50,7 @@
 
 <script setup>
 import { pickBy } from 'lodash-es';
+import XLSX from "xlsx";
 
 import { getOrganization, handleServerError } from '~/src/utils';
 
@@ -170,6 +173,24 @@ async function toggleArchive(index) {
   } finally {
     inAction.value = false;
   }
+}
+
+async function downloadResults(index) {
+  const tournament = tournaments.value[index];
+  const id = tournament.id;
+  const tournamentDetails = await $fetch(`/api/tournaments/${id}`, { headers });
+  console.log(tournamentDetails);
+  const workbook = XLSX.utils.book_new();
+  tournamentDetails.mats.forEach((mat) => {
+    mat.groups.forEach((group) => {
+      const matchDetails = group.matches.map((match) => {
+        return { tori: match.tori, uke: match.uke, 1: match.summary.scores[0], 2: match.summary.scores[1], 3: match.summary.scores[2], 4: match.summary.scores[3], 5: match.summary.scores[4], total: match.summary.total };
+      });
+      const worksheet = XLSX.utils.json_to_sheet(matchDetails, { header: ['tori', 'uke', '1', '2', '3', '4', '5', 'total'] });
+      XLSX.utils.book_append_sheet(workbook, worksheet, group.name.substring(0, 31));
+    });
+  });
+  XLSX.writeFile(workbook, `${tournamentDetails.name}.xlsx`, { compression: true });
 }
 
 function _filterUpdate(value, key, original) {
