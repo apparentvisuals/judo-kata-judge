@@ -5,7 +5,7 @@
     <PrimeToolbar>
       <template #start>
         <div class="flex items-center gap-2">
-          <span>{{ tournament.name }}</span>
+          <span>{{ adjustedTournament.name }}</span>
           <PrimeButton icon="pi pi-plus" :label="$t('buttons.addMat')" @click.prevent="addMat" title="Add Mat">
           </PrimeButton>
           <PrimeButton icon="pi pi-envelope" :label="$t('buttons.inviteLink')" @click.prevent="createInvite"
@@ -22,7 +22,7 @@
           @click.prevent="save" :aria-label="isReordering ? $t('buttons.save') : $t('buttons.reorder')" />
       </template>
     </PrimeToolbar>
-    <PrimePanel v-for="(mat, matIndex) in tournament.mats" toggleable class="mt-2">
+    <PrimePanel v-for="(mat, matIndex) in adjustedTournament.mats" toggleable class="mt-2">
       <template #header>
         <span class="flex items-center justify-between w-full">
           <h2 class="font-medium">Mat {{ matIndex + 1 }}</h2>
@@ -61,24 +61,24 @@
             </div>
           </template>
         </PrimeColumn>
-        <template #expansion="{ data, index }">
+        <template #expansion="{ data, index: groupIndex }">
           <PrimeDataTable :value="data.matches" @row-reorder="data.matchReorder" data-key="id">
             <PrimeColumn v-if="isReordering" row-reorder class="w-2" />
             <PrimeColumn field="tori" :header="$t('labels.tori')" />
             <PrimeColumn field="uke" :header="$t('labels.uke')" />
             <PrimeColumn field="actions" :header="$t('labels.actions')" class="w-20">
-              <template #body="{ data: match }">
+              <template #body="{ data: match, index: matchIndex }">
                 <div class="flex justify-center gap-2">
                   <NuxtLink v-if="!isReordering"
-                    :to="`/admin/t/${tournament.id}/${matIndex}/${match.groupIndex}/${index}`" target="_blank"
+                    :to="`/admin/t/${adjustedTournament.id}/${matIndex}/${groupIndex}/${matchIndex}`" target="_blank"
                     :title="$t('buttons.results')" class="p-button p-component p-button-icon-only">
                     <i class="pi pi-book" />
                   </NuxtLink>
                   <PrimeButton v-if="!isReordering" icon="pi pi-pencil" severity="secondary"
-                    @click.prvent="showUpdateMatch(matIndex, match.groupIndex, index, match)"
+                    @click.prvent="showUpdateMatch(matIndex, groupIndex, matchIndex, match)"
                     :disabled="match.completed || inAction" :title="$t('buttons.editMatch')" />
                   <PrimeButton v-if="!isReordering" icon="pi pi-times" severity="danger"
-                    @click.prevent="showDeleteMatch(matIndex, match.groupIndex, index)"
+                    @click.prevent="showDeleteMatch(matIndex, groupIndex, matchIndex)"
                     :disabled="match.completed || inAction" :title="$t('buttons.deleteMatch')" />
                 </div>
               </template>
@@ -134,8 +134,8 @@ const tournamentId = computed(() => route.params.tournament);
 const headers = computed(() => ({ authorization: `Bearer ${cookie.value.adminCode}` }));
 
 const invite = computed(() => {
-  if (tournament.value.invites) {
-    const inviteCodes = Object.keys(tournament.value.invites);
+  if (adjustedTournament.value.invites) {
+    const inviteCodes = Object.keys(adjustedTournament.value.invites);
     if (inviteCodes.length > 0) {
       return inviteCodes[0];
     }
@@ -157,7 +157,7 @@ async function createInvite() {
     const response = await $fetch(`/api/tournaments/${tournamentId.value}/invite`, { headers: headers.value });
     const newInviteCode = {};
     newInviteCode[response.id] = {};
-    tournament.value.invites = Object.assign({}, tournament.value.invites, newInviteCode);
+    tournament.value.invites = Object.assign({}, adjustedTournament.value.invites, newInviteCode);
   }
   inviteVisible.value = true;
 }
@@ -185,7 +185,7 @@ async function cancel() {
 
 async function save() {
   if (isReordering.value) {
-    const body = _tournamentToPayload(tournament.value);
+    const body = _tournamentToPayload(adjustedTournament.value);
     try {
       error.value = '';
       const response = await $fetch(`/api/tournaments/${tournamentId.value}`, { method: 'POST', body, headers: headers.value });
@@ -246,12 +246,12 @@ async function showDeleteGroup(mat, group) {
 }
 
 function canRandomize(matIndex, groupIndex) {
-  const matches = tournament.value.mats[matIndex].groups[groupIndex].matches;
+  const matches = adjustedTournament.value.mats[matIndex].groups[groupIndex].matches;
   return matches.every((match) => !match.completed);
 }
 
 function randomizeGroup(matIndex, groupIndex) {
-  const matches = tournament.value.mats[matIndex].groups[groupIndex].matches;
+  const matches = adjustedTournament.value.mats[matIndex].groups[groupIndex].matches;
   shuffle(matches);
 }
 
@@ -316,19 +316,23 @@ function _tournamentToPayload(tournament) {
   return tournament;
 }
 
-onMounted(() => {
-  tournament.value.mats.forEach((mat) => {
-    mat.groupReorder = (event) => {
-      mat.groups = event.value;
-    };
-    mat.groups.forEach((group, groupIndex) => {
-      group.matchReorder = (event) => {
-        group.matches = event.value;
-      };
-      group.matches.forEach((match) => {
-        match.groupIndex = groupIndex;
+const adjustedTournament = computed(() => {
+  if (tournament.value) {
+    const mats = tournament.value.mats.map((mat) => {
+      const groups = mat.groups.map((group) => {
+        return {
+          ...group, matchReorder: (event) => {
+            group.matches = event.value;
+          }
+        };
       });
+      return {
+        ...mat, groups, groupReorder: (event) => {
+          mat.groups = event.value;
+        }
+      }
     });
-  });
+    return { ...tournament.value, mats };
+  }
 });
 </script>
