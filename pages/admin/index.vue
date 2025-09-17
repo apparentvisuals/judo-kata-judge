@@ -231,7 +231,7 @@ async function downloadTechniqueResults(index) {
         for (const [matchIndex, match] of group.matches.entries()) {
           for (let ii = 0; ii < numberOfJudges; ii++) {
             if (match.completed) {
-              matchData[`${matchIndex + 1}-${ii + 1}`] = calculateMoveScore(match.scores[ii].scores[index].deductions);
+              matchData[`${matchIndex + 1}-${ii + 1}`] = calculateMoveScore(match.scores[ii].scores[index].deductions.split(':'));
             } else {
               matchData[`${matchIndex + 1}-${ii + 1}`] = '';
             }
