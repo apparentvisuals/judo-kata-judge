@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     PrimeAutoComplete: typeof import('primevue/autocomplete')['default']
     PrimeButton: typeof import('primevue/button')['default']
+    PrimeButtonGroup: typeof import('primevue/buttongroup')['default']
     PrimeCard: typeof import('primevue/card')['default']
     PrimeCheckbox: typeof import('primevue/checkbox')['default']
     PrimeColumn: typeof import('primevue/column')['default']
@@ -35,6 +36,7 @@ declare module 'vue' {
     PrimeRow: typeof import('primevue/row')['default']
     PrimeSelect: typeof import('primevue/select')['default']
     PrimeSelectButton: typeof import('primevue/selectbutton')['default']
+    PrimeSplitButton: typeof import('primevue/splitbutton')['default']
     PrimeTab: typeof import('primevue/tab')['default']
     PrimeTabList: typeof import('primevue/tablist')['default']
     PrimeTabs: typeof import('primevue/tabs')['default']

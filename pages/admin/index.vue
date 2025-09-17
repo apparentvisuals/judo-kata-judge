@@ -20,14 +20,20 @@
             {{ getOrganization(data.org) }}
           </template>
         </PrimeColumn>
-        <PrimeColumn field="actions" frozen alignFrozen="right" :header="$t('labels.actions')" class="w-20">
+        <PrimeColumn field="actions" frozen alignFrozen="right" :header="$t('labels.actions')" class="w-[32rem]">
           <template #body="{ data, index }">
             <div class="flex gap-2">
-              <PrimeButton icon="pi pi-book" severity="secondary" title="Results"
-                @click.prevent="downloadResults(index)" />
-              <PrimeButton icon="pi pi-check" severity="secondary" title="Complete"
+              <PrimeButtonGroup>
+                <PrimeButton icon="pi pi-book" severity="secondary" title="Results Total" label="Total"
+                  @click.prevent="downloadTotalResults(index)" />
+                <!-- <PrimeButton severity="secondary" title="Results Count" label="Count"
+                  @click.prevent="downloadCountResults(index)" /> -->
+                <PrimeButton severity="secondary" title="Results Technique" label="Technique"
+                  @click.prevent="downloadTechniqueResults(index)" />
+              </PrimeButtonGroup>
+              <PrimeButton icon="pi pi-check" :severity="data.complete ? 'warn' : 'secondary'" title="Complete"
                 @click.prevent="toggleComplete(index)" />
-              <PrimeButton icon="pi pi-box" severity="secondary" title="Archive"
+              <PrimeButton icon="pi pi-box" :severity="data.archive ? 'warn' : 'secondary'" title="Archive"
                 @click.prevent="toggleArchive(index)" />
               <PrimeButton :disabled="data.complete || inAction" icon="pi pi-pencil" @click.prevent="showUpdate(index)"
                 title="Edit" />
@@ -52,7 +58,7 @@
 import { pickBy } from 'lodash-es';
 import XLSX from "xlsx";
 
-import { getOrganization, handleServerError } from '~/src/utils';
+import { calculateMoveScore, getGroupName, getOrganization, handleServerError, moveList } from '~/src/utils';
 
 useHead({
   title: 'Tournaments - Kata Admin',
@@ -175,21 +181,69 @@ async function toggleArchive(index) {
   }
 }
 
-async function downloadResults(index) {
+async function downloadTotalResults(index) {
   const tournament = tournaments.value[index];
   const id = tournament.id;
   const tournamentDetails = await $fetch(`/api/tournaments/${id}`, { headers });
   const workbook = XLSX.utils.book_new();
   tournamentDetails.mats.forEach((mat) => {
     mat.groups.forEach((group) => {
+      const options = { header: ['tori', 'uke'] };
+      for (let ii = 0; ii < group.numberOfJudges; ii++) {
+        options.header.push(`${ii + 1}`);
+      }
+      options.header.push('total');
       const matchDetails = group.matches.map((match) => {
-        return { tori: match.tori, uke: match.uke, 1: match.summary.scores[0], 2: match.summary.scores[1], 3: match.summary.scores[2], 4: match.summary.scores[3], 5: match.summary.scores[4], total: match.summary.total };
+        const data = { tori: match.tori, uke: match.uke };
+        if (match.completed) {
+          for (let ii = 0; ii < group.numberOfJudges; ii++) {
+            data[`${ii + 1}`] = match.summary.scores[ii];
+          }
+          data.total = match.summary.total;
+        }
+        return data;
       });
-      const worksheet = XLSX.utils.json_to_sheet(matchDetails, { header: ['tori', 'uke', '1', '2', '3', '4', '5', 'total'] });
-      XLSX.utils.book_append_sheet(workbook, worksheet, group.name.substring(0, 31));
+      const worksheet = XLSX.utils.json_to_sheet(matchDetails, options);
+      XLSX.utils.book_append_sheet(workbook, worksheet, getGroupName(group).substring(0, 31));
     });
   });
-  XLSX.writeFile(workbook, `${tournamentDetails.name}.xlsx`, { compression: true });
+  XLSX.writeFile(workbook, `${tournamentDetails.name} Total.xlsx`, { compression: true });
+}
+
+async function downloadTechniqueResults(index) {
+  const tournament = tournaments.value[index];
+  const id = tournament.id;
+  const tournamentDetails = await $fetch(`/api/tournaments/${id}/details`, { headers });
+  const workbook = XLSX.utils.book_new();
+  tournamentDetails.mats.forEach((mat) => {
+    mat.groups.forEach((group) => {
+      const moves = moveList(group.kata);
+      const numberOfJudges = group.numberOfJudges;
+      const data = [];
+      const options = { header: ['technique'] };
+      for (let g = 0; g < group.matches.length; g++) {
+        for (let ii = 0; ii < numberOfJudges; ii++) {
+          options.header.push(`${g + 1}-${ii + 1}`);
+        }
+      }
+      for (const [index, move] of moves.entries()) {
+        const matchData = { technique: move };
+        for (const [matchIndex, match] of group.matches.entries()) {
+          for (let ii = 0; ii < numberOfJudges; ii++) {
+            if (match.completed) {
+              matchData[`${matchIndex + 1}-${ii + 1}`] = calculateMoveScore(match.scores[ii].scores[index].deductions);
+            } else {
+              matchData[`${matchIndex + 1}-${ii + 1}`] = '';
+            }
+          }
+        }
+        data.push(matchData);
+      }
+      const worksheet = XLSX.utils.json_to_sheet(data, options);
+      XLSX.utils.book_append_sheet(workbook, worksheet, getGroupName(group).substring(0, 31));
+    });
+  });
+  XLSX.writeFile(workbook, `${tournamentDetails.name} Technique.xlsx`, { compression: true });
 }
 
 function _filterUpdate(value, key, original) {
