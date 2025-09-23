@@ -4,9 +4,14 @@
       <PrimeInputText id="name" name="name" fluid autofocus />
       <label for="name">Name</label>
     </PrimeIftaLabel>
+    <PrimeIftaLabel>
+      <PrimeSelect input-id="region" name="region" :options="objectToPairs(PROVINCE_MAP)" option-label="value"
+        option-value="key" fluid />
+      <label for="region">Region</label>
+    </PrimeIftaLabel>
     <PrimeIftaLabel v-for="key of ['nnk', 'knk', 'jnk', 'kgj', 'kink', 'konk', 'ink']" :key>
-      <PrimeSelect :input-id="key" :name="key" :options="objectToPairs(LEVEL_MAP)" option-label="value"
-        option-value="key" fluid show-clear />
+      <PrimeSelect :input-id="key" :name="key" :options="certificationLevels" option-label="value" option-value="key"
+        fluid />
       <label :for="key">{{ getKataName(key) }}</label>
     </PrimeIftaLabel>
     <div class="flex justify-end gap-2">
@@ -18,8 +23,7 @@
 
 <script setup>
 import { Form as PrimeForm } from '@primevue/forms';
-import { KATA_MAP, LEVEL_MAP, PROVINCE_MAP, getKataName, getLevelName, getProvinceName } from '~/src/utils';
-import { objectToPairs } from '../src/utils';
+import { LEVEL_MAP, PROVINCE_MAP, getKataName, getLevelName, objectToPairs } from '~/src/utils';
 
 const prop = defineProps(['judge']);
 const emit = defineEmits(['submit', 'cancel']);
@@ -60,4 +64,14 @@ const onSubmit = ({ valid, values }) => {
 const onCancel = () => {
   emit('cancel');
 };
+
+const certificationLevels = computed(() => {
+  return Object.entries(LEVEL_MAP).map(([key, value]) => {
+    if (key === '') {
+      return { key: '', value: 'Not Certified' };
+    } else {
+      return { key, value };
+    }
+  });
+});
 </script>

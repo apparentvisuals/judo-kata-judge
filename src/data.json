@@ -47,8 +47,10 @@
     "us": "United States"
   },
   "judgeLevels": {
+    "": "",
     "p": "Provincial",
-    "n": "National",
+    "n": "National A",
+    "n2": "National B",
     "pjc": "PJC",
     "ijf": "IJF"
   },
