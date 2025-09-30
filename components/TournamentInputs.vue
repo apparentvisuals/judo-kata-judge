@@ -51,6 +51,7 @@ const resolver = ({ values }) => {
 
 const onSubmit = ({ valid, values }) => {
   if (valid) {
+    values.org = prop.org;
     emit('submit', values);
   }
 };

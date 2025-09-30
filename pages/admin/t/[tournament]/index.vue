@@ -52,6 +52,8 @@
               <PrimeButton v-if="isReordering" icon="pi pi-sync" :disabled="!canRandomize(matIndex, groupIndex)"
                 @click.prevent="randomizeGroup(matIndex, groupIndex)" :aria-label="$t('buttons.randomize')"
                 :title="$t('buttons.randomize')" />
+              <PrimeButton v-if="isReordering" icon="pi pi-sort" @click="toggleMenu($event, matIndex, groupIndex)" />
+              <PrimeMenu ref="matMenu" id="matMenu" :model="matMenuItems" :popup="true" />
               <PrimeButton v-if="!isReordering" icon="pi pi-pencil" severity="secondary"
                 @click.prvent="showUpdateGroup(matIndex, groupIndex, group)" :aria-label="$t('buttons.editGroup')"
                 :title="$t('buttons.editGroup')" />
@@ -115,6 +117,7 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 const confirm = useConfirm();
 const { t } = useI18n();
 
+const matMenu = ref();
 const error = ref('');
 const inAction = ref(false);
 const matToEdit = ref();
@@ -145,6 +148,35 @@ const invitePath = computed(() => {
   if (invite.value) {
     return `/i/${invite.value}`;
   }
+});
+
+const adjustedTournament = computed(() => {
+  if (tournament.value) {
+    const mats = tournament.value.mats.map((mat) => {
+      const groups = mat.groups.map((group) => {
+        return {
+          ...group, matchReorder: (event) => {
+            group.matches = event.value;
+          }
+        };
+      });
+      return {
+        ...mat, groups, groupReorder: (event) => {
+          mat.groups = event.value;
+        }
+      }
+    });
+    return { ...tournament.value, mats };
+  }
+});
+
+const matMenuItems = computed(() => {
+  return [{
+    label: 'Mats',
+    items: adjustedTournament.value.mats.map((mat, index) => {
+      return { label: `Move to Mat ${index + 1}`, command: () => moveGroup(matToEdit.value, groupToEdit.value, index) };
+    }),
+  }];
 });
 
 async function addMat() {
@@ -301,6 +333,18 @@ async function showDeleteMatch(mat, group, match) {
   });
 }
 
+const moveGroup = async (matIndex, groupIndex, newMatIndex) => {
+  if (matIndex !== undefined && groupIndex !== undefined && newMatIndex !== undefined && matIndex !== newMatIndex) {
+    tournament.value.mats[newMatIndex].groups.push(tournament.value.mats[matIndex].groups[groupIndex]);
+    tournament.value.mats[matIndex].groups.splice(groupIndex, 1);
+  }
+}
+
+const toggleMenu = (event, matIndex, groupIndex) => {
+  matToEdit.value = matIndex;
+  groupToEdit.value = groupIndex;
+  matMenu.value[0].toggle(event);
+}
 
 const { data: tournament, error: tError } = await useFetch(`/api/tournaments/${tournamentId.value}`, { headers: headers.value });
 watch(tError, (error) => {
@@ -316,23 +360,4 @@ function _tournamentToPayload(tournament) {
   return tournament;
 }
 
-const adjustedTournament = computed(() => {
-  if (tournament.value) {
-    const mats = tournament.value.mats.map((mat) => {
-      const groups = mat.groups.map((group) => {
-        return {
-          ...group, matchReorder: (event) => {
-            group.matches = event.value;
-          }
-        };
-      });
-      return {
-        ...mat, groups, groupReorder: (event) => {
-          mat.groups = event.value;
-        }
-      }
-    });
-    return { ...tournament.value, mats };
-  }
-});
 </script>

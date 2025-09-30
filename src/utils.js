@@ -68,6 +68,10 @@ export function duration(kata) {
     case 'ko6':
     case 'ko7':
       return 3;
+    case 'ink':
+      return 4;
+    case 'konk':
+      return 15;
     default:
       return 0;
   }

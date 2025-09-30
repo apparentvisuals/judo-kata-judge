@@ -86,6 +86,7 @@ if (err.value) {
 async function add(data) {
   try {
     inAction.value = true;
+    console.log(data);
     const body = data;
     const tournament = await $fetch(`/api/tournaments`, { method: 'POST', body, headers });
     tournaments.value.push(tournament);

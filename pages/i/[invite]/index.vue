@@ -8,9 +8,15 @@
           :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
           {{ getTitle(item) }}
           <div class="flex gap-2">
-            <NuxtLink :to="getUrl(item)" target="_blank">
-              <PrimeButton icon="pi pi-external-link" :title="$t('public.button.open')"></PrimeButton>
-            </NuxtLink>
+            <!-- <NuxtLink :to="getUrl(item)" target="_blank"> -->
+            <PrimeButton as="a" icon="pi pi-external-link" :title="$t('public.button.open')" :href="getUrl(item)"
+              target="_blank" rel="noopener"></PrimeButton>
+            <!-- </NuxtLink> -->
+            <!-- <NuxtLink v-if="item.v2" :to="getUrlv2(item)" target="_blank"> -->
+            <PrimeButton v-if="item.v2" as="a" icon="pi pi-external-link" label="V2" :title="$t('public.button.open')"
+              :href="getUrlv2(item)" target="_blank" rel="noopener">
+            </PrimeButton>
+            <!-- </NuxtLink> -->
             <PrimeButton icon="pi pi-qrcode" :title="$t('public.button.qr')" @click.prevent="showQr($event, item)" />
           </div>
         </div>
@@ -70,11 +76,12 @@ function _generateMatItems(mat, index) {
   return [
     { title: 'schedule', mat, index },
     { title: 'announce', mat, index },
-    { title: 'judge', judge: 1, mat, index },
-    { title: 'judge', judge: 2, mat, index },
-    { title: 'judge', judge: 3, mat, index },
-    { title: 'judge', judge: 4, mat, index },
-    { title: 'judge', judge: 5, mat, index },
+    { title: 'judge', judge: 1, mat, index, v2: true },
+    { title: 'judge', judge: 2, mat, index, v2: true },
+    { title: 'judge', judge: 3, mat, index, v2: true },
+    { title: 'judge', judge: 4, mat, index, v2: true },
+    { title: 'judge', judge: 5, mat, index, v2: true },
+    { title: 'mock', mat, index },
   ];
 }
 
@@ -88,7 +95,8 @@ function getTitle(data) {
       return `Mat ${data.index + 1} Announce / Announce tapis ${data.index + 1}`;
     case 'judge':
       return `Mat ${data.index + 1} judge ${data.judge} / Tapis ${data.index + 1} juge ${data.judge}`;
-  }
+    case 'mock':
+  }   return `Mat ${data.index + 1} judge mock / Tapis ${data.index + 1} juge simulé`;
 }
 
 function getUrl(data) {
@@ -101,6 +109,15 @@ function getUrl(data) {
       return _genUrl(`/i/${invite.value}/announce/${data.index}`);
     case 'judge':
       return _genUrl(`/i/${invite.value}/judge/${data.index}/${data.judge}`);
+    case 'mock':
+      return _genUrl(`/i/${invite.value}/judge/${data.index}/mock`);
+  }
+}
+
+function getUrlv2(data) {
+  switch (data.title) {
+    case 'judge':
+      return _genUrl(`/i/${invite.value}/judge/${data.index}/v2/${data.judge}`);
   }
 }
 

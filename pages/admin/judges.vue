@@ -6,6 +6,7 @@
       <template #start>
         <PrimeButton icon="pi pi-plus" :label="$t('buttons.addJudge')" :title="$t('buttons.addJudge')"
           @click.prevent="addVisible = true" :disabled="inAction" />
+        <PrimeButton label="Export" @click="exportTable" icon="pi pi-file-excel" class="ml-2" />
       </template>
       <template #end>
         <PrimeIconField>
@@ -17,8 +18,8 @@
       </template>
     </PrimeToolbar>
     <PrimePanel class="mt-2">
-      <PrimeDataTable columnResizeMode="fit" scrollable scrollHeight="flex" :value="judges" data-key="id"
-        v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['id', 'name']">
+      <PrimeDataTable ref="judgesTable" columnResizeMode="fit" scrollable scrollHeight="flex" :value="judges"
+        data-key="id" v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['id', 'name']">
         <PrimeColumn field="id" :header="$t('labels.id')" class="w-10" />
         <PrimeColumn field="name" :header="$t('labels.name')" />
         <PrimeColumn field="region" :header="$t('labels.region')" class="w-48 hidden lg:table-cell"
@@ -72,6 +73,7 @@ const cookie = useCookie('jkj', { default: () => ({}) });
 const confirm = useConfirm();
 const { t } = useI18n();
 
+const judgesTable = ref();
 const error = ref('');
 const inAction = ref(false);
 const toUpdate = ref();
@@ -152,6 +154,10 @@ async function remove(data) {
     },
     reject: () => { },
   });
+}
+
+const exportTable = () => {
+  judgesTable.value.exportCSV();
 }
 
 function _filterUpdate(value, key, original) {

@@ -23,7 +23,7 @@
 
 <script setup>
 import { Form as PrimeForm } from '@primevue/forms';
-import { LEVEL_MAP, PROVINCE_MAP, getKataName, getLevelName, objectToPairs } from '~/src/utils';
+import { LEVEL_MAP, PROVINCE_MAP, getKataName, objectToPairs } from '~/src/utils';
 
 const prop = defineProps(['judge']);
 const emit = defineEmits(['submit', 'cancel']);
@@ -31,7 +31,7 @@ const emit = defineEmits(['submit', 'cancel']);
 const initialValues = reactive({
   name: prop.judge && prop.judge.name || '',
   region: prop.judge && prop.judge.region || 'on',
-  nnk: prop.judge && prop.judge.knk || '',
+  nnk: prop.judge && prop.judge.nnk || '',
   knk: prop.judge && prop.judge.knk || '',
   jnk: prop.judge && prop.judge.jnk || '',
   kgj: prop.judge && prop.judge.kgj || '',
@@ -48,13 +48,6 @@ const resolver = ({ values }) => {
   return { values, errors };
 };
 
-const getLocalLevelName = (level) => {
-  if (!level) {
-    return 'Not certified';
-  }
-  return getLevelName(level);
-};
-
 const onSubmit = ({ valid, values }) => {
   if (valid) {
     emit('submit', values);
@@ -66,12 +59,13 @@ const onCancel = () => {
 };
 
 const certificationLevels = computed(() => {
-  return Object.entries(LEVEL_MAP).map(([key, value]) => {
+  const levels = Object.entries(LEVEL_MAP).map(([key, value]) => {
     if (key === '') {
       return { key: '', value: 'Not Certified' };
     } else {
       return { key, value };
     }
   });
+  return levels;
 });
 </script>

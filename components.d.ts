@@ -27,6 +27,7 @@ declare module 'vue' {
     PrimeInputIcon: typeof import('primevue/inputicon')['default']
     PrimeInputNumber: typeof import('primevue/inputnumber')['default']
     PrimeInputText: typeof import('primevue/inputtext')['default']
+    PrimeMenu: typeof import('primevue/menu')['default']
     PrimeMenubar: typeof import('primevue/menubar')['default']
     PrimeMessage: typeof import('primevue/message')['default']
     PrimeOverlayPanel: typeof import('primevue/overlaypanel')['default']
