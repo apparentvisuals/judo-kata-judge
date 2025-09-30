@@ -9,8 +9,13 @@
           {{ index + 1 }}
         </template>
       </PrimeColumn>
-      <PrimeColumn field="tori" header="Tori" />
-      <PrimeColumn field="uke" header="Uke" />
+      <PrimeColumn field="name" header="Tori / Uke">
+        <template #body="{ data }">
+          <span v-if="data.break" class="italic">Break</span>
+          <span v-else>{{ data.tori }} / {{ data.uke }}</span>
+        </template>
+      </PrimeColumn>
+      <!-- <PrimeColumn field="uke" header="Uke" /> -->
       <PrimeColumn field="startTime" header="Time" class="w-16">
         <template #body="{ data }">
           {{ data.startTime ? `${format(data.startTime, 'HH:mm')}` : '' }}
